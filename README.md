@@ -21,3 +21,25 @@ SchulSystem ist ein modulares Schulverwaltungssystem in Python, das IServ, WebUn
 
 ## 🏗️ Aufbau
 
+EduClass/
+├── main.py # Hauptstartdatei
+├── login.py # Loginfenster
+├── dashboard.py # Zentrale Oberfläche
+├── update_manager.py # Automatisches Update-System
+├── modules/ # Alle Funktionsmodule
+│ ├── stundenplan.py
+│ ├── nachrichten.py
+│ └── ...
+├── data/ # JSON-Dateien zur Datenspeicherung (lokal)
+│ ├── users.json
+│ ├── messages.json
+│ └── ...
+
+
+---
+
+## 🚀 Erste Schritte
+
+1. 🔽 **Download oder Clone** des Repositories:
+   ```bash
+   git clone https://github.com/Lukas1120987/SchulSystem.git
