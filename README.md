@@ -17,8 +17,12 @@
 - ⚙️ **Adminbereich** zur Verwaltung von Nutzern, Gruppen und Einstellungen  
 - 🔄 **Auto-Updater** via GitHub (optional)  
 
-## Nutzung
-git clone https://github.com/Lukas1120987/SchulSystem.git
+## 🚀 Nutzung
+
+1. 🔽 **Download oder Clone** des Repositories:
+   
+bash
+   git clone https://github.com/Lukas1120987
 
 
 ## 🏗️ Aufbau
