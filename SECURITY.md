@@ -13,4 +13,4 @@ Schaue hier nach, welche Versionen mit SIcherheitsfeatures ausgestattet sind.
 
 ## Melden eines Sicherheitsrisiko
 
-Starte in "Report Issue" eine neue Diskussion und beschreibe den Fehler so gut wie möglich
+Starte in  [GitHub-Issue](#)  eine neue Diskussion und beschreibe den Fehler so gut wie möglich
