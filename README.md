@@ -65,6 +65,11 @@ Hier kannst du deinen Benutzernamen ändern, dein Passwort anpassen, Feedback ge
 bash
    git clone https://github.com/Lukas1120987/SchulSystem-EXE
 
+---
+## Kontakt
+per Discord: https://discord.gg/NHgr4FKXE3
+
+---
 
 ## 🏗️ Aufbau
 
