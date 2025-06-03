@@ -4,7 +4,7 @@ import json
 from dashboard import Dashboard
 import random
 from tkinter import simpledialog
-from uploader import check_and_update
+from updater import check_and_update
 
 # Farben
 PRIMARY_BLUE = "#1a73e8"
