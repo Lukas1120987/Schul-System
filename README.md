@@ -66,7 +66,7 @@ Hier kannst du deinen Benutzernamen ändern, dein Passwort anpassen, Feedback ge
 1. 🔽 **Download oder Clone** des Repositories:
    
 bash
-   git clone https://github.com/Lukas1120987/SchulSystem-EXE
+   git clone https://github.com/Lukas1120987/SchulSystem
 
 ---
 ## Kontakt
