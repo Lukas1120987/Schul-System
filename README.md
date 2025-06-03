@@ -4,17 +4,8 @@
 
 ---
 ## Wichtiges
-Dieses Projekt funktioniert auch, wenn du dir dieses Projekt herunterlädst, für vollen Funktionsumpfang empfehlen wir aber die EXE-Datei des SchulSystems zu nutzen. Diese finden sie hier: https://github.com/Lukas1120987/SchulSystem-EXE
+Bevor du main.py startest, achte bitte darauf, dass du die ZIP entpackt hast.
 
----
-# EXE oder keine EXE
-Was spicht für eine EXE?
-- automatisches Update bei jedem Start und bei Internetverbindung
-- keine Fehler in bei den Ordnern und dem Setup
-
-Was spricht gegen eine EXE
-- funktioniert nur auf Windows
-- ist, wegen der Kompilierung, größer als die normale Anwendung 
 ---
 ## Enthaltene Module:
 
