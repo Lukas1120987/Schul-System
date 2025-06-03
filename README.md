@@ -4,7 +4,7 @@
 
 ---
 ## Wichtiges
-Dieses Projekt funktioniert auch, wenn du dir dieses Projekt herunterlädst, für vollen Funktionsumpfan empfehlen wir aber die EXE-Datei des SchulSystems zu nutzen. Diese finden sie hier: https://github.com/Lukas1120987/SchulSystem-EXE
+Dieses Projekt funktioniert auch, wenn du dir dieses Projekt herunterlädst, für vollen Funktionsumpfang empfehlen wir aber die EXE-Datei des SchulSystems zu nutzen. Diese finden sie hier: https://github.com/Lukas1120987/SchulSystem-EXE
 
 ---
 # EXE oder keine EXE
