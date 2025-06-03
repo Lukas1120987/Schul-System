@@ -4,6 +4,7 @@ import json
 from dashboard import Dashboard
 import random
 from tkinter import simpledialog
+from uploader import check_and_update
 
 # Farben
 PRIMARY_BLUE = "#1a73e8"
@@ -149,6 +150,7 @@ def open_login_window():
     root.mainloop()
 
 def start():
+    check_and_update()
     splash_root = tk.Tk()
     splash = SplashScreen(splash_root)
     splash_root.mainloop()
