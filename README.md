@@ -22,7 +22,7 @@
 1. 🔽 **Download oder Clone** des Repositories:
    
 bash
-   git clone https://github.com/Lukas1120987
+   git clone https://github.com/Lukas1120987/SchulSystem-EXE
 
 
 ## 🏗️ Aufbau
