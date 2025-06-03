@@ -2,6 +2,9 @@
 
 **SchulSystem** ist ein modulares Schulverwaltungssystem in Python, das IServ, WebUntis und andere Tools kombiniert – mit Fokus auf einfache Bedienung, erweiterbare Module und lokale Datenhaltung.
 
+---
+## Wichtiges
+
 
 ---
 ## Enthaltene Module:
