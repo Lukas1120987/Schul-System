@@ -43,7 +43,7 @@ class Modul:
         with open("data/notifications.json", "r") as f:
             daten = json.load(f)
 
-        # Wenn 'alle' gewählt wurde, alle User aus users.json laden
+        # Wenn 'alle' gewählt wurde, alle User aus users.json laden und ansprechen
         empfaenger_liste = []
         if empfaenger.lower() == "alle":
             if not os.path.exists("data/users.json"):
