@@ -51,7 +51,7 @@ class Modul:
         self.personal_tab = tk.Frame(self.notebook, bg="white")
         self.group_tab = tk.Frame(self.notebook, bg="white")
 
-        self.notebook.add(self.personal_tab, text="Meine Aufgaben")
+        self.notebook.add(self.personal_tab, text="Aufgaben")
         self.notebook.add(self.group_tab, text="Gruppenaufgaben")
 
         self.build_personal_tab()
