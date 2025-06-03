@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 import json
 from datetime import datetime
 
-class odul:
+class Modul:
     def __init__(self, parent, nutzername, user_data=None):
         self.frame = tk.Frame(parent)
         self.nutzername = nutzername
