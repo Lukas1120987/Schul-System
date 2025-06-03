@@ -51,7 +51,7 @@ class Modul:
         self.pass_change = tk.Entry(self.frame, show="*")
         self.pass_change.pack()
 
-        tk.Button(self.frame, text="Passwort eines Benutzers ändern", command=self.change_password).pack(pady=5)
+        tk.Button(self.frame, text="Passwort ändern", command=self.change_password).pack(pady=5)
 
         tk.Label(self.frame, text="🏫 Gruppen verwalten", font=("Arial", 12, "bold"), bg="white").pack(pady=10)
 
