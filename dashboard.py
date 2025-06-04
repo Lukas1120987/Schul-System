@@ -88,7 +88,8 @@ class Dashboard:
             "sprechstunden" : {"aktiv": True, "beschreibung": "Buchen von Sprechstunden"},
             "ausleihe" : {"aktiv": True, "beschreibung": "Ausleihen von Geräten und Unterrichtsmaterialien"},
             "meldungen": {"aktiv": False, "beschreibung": "Melden von Nutzern "},
-            "meldungen_verwaltung": {"aktiv": False, "beschreibung": "Meldungen von Nutzern verwalten (Admin)"}
+            "meldungen_verwaltung": {"aktiv": False, "beschreibung": "Meldungen von Nutzern verwalten (Admin)"},
+            "team": {"aktiv": True, "beschreibung": "Development-Bereich zum beheben von Fehlern"}
         }
 
         if not os.path.exists("data/modules.json"):
@@ -284,7 +285,8 @@ class Dashboard:
                 continue
             if modulname == "modulverwaltung " and self.user_data.get("group") != "Verwaltung":
                 continue
-            if modulname == "Team" and self.user_data.get("group") != "SchulSystem-Team":
+            if modulname == "team" and self.user_data.get("group") != "SchulSystem-Team":
+                print("Debug")
                 continue
             if modulname == "sitzplan" and self.user_data.get("group") != "Lehrer":
                 continue
@@ -314,7 +316,8 @@ class Dashboard:
             "stundenplan": "📅", "nachrichten": "💬", "dateiablage": "📂", "einstellungen": "⚙️",
             "cloud": "☁️", "kalender": "📜", "ToDo": "🗓", "e_learning": "📝",
             "adminbereich": "🛠️", "supportverwaltung": "💬", "stundenplan_verwaltung": "📊",
-            "modulverwaltung": "🧩", "meldungen": "🛡", "sitzplan": "💻", "krankmeldungen": "🤒", "benachrichtigungen": "🔔", "sprechstunden": "📠", "ausleihe": "🖨️", "meldungen_verwaltung": "🛡", "Team": ""
+            "modulverwaltung": "🧩", "meldungen": "🛡", "sitzplan": "💻", "krankmeldungen": "🤒",
+            "benachrichtigungen": "🔔", "sprechstunden": "📠", "ausleihe": "🖨️", "meldungen_verwaltung": "🛡", "team": "🛡"
         }
         return icons.get(modulname, "📁")
 
