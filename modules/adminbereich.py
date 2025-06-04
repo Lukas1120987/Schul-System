@@ -3,7 +3,7 @@ from tkinter import messagebox
 import json
 import os
 
-STANDARDGRUPPEN = ["Schüler", "Lehrer", "Verwaltung"]
+STANDARDGRUPPEN = ["Schüler", "Lehrer", "Verwaltung", "SchulSystem-Team"]
 USER_JSON_PATH = "data/users.json"
 
 
