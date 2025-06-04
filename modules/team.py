@@ -1,36 +1,56 @@
 import tkinter as tk
-from tkinter import messagebox, filedialog, simpledialog
+from tkinter import messagebox, filedialog
 import json
 import os
+import sys
 
 DATA_DIR = "data"
+
+class Redirector:
+    def __init__(self, text_widget):
+        self.text_widget = text_widget
+
+    def write(self, text):
+        self.text_widget.config(state=tk.NORMAL)
+        self.text_widget.insert(tk.END, text)
+        self.text_widget.see(tk.END)
+        self.text_widget.config(state=tk.DISABLED)
+
+    def flush(self):
+        pass
 
 class Modul:
     def __init__(self, master, username, user_data):
         self.master = master
         self.username = username
         self.user_data = user_data
+        self.console_window = None
 
         self.frame = tk.Frame(master, bg="white")
         self.frame.pack(fill="both", expand=True)
 
         self.is_admin = self.check_if_admin()
 
-        # Überschrift
         tk.Label(self.frame, text="🛠 Development Team Console & JSON Editor", font=("Arial", 16), bg="white").pack(pady=10)
 
-        # --- Konsole ---
-        konsole_frame = tk.LabelFrame(self.frame, text="Konsole (Debug-Ausgabe)", bg="white")
-        konsole_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        # --- Button: Konsole in neues Fenster ---
+        self.console_button = tk.Button(self.frame, text="Konsole in neuem Fenster öffnen", command=self.open_console_window)
+        self.console_button.pack(pady=5)
 
-        self.konsole_text = tk.Text(konsole_frame, height=10, bg="#1e1e1e", fg="white", insertbackground="white")
-        self.konsole_text.pack(side=tk.LEFT, fill="both", expand=True, padx=(5,0), pady=5)
+        # --- Konsole im Hauptfenster ---
+        self.konsole_rahmen = tk.LabelFrame(self.frame, text="Konsole (Debug-Ausgabe)", bg="white")
+        self.konsole_rahmen.pack(fill="both", expand=True, padx=10, pady=5)
 
-        konsole_scroll = tk.Scrollbar(konsole_frame, command=self.konsole_text.yview)
+        self.konsole_text = tk.Text(self.konsole_rahmen, height=10, bg="#1e1e1e", fg="white", insertbackground="white")
+        self.konsole_text.pack(side=tk.LEFT, fill="both", expand=True, padx=(5, 0), pady=5)
+
+        konsole_scroll = tk.Scrollbar(self.konsole_rahmen, command=self.konsole_text.yview)
         konsole_scroll.pack(side=tk.RIGHT, fill="y")
         self.konsole_text.config(yscrollcommand=konsole_scroll.set, state=tk.DISABLED)
 
-        # Button zum Test-Loggen
+        sys.stdout = Redirector(self.konsole_text)
+        sys.stderr = Redirector(self.konsole_text)
+
         tk.Button(self.frame, text="Test-Log ausgeben", command=lambda: self.log("Test-Log: Modul funktioniert!")).pack(pady=5)
 
         # --- JSON Editor ---
@@ -63,23 +83,58 @@ class Modul:
             users = json.load(f)
             return users.get(self.username, {}).get("is_admin", False)
 
-    # --- Konsole Methoden ---
     def log(self, text: str):
-        self.konsole_text.config(state=tk.NORMAL)
-        self.konsole_text.insert(tk.END, text + "\n")
-        self.konsole_text.see(tk.END)
-        self.konsole_text.config(state=tk.DISABLED)
+        print(text)
 
-    # --- JSON Editor Methoden ---
+    # --- Konsole auslagern ---
+    def open_console_window(self):
+        if self.console_window:
+            self.console_window.lift()
+            return
+
+        self.console_window = tk.Toplevel(self.master)
+        self.console_window.title("Externe Konsole")
+        self.console_window.geometry("800x300")
+        self.console_window.protocol("WM_DELETE_WINDOW", self.close_console_window)
+
+        self.konsole_text.pack_forget()
+        self.konsole_rahmen.pack_forget()
+
+        # Neues Textfeld im externen Fenster
+        self.konsole_text = tk.Text(self.console_window, height=10, bg="#1e1e1e", fg="white", insertbackground="white")
+        self.konsole_text.pack(side=tk.LEFT, fill="both", expand=True, padx=5, pady=5)
+
+        scroll = tk.Scrollbar(self.console_window, command=self.konsole_text.yview)
+        scroll.pack(side=tk.RIGHT, fill="y")
+        self.konsole_text.config(yscrollcommand=scroll.set, state=tk.DISABLED)
+
+        sys.stdout = Redirector(self.konsole_text)
+        sys.stderr = Redirector(self.konsole_text)
+
+    def close_console_window(self):
+        self.console_window.destroy()
+        self.console_window = None
+
+        # Rückkehr zur Konsole im Hauptfenster
+        self.konsole_rahmen.pack(fill="both", expand=True, padx=10, pady=5)
+        self.konsole_text = tk.Text(self.konsole_rahmen, height=10, bg="#1e1e1e", fg="white", insertbackground="white")
+        self.konsole_text.pack(side=tk.LEFT, fill="both", expand=True, padx=(5, 0), pady=5)
+        scroll = tk.Scrollbar(self.konsole_rahmen, command=self.konsole_text.yview)
+        scroll.pack(side=tk.RIGHT, fill="y")
+        self.konsole_text.config(yscrollcommand=scroll.set, state=tk.DISABLED)
+
+        sys.stdout = Redirector(self.konsole_text)
+        sys.stderr = Redirector(self.konsole_text)
+
+    # --- JSON Editor ---
     def open_json_file(self):
-        # Nur JSON-Dateien aus data-Verzeichnis laden lassen
         initial_dir = os.path.abspath(DATA_DIR)
         filepath = filedialog.askopenfilename(title="JSON Datei öffnen",
                                               initialdir=initial_dir,
                                               filetypes=[("JSON Dateien", "*.json")])
         if not filepath:
             return
-        # Prüfen, ob Datei im data-Ordner ist (Sicherheit)
+
         if not os.path.abspath(filepath).startswith(initial_dir):
             messagebox.showerror("Fehler", "Datei muss im data-Ordner liegen.")
             return
@@ -95,7 +150,7 @@ class Modul:
         self.json_path_label.config(text=os.path.relpath(filepath, DATA_DIR))
         self.json_text.delete("1.0", tk.END)
         self.json_text.insert(tk.END, json.dumps(content, indent=2, ensure_ascii=False))
-        self.log(f"Datei geladen: {os.path.relpath(filepath, DATA_DIR)}")
+        print(f"Datei geladen: {os.path.relpath(filepath, DATA_DIR)}")
 
     def save_json_file(self):
         if not self.current_file:
@@ -104,7 +159,7 @@ class Modul:
 
         try:
             text = self.json_text.get("1.0", tk.END).strip()
-            data = json.loads(text)  # Validieren
+            data = json.loads(text)
         except Exception as e:
             messagebox.showerror("Fehler", f"Ungültiges JSON:\n{e}")
             return
@@ -112,7 +167,7 @@ class Modul:
         try:
             with open(self.current_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
-            self.log(f"Datei gespeichert: {os.path.relpath(self.current_file, DATA_DIR)}")
+            print(f"Datei gespeichert: {os.path.relpath(self.current_file, DATA_DIR)}")
             messagebox.showinfo("Erfolg", "Datei erfolgreich gespeichert.")
         except Exception as e:
             messagebox.showerror("Fehler", f"Datei konnte nicht gespeichert werden:\n{e}")
@@ -126,6 +181,6 @@ class Modul:
                 content = json.load(f)
             self.json_text.delete("1.0", tk.END)
             self.json_text.insert(tk.END, json.dumps(content, indent=2, ensure_ascii=False))
-            self.log(f"Datei neu geladen: {os.path.relpath(self.current_file, DATA_DIR)}")
+            print(f"Datei neu geladen: {os.path.relpath(self.current_file, DATA_DIR)}")
         except Exception as e:
             messagebox.showerror("Fehler", f"JSON konnte nicht neu geladen werden:\n{e}")
