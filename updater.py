@@ -56,7 +56,7 @@ class InstallAssistantSplash:
         self.title_label.pack(pady=(0, 30))
 
         self.instructions = tk.Label(self.container,
-                                     text="Setup-Assistent für SchulSystem\nBitte warte, bis der Vorgang abgeschlossen ist.",
+                                     text="Update-Assistent für SchulSystem\nSuche nach Updates.",
                                      font=("Segoe UI", 18), fg="lightgray", bg="#1e2a45", justify="center")
         self.instructions.pack(pady=(0, 20))
 
