@@ -15,15 +15,43 @@ class Dashboard:
         self.username = username
         self.user_data = user_data
 
-        self.sidebar_bg = "#2c3e50"
-        self.sidebar_hover = "#34495e"
-        self.button_fg = "white"
-        self.button_bg = "#2980b9"
+        self.sidebar_bg = "#1e272e"           # Dunkles Grau-Blau
+        self.sidebar_hover = "#485460"        # Etwas heller bei Hover
+        self.button_fg = "#ecf0f1"            # Helles Grau
+        self.content_bg = "#f8f9fa"           # Sanft helles Hauptfeld
+
         self.button_hover_bg = "#3498db"
         self.content_bg = "#ecf0f1"
 
-        self.sidebar = tk.Frame(master, bg=self.sidebar_bg, width=220)
-        self.sidebar.pack(side="left", fill="y")
+        # --- Sidebar mit Scrollfunktion ---
+        self.sidebar_canvas = tk.Canvas(master, bg=self.sidebar_bg, width=220, highlightthickness=0)
+        self.sidebar_canvas.pack(side="left", fill="y")
+
+        self.sidebar_scrollbar = ttk.Scrollbar(master, orient="vertical", command=self.sidebar_canvas.yview)
+        self.sidebar_scrollbar.place(x=220, rely=0, relheight=1)  # scrollbar rechts neben canvas
+
+        self.sidebar_canvas.configure(yscrollcommand=self.sidebar_scrollbar.set)
+
+        # Inhalt der Sidebar als Frame im Canvas
+        self.sidebar_frame = tk.Frame(self.sidebar_canvas, bg=self.sidebar_bg)
+        self.sidebar_window = self.sidebar_canvas.create_window((0, 0), window=self.sidebar_frame, anchor="nw")
+
+        # Automatisches Scrollregion-Update
+        def update_scroll_region(event=None):
+            self.sidebar_canvas.configure(scrollregion=self.sidebar_canvas.bbox("all"))
+
+        self.sidebar_frame.bind("<Configure>", update_scroll_region)
+
+        # Mausrad-Unterstützung
+        def on_mousewheel(event):
+            self.sidebar_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+        self.sidebar_canvas.bind_all("<MouseWheel>", on_mousewheel)  # für Windows
+        self.sidebar_canvas.bind_all("<Button-4>", lambda e: self.sidebar_canvas.yview_scroll(-1, "units"))  # Linux scroll up
+        self.sidebar_canvas.bind_all("<Button-5>", lambda e: self.sidebar_canvas.yview_scroll(1, "units"))   # Linux scroll down
+
+        # Endgültige Zuweisung für weitere Widgets
+        self.sidebar = self.sidebar_frame  # damit add_user_info etc. weiter funktionieren
 
         self.content = tk.Frame(master, bg=self.content_bg)
         self.content.pack(side="right", fill="both", expand=True)
@@ -73,10 +101,15 @@ class Dashboard:
 
     def add_user_info(self):
         name_label = tk.Label(
-            self.sidebar, text=f"👤 {self.username}", bg=self.sidebar_bg, fg="white",
-            font=("Segoe UI", 11, "bold"), anchor="w", padx=10
+            self.sidebar,
+            text=f"👤 {self.username}",
+            bg=self.sidebar_bg,
+            fg="#ffffff",
+            font=("Segoe UI", 11, "bold"),
+            anchor="center"
         )
-        name_label.pack(pady=(10, 20), fill="x")
+        name_label.pack(pady=(20, 10), fill="x")
+
     
     def check_unread_notifications(self):
         def update_notifications():
@@ -130,15 +163,20 @@ class Dashboard:
     def add_notification_button(self):
         btn = tk.Button(
             self.master,
-            text="🔔 Benachrichtigungen",
-            font=("Segoe UI", 10, "bold"),
-            bg="#f39c12",
-            fg="white",
-            activebackground="#e67e22",
+            text="🔔",
+            font=("Segoe UI", 12),
+            bg=self.master.cget("bg"),     # Hintergrundfarbe des Master-Widgets
+            fg="#f39c12",
+            activebackground="#ecf0f1",
+            activeforeground="#e67e22",
+            borderwidth=0,
             relief="flat",
+            cursor="hand2",
             command=self.show_all_notifications
         )
-        btn.place(x=230, y=10)  # Rechts von der Sidebar
+        btn.place(x=230, y=10, width=40, height=40)
+
+
 
 
     def show_dashboard_popup(self, message):
@@ -250,15 +288,25 @@ class Dashboard:
             if modulname == "sitzplan" and self.user_data.get("group") != "Lehrer":
                 continue
 
-            label = self.get_icon(modulname) + " " + modulname.replace("_", " ").capitalize()
+            # Stilvolle Buttons mit Hover-Effekt
             btn = tk.Label(
-                self.sidebar, text=label, anchor="w", bg=self.button_bg, fg=self.button_fg,
-                font=("Segoe UI", 10), padx=12, pady=8, cursor="hand2"
+                self.sidebar,
+                text=f"📁 {modulname.replace('_', '').title()}",
+                bg=self.sidebar_bg,
+                fg=self.button_fg,
+                font=("Segoe UI", 10, "bold"),
+                anchor="w",
+                padx=15,
+                pady=10,
+                cursor="hand2"
             )
-            btn.pack(pady=4, padx=10, fill="x")
+            btn.pack(fill="x", pady=2)
+
+            # Hover-Farben
+            btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.sidebar_hover))
+            btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.sidebar_bg))
             btn.bind("<Button-1>", lambda e, m=modulname: self.load_module(m))
-            btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.button_hover_bg))
-            btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.button_bg))
+
 
     def get_icon(self, modulname):
         icons = {
