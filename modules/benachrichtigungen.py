@@ -10,7 +10,7 @@ class Modul:
         self.username = username
         self.user_data = user_data
 
-        self.frame = tk.Frame(master, bg="white")
+        self.frame = tk.Frame(master, bg="")
         tk.Label(self.frame, text="📣 Benachrichtigungen senden", font=("Segoe UI", 14, "bold")).pack(pady=10)
 
         tk.Label(self.frame, text="Empfänger (Username oder 'alle')").pack()
