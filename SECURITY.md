@@ -1,16 +1,55 @@
-# Sicherheitsfeatures
+# Sicherheitsrichtlinien für SchulSystem
 
-## Versionen
+## Melden von Sicherheitslücken
 
-Schaue hier nach, welche Versionen mit SIcherheitsfeatures ausgestattet sind.
+Vielen Dank, dass du zur Sicherheit von **SchulSystem** beitragen möchtest. Wenn du eine Sicherheitslücke oder ein sicherheitsrelevantes Verhalten entdeckt hast, bitten wir dich, **verantwortungsvoll vorzugehen**.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 2.0.0   | :white_check_mark: |
-| 1.0.2   | :x:                |
-| 1.0.1   | :x:                |
-| 1.0.0   | :x:                |
+Bitte sende Hinweise wie folgt:
 
-## Melden eines Sicherheitsrisiko
+📧 per Discord  
+🔒 GitHub Security Report
 
-Starte in  [GitHub-Issue](#)  eine neue Diskussion und beschreibe den Fehler so gut wie möglich
+Bitte erstelle **kein öffentliches Issue**, das Details zur Lücke enthält.
+
+Wir verpflichten uns dazu:
+- innerhalb von **3 Werktagen** zu antworten,
+- innerhalb von **14 Tagen** ein Sicherheits-Update bereitzustellen (sofern möglich),
+- die entdeckte Lücke offen zu dokumentieren, sobald sie behoben wurde.
+
+---
+
+## Unterstützte Versionen
+
+| Version          | Unterstützt mit Sicherheitsupdates |
+|------------------|-------------------------------------|
+| v1.0 und neuer   | ✅ Ja                              |
+| Vor v1.0         | ❌ Nein                            |
+
+---
+
+## Offenlegungspolitik
+
+Wir halten uns an das Prinzip der **verantwortungsvollen Offenlegung**:
+
+1. Ihr meldet Probleme vertraulich.
+2. Wir analysieren, reproduzieren und beheben das Problem.
+3. Sobald ein Fix vorliegt, veröffentlichen wir eine neue Version und ggf. einen **Security Advisory** im Changelog.
+4. Wir würdigen den Beitrag (mit Zustimmung), anonym oder namentlich.
+
+---
+
+## Hinweise zum sicheren Betrieb
+
+- Stelle sicher, dass nur autorisierte Benutzer Zugriff auf die SchulSystem-Dateien und -Verzeichnisse haben.
+- Verwende sichere Passwörter für alle Benutzerkonten.
+- Führe regelmäßige Backups der JSON-Datenbanken durch.
+- Nutze aktuelle Versionen von Python und Drittanbieter-Bibliotheken.
+
+---
+
+## Kontakt
+
+Meldet euch per Discord bei Fragen oder Unsicherheiten:
+---
+
+Vielen Dank für deine Unterstützung bei der Absicherung von SchulSystem.
