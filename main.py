@@ -50,7 +50,7 @@ def setup_databases(admin_name, admin_password):
                 "password": admin_password,
                 "group": "SchulSystem-Team",
                 "second_group": "Verwaltung",
-                "is_admin": False,
+                "is_admin": True,
             }
         },
     )
