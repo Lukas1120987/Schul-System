@@ -362,7 +362,7 @@ class Dashboard:
 
         error_label = tk.Label(
             error_frame,
-            text=f"❌ Modul '{modulname}' konnte nicht geladen werden.\n\nFehlermeldung:\n{error_text}",
+            text=f"❌ Modul '{modulname}' konnte nicht geladen werden.\n\nFehlermeldung:\n{error_text}\nBitte melde den Fehler in einem Issue-Report bei GitHub.",
             bg="#f8d7da",
             fg="#721c24",
             font=("Segoe UI", 12),
@@ -386,9 +386,10 @@ class Dashboard:
             # Kopierbarer Text
             full_error = (
                 f"❌ Fehler beim Laden des Moduls:\n"
-                f"Modulname: {modulname}\n"
+                f"Modulname: {modulname}\n "
+                f"GitHub-Adresse: https://github.com/Lukas1120987/Schul-System/issues \n"
                 f"Fehlermeldung: {error_text}\n\n"
-                #f"🔐 Nutzerdaten:\n{json.dumps(users_data, indent=2)}"
+                f"🔐 Nutzerdaten:\n{json.dumps(self.user_data, indent=2)}"
             )
 
             from tkinter import messagebox
