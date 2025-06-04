@@ -22,12 +22,12 @@ Wir verpflichten uns dazu:
 
 | Version          | Unterstützt mit Sicherheitsupdates |
 |------------------|-------------------------------------|
-| v1.0 und neuer   | ✅ Ja                              |
-| Vor v1.0         | ❌ Nein                            |
+| Version 2.1 und neuer   | ✅ Ja                              |
+| Vor  Version 2.0         | ❌ Nein                            |
 
 ---
 
-## Offenlegungspolitik
+## Offenlegungsprinzip
 
 Wir halten uns an das Prinzip der **verantwortungsvollen Offenlegung**:
 
