@@ -51,16 +51,16 @@ class InstallAssistantSplash:
         except Exception as e:
             print("Logo konnte nicht geladen werden:", e)
 
-        self.title_label = tk.Label(self.container, text="Willkommen bei SchulSystem",
+        self.title_label = tk.Label(self.container, text="SchulSystem \n Update",
                                     font=("Segoe UI", 44, "bold"), fg="white", bg="#1e2a45")
         self.title_label.pack(pady=(0, 30))
 
         self.instructions = tk.Label(self.container,
-                                     text="Update-Assistent für SchulSystem\nSuche nach Updates.",
+                                     text="Update-Assistent für SchulSystem\n",
                                      font=("Segoe UI", 18), fg="lightgray", bg="#1e2a45", justify="center")
         self.instructions.pack(pady=(0, 20))
 
-        self.loading_label = tk.Label(self.container, text="Lade", font=("Segoe UI", 16),
+        self.loading_label = tk.Label(self.container, text="Suche nach Updates", font=("Segoe UI", 16),
                                       fg="lightgray", bg="#1e2a45")
         self.loading_label.pack(pady=10)
 
@@ -95,7 +95,7 @@ class InstallAssistantSplash:
 
     def animate_loading_text(self):
         self.dot_count = (self.dot_count + 1) % 4
-        self.loading_label.config(text="Lade" + "." * self.dot_count)
+        self.loading_label.config(text="Suche nach Updates" + "." * self.dot_count)
 
     def continue_now(self):
         self.root.unbind("<h>")
