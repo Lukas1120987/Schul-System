@@ -129,7 +129,7 @@ class Dashboard:
 
     def add_notification_button(self):
         btn = tk.Button(
-            self.content,
+            self.master,
             text="🔔 Benachrichtigungen",
             font=("Segoe UI", 10, "bold"),
             bg="#f39c12",
@@ -138,7 +138,8 @@ class Dashboard:
             relief="flat",
             command=self.show_all_notifications
         )
-        btn.place(relx=0.0, x=10, y=10, anchor="nw")
+        btn.place(x=230, y=10)  # Rechts von der Sidebar
+
 
     def show_dashboard_popup(self, message):
         # Schatten für Popup
@@ -381,7 +382,7 @@ class Dashboard:
 
     def add_help_button(self):
         help_btn = tk.Button(
-            self.content,
+            self.master,
             text="ℹ️ Hilfe",
             font=("Segoe UI", 10, "bold"),
             bg="#3498db",
@@ -390,7 +391,8 @@ class Dashboard:
             relief="flat",
             command=self.show_help_window
         )
-        help_btn.place(relx=1.0, x=-10, y=10, anchor="ne")
+        help_btn.place(relx=1.0, x=-10, y=10, anchor="ne")  # Oben rechts im Fenster
+
 
     def show_help_window(self):
         try:
