@@ -48,7 +48,7 @@ class SplashScreen:
         self.progress.pack(pady=30)
         self.progress.start(15)
 
-        tk.Label(self.frame, text="SchulSystem", font=("Segoe UI", 8), #© SchulSystem 2025
+        tk.Label(self.frame, text="© SchulSystem 2025 \n Unter MIT License", font=("Segoe UI", 8), #© SchulSystem 2025
                  bg=PRIMARY_BLUE, fg="#cccccc").pack(side="bottom", pady=10)
 
         self.loading_steps = [
