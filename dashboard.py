@@ -99,6 +99,7 @@ class Dashboard:
         with open("data/modules.json", "r") as f:
             return json.load(f)
 
+
     def add_user_info(self):
         name_label = tk.Label(
             self.sidebar,
@@ -165,10 +166,10 @@ class Dashboard:
             self.master,
             text="🔔",
             font=("Segoe UI", 12),
-            bg=self.master.cget("bg"),     # Hintergrundfarbe des Master-Widgets
-            fg="#f39c12",
-            activebackground="#ecf0f1",
-            activeforeground="#e67e22",
+            bg="#e67e22",     # Hintergrundfarbe des Master-Widgets
+            fg="#1e272e",
+            activebackground="#e67e22",
+            activeforeground="#1e272e",
             borderwidth=0,
             relief="flat",
             cursor="hand2",
@@ -413,7 +414,7 @@ class Dashboard:
         open_login_window()
 
     def add_logout_button(self):
-        logout_frame = tk.Frame(self.sidebar, bg="#e0e0e0")
+        logout_frame = tk.Frame(self.sidebar, bg="#1e272e")
         logout_frame.pack(side="bottom", fill="x", pady=10)
 
         logout_btn = tk.Button(
