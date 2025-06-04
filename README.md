@@ -83,7 +83,7 @@ EduClass/
 ├── main.py                 # Hauptstartdatei
 ├── login.py                # Loginfenster
 ├── dashboard.py            # Zentrale Oberfläche
-├── update_manager.py       # Automatisches Update-System
+├── updater.py       # Automatisches Update-System
 ├── modules/                # Alle Funktionsmodule
 │   ├── stundenplan.py
 │   ├── nachrichten.py
