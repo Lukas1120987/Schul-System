@@ -52,10 +52,10 @@ class SplashScreen:
                  bg=PRIMARY_BLUE, fg="#cccccc").pack(side="bottom", pady=10)
 
         self.loading_steps = [
-            "Initialisiere Datenbank...",
-            "Lade Benutzeroberfläche...",
-            "Importiere Stundenplan...",
-            "Verbinde mit Server...",
+            "Initialisiere Datenbanken...",
+            "Lade Benutzeroberflächen...",
+            "Importiere Stundenpläne...",
+            "Verbinde mit Updater...",
             "Lade Module...",
             "Lade Einstellungen...",
             "Überprüfe Benutzerrechte...",
