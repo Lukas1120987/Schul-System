@@ -87,26 +87,51 @@ class LoginWindow:
         self.master.configure(bg=WHITE)
         self.master.attributes("-fullscreen", True)
 
-
         self.frame = tk.Frame(master, bg=WHITE, padx=20, pady=20)
         self.frame.pack(expand=True)
 
-        tk.Label(self.frame, text="Willkommen bei SchulSystem", font=("Segoe UI", 16, "bold"), bg=WHITE, fg=PRIMARY_BLUE)\
-            .grid(row=0, column=0, columnspan=2, pady=(10, 20))
+        tk.Label(self.frame, text="Willkommen bei SchulSystem", font=("Segoe UI", 16, "bold"),
+                 bg=WHITE, fg=PRIMARY_BLUE).grid(row=0, column=0, columnspan=2, pady=(10, 20))
 
+        # Benutzername
         tk.Label(self.frame, text="Benutzername:", bg=WHITE, fg=TEXT_COLOR, font=("Segoe UI", 10))\
-            .grid(row=1, column=0, sticky="e", pady=5)
+            .grid(row=1, column=0, sticky="e", pady=5, padx=(0, 10))
+        self.entry_username = tk.Entry(self.frame, font=("Segoe UI", 10), bg="#f1f3f4",
+                                       bd=0, relief="flat", width=30)
+        self.entry_username.grid(row=1, column=1, pady=5, sticky="w")
+
+        # Passwort
         tk.Label(self.frame, text="Passwort:", bg=WHITE, fg=TEXT_COLOR, font=("Segoe UI", 10))\
-            .grid(row=2, column=0, sticky="e", pady=5)
+            .grid(row=2, column=0, sticky="e", pady=5, padx=(0, 10))
 
-        self.entry_username = tk.Entry(self.frame, font=("Segoe UI", 10), bg="#f1f3f4", bd=0, relief="flat")
-        self.entry_password = tk.Entry(self.frame, show="·", font=("Segoe UI", 10), bg="#f1f3f4", bd=0, relief="flat")
-        self.entry_username.grid(row=1, column=1, pady=5, ipadx=5, ipady=3)
-        self.entry_password.grid(row=2, column=1, pady=5, ipadx=5, ipady=3)
+        self.password_container = tk.Frame(self.frame, bg=WHITE)
+        self.password_container.grid(row=2, column=1, pady=5, sticky="w")
 
-        self.login_btn = tk.Button(self.frame, text="Login", bg=PRIMARY_BLUE, fg="white", font=("Segoe UI", 10, "bold"),
-                                   activebackground="#1669c1", activeforeground="white", command=self.login, relief="flat", padx=10, pady=5)
+        self.entry_password = tk.Entry(self.password_container, show="·", font=("Segoe UI", 10),
+                                       bg="#f1f3f4", bd=0, relief="flat", width=27)
+        self.entry_password.pack(side="left", ipadx=5, ipady=3)
+
+        self.eye_button = tk.Button(self.password_container, text="👁️", bg=WHITE, bd=0,
+                                    font=("Segoe UI", 10), command=self.toggle_password_visibility)
+        self.eye_button.pack(side="left", padx=5)
+
+        # Login-Button
+        self.login_btn = tk.Button(self.frame, text="Login", bg=PRIMARY_BLUE, fg="white",
+                                   font=("Segoe UI", 10, "bold"), activebackground="#1669c1",
+                                   activeforeground="white", command=self.login,
+                                   relief="flat", padx=10, pady=5)
         self.login_btn.grid(row=3, column=0, columnspan=2, pady=20)
+
+    def toggle_password_visibility(self):
+        if self.entry_password.cget('show') == '':
+            self.entry_password.config(show='·')
+            self.eye_button.config(text="👁️")
+        else:
+            self.entry_password.config(show='')
+            self.eye_button.config(text="🚫  ")
+
+
+
 
     def login(self):
         username = self.entry_username.get()
