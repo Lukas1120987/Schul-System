@@ -27,40 +27,40 @@ Erstelle Sitzpläne für Klassen mit Drag-and-Drop-Funktion – ideal zur Visual
  🧪 E-Learning
 Erstelle Tests, ordne sie Gruppen zu und werte Ergebnisse aus. Für digitales Lernen im Schulalltag.
 
-#### 📅 Stundenplan
+ 📅 Stundenplan
 Zeigt deinen persönlichen Stundenplan (Wochenansicht), angepasst an deine Gruppenzugehörigkeit.
 
-#### 🛠️ Stundenplanverwaltung
+ 🛠️ Stundenplanverwaltung
 Erstelle, bearbeite und verwalte den Stundenplan zentral.
 
-#### 📢 Meldungen
+ 📢 Meldungen
 Erstelle neue Meldungen für Nachrichten oder Dateien.
 
-#### 📝 Meldungenverwaltung
+ 📝 Meldungenverwaltung
 Anzeigen und bearbeiten von Meldungen.
 
-#### 🧑‍🏫 Sprechstunden
+ 🧑‍🏫 Sprechstunden
 Lehrkräfte können hier Sprechzeiten festlegen, Schüler buchen Termine.
 
-#### 📚 Ausleihe
+📚 Ausleihe
 Verwalte schulinterne Ausleihsysteme (z. B. Laptops, Bücher, Geräte) mit Ausleihe und Rückgabe.
 
-#### 🧑‍💼 Adminbereich
+🧑‍💼 Adminbereich
 Zentraler Zugang für Administratoren zur Benutzerverwaltung und Gruppenzuweisung.
 
-#### 🤧 Krankmeldungen
+ 🤧 Krankmeldungen
 Ermöglicht einfache Abwesenheits- und Krankmeldungen mit Gruppenübersicht.
 
-#### ✅ ToDo‘s
+ ✅ ToDo‘s
 Persönliche Aufgabenverwaltung für Schüler, Lehrer und Verwaltung – mit Status und Gruppenbindung.
 
-#### 📆 Kalender
+ 📆 Kalender
 Zeigt alle schulischen Termine, Veranstaltungen, Prüfungen und individuelle Einträge in einer Monats- oder Wochenübersicht des Nutzers.
 
-#### 🆘 Support
+ 🆘 Support
 Erstelle Supporttickets, verfolge Bearbeitungsstatus und gib Rückmeldung – direkt an das Admin-Team.
 
-#### ⚙️ Einstellungen
+ ⚙️ Einstellungen
 Hier kannst du deinen Benutzernamen ändern, dein Passwort anpassen, Feedback geben oder das System personalisieren.
 
 ---
