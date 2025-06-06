@@ -1,6 +1,9 @@
+import tkinter as tk
+from tkinter import messagebox
 import json
 import os
 
+#STANDARDGRUPPEN = ["Schüler", "Lehrer", "Verwaltung"]
 STANDARDGRUPPEN = ["Schüler", "Lehrer", "Verwaltung", "SchulSystem-Team"]
 USER_JSON_PATH = "data/users.json"
 
@@ -266,6 +269,6 @@ class Modul:
         tk.Button(win, text="Erstellen", command=create).pack(pady=10)
 
 
-    def get_all_groups(self):
+    def get_all_groups(self):More actions
         users = self.load_users()
         return sorted(set(u["group"] for u in users.values()))
