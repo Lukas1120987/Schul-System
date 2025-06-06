@@ -24,21 +24,21 @@ class Modul:
 
     def load_tasks(self):
         try:
-            with open(self.user_tasks_file, "r") as f:
+            with open(self.user_tasks_file, "r", encoding="utf-8") as f:
                 self.user_tasks = json.load(f)
         except:
             self.user_tasks = {}
 
         try:
-            with open(self.group_tasks_file, "r") as f:
+            with open(self.group_tasks_file, "r", encoding="utf-8") as f:
                 self.group_tasks = json.load(f)
         except:
             self.group_tasks = {}
 
     def save_tasks(self):
-        with open(self.user_tasks_file, "w") as f:
+        with open(self.user_tasks_file, "w", encoding="utf-8") as f:
             json.dump(self.user_tasks, f, indent=2)
-        with open(self.group_tasks_file, "w") as f:
+        with open(self.group_tasks_file, "w", encoding="utf-8") as f:
             json.dump(self.group_tasks, f, indent=2)
 
     def create_widgets(self):
