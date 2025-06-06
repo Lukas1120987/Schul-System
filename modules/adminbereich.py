@@ -269,6 +269,6 @@ class Modul:
         tk.Button(win, text="Erstellen", command=create).pack(pady=10)
 
 
-    def get_all_groups(self):More actions
+    def get_all_groups(self):
         users = self.load_users()
         return sorted(set(u["group"] for u in users.values()))
