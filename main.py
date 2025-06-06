@@ -74,7 +74,7 @@ def setup_databases(admin_name, admin_password):
                 "datum": "13.05.2025 08:00",
                 "betreff": "Willkommen",
                 "inhalt": (
-                    f"Hallo {admin_name}, willkommen bei EduClass! \n"
+                    f"Hallo {admin_name}, willkommen im SchulSystem! \n"
                     "Schau im Hilfe-Bereich nach, wenn du Fragen hast."
                 ),
             }
