@@ -26,18 +26,18 @@ class Modul:
     def ensure_db_exists(self):
         os.makedirs(os.path.dirname(DB), exist_ok=True)
         if not os.path.exists(DB):
-            with open(DB, "w") as f:
+            with open(DB, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
     def load_data(self):
         try:
-            with open(DB, "r") as f:
+            with open(DB, "r", encoding="utf-8") as f:
                 self.tests = json.load(f)
         except:
             self.tests = []
 
         try:
-            with open(USERS_DB, "r") as f:
+            with open(USERS_DB, "r", encoding="utf-8") as f:
                 self.groups = list(set(u["group"] for u in json.load(f)))
         except:
             self.groups = []
@@ -97,7 +97,7 @@ class Modul:
         }
 
         self.tests.append(test)
-        with open(DB, "w") as f:
+        with open(DB, "w", encoding="utf-8") as f:
             json.dump(self.tests, f, indent=2)
 
         self.test_title.delete(0, "end")
