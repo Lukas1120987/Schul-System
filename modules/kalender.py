@@ -73,13 +73,13 @@ class Modul:
 
     def load_dates(self):
         try:
-            with open(self.data_file, "r") as f:
+            with open(self.data_file, "r", encoding="utf-8") as f:
                 self.dates = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             self.dates = {}
 
     def save_dates(self):
-        with open(self.data_file, "w") as f:
+        with open(self.data_file, "w", encoding="utf-8") as f:
             json.dump(self.dates, f, indent=2)
 
     def update_display(self):
