@@ -20,6 +20,7 @@ class Modul:
         self.add_password_change()
         self.add_support_ticket()
         self.add_feedback_form()
+        self.add_email_field()
 
     def get_frame(self):
         return self.frame
@@ -115,3 +116,28 @@ class Modul:
                 messagebox.showwarning("Fehler", "Feedback darf nicht leer sein.")
 
         tk.Button(section, text="Absenden", command=send_feedback).pack(padx=5, pady=5)
+
+
+    def add_email_field(self):
+        section = tk.LabelFrame(self.frame, text="E-Mail-Adresse für Passwort-Zurücksetzung")
+        section.pack(padx=10, pady=5, fill="x")
+
+        email_entry = tk.Entry(section)
+        email_entry.insert(0, self.nutzerdaten.get("email", ""))
+        email_entry.pack(side="left", padx=5, pady=5, expand=True, fill="x")
+
+        def update_email():
+            email = email_entry.get().strip()
+            if "@" in email and "." in email:
+                with open(USERS_PATH, "r") as f:
+                    users = json.load(f)
+                users[self.nutzername]["email"] = email
+                with open(USERS_PATH, "w") as f:
+                    json.dump(users, f, indent=2)
+                messagebox.showinfo("Erfolg", "E-Mail-Adresse gespeichert.")
+            else:
+                messagebox.showwarning("Fehler", "Bitte eine gültige E-Mail-Adresse eingeben.")
+
+        tk.Button(section, text="Speichern", command=update_email).pack(side="right", padx=5, pady=5)
+
+
