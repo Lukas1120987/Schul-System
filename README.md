@@ -12,19 +12,19 @@ Bevor du main.py startest, achte bitte darauf, dass du die `ZIP` entpackt hast.
 ---
 ## Enthaltene Module:
 
-#### 💬 Nachrichten
+💬 Nachrichten
 Versende und empfange schulinterne Nachrichten – mit Suchfunktion.
 
-#### ☁️ Cloud
+☁️ Cloud
 Teile Dateien direkt mit Gruppen oder Einzelpersonen. Verwalte Freigaben und Zugriffsrechte komfortabel über eine übersichtliche Oberfläche.
 
-#### 🗂️ Dateiablage
+🗂️ Dateiablage
 Lade Dateien für alle hoch, speichere sie  ab und greife jederzeit lokal darauf zu.
 
-#### 🪑 Sitzplan
+🪑 Sitzplan
 Erstelle Sitzpläne für Klassen mit Drag-and-Drop-Funktion – ideal zur Visualisierung und Organisation im Unterricht.
 
-#### 🧪 E-Learning
+ 🧪 E-Learning
 Erstelle Tests, ordne sie Gruppen zu und werte Ergebnisse aus. Für digitales Lernen im Schulalltag.
 
 #### 📅 Stundenplan
