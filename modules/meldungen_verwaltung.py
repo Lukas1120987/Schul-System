@@ -24,7 +24,7 @@ class Modul:
 
     def lade_meldungen(self):
         try:
-            with open(self.messages_file, "r") as f:
+            with open(self.messages_file, "r", encoding="utf-8") as f:
                 messages = json.load(f)
         except FileNotFoundError:
             messages = []
@@ -50,14 +50,14 @@ class Modul:
         id_to_delete = selected[0]
 
         try:
-            with open(self.messages_file, "r") as f:
+            with open(self.messages_file, "r", encoding="utf-8") as f:
                 messages = json.load(f)
         except FileNotFoundError:
             messages = []
 
         messages = [m for m in messages if m["id"] != id_to_delete]
 
-        with open(self.messages_file, "w") as f:
+        with open(self.messages_file, "w", encoding="utf-8") as f:
             json.dump(messages, f, indent=4)
 
         self.tree.delete(id_to_delete)
