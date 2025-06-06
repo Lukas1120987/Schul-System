@@ -42,14 +42,14 @@ class Modul:
 
     def initialisiere_geraete_datei(self):
         if not os.path.exists(GERÄTE_DATEI):
-            with open(GERÄTE_DATEI, "w") as f:
+            with open(GERÄTE_DATEI, "w", encoding="utf-8") as f:
                 json.dump({}, f, indent=2)
 
 
     def check_if_admin(self):
         if not os.path.exists(USERS_DATEI):
             return False
-        with open(USERS_DATEI, "r") as f:
+        with open(USERS_DATEI, "r", encoding="utf-8") as f:
             users = json.load(f)
             return users.get(self.username, {}).get("is_admin", False)
 
@@ -57,7 +57,7 @@ class Modul:
         self.geraete_listbox.delete(0, tk.END)
         if not os.path.exists(GERÄTE_DATEI):
             return
-        with open(GERÄTE_DATEI, "r") as f:
+        with open(GERÄTE_DATEI, "r", encoding="utf-8") as f:
             geraete = json.load(f)
             for name, daten in geraete.items():
                 status = "✅ Verfügbar" if daten["verfügbar"] else f"❌ Ausgeliehen von {daten['ausgeliehen_von']}"
@@ -75,7 +75,7 @@ class Modul:
         if not name:
             messagebox.showerror("Fehler", "Bitte ein Gerät auswählen.")
             return
-        with open(GERÄTE_DATEI, "r") as f:
+        with open(GERÄTE_DATEI, "r", encoding="utf-8") as f:
             daten = json.load(f).get(name)
         messagebox.showinfo(name, f"📃 Beschreibung:\n{daten['beschreibung']}\n\nStatus: {'Verfügbar' if daten['verfügbar'] else 'Ausgeliehen'}")
 
@@ -83,14 +83,14 @@ class Modul:
         name = self.get_selected_geraet()
         if not name:
             return
-        with open(GERÄTE_DATEI, "r") as f:
+        with open(GERÄTE_DATEI, "r", encoding="utf-8") as f:
             daten = json.load(f)
         if not daten[name]["verfügbar"]:
             messagebox.showwarning("Nicht verfügbar", "Gerät ist bereits ausgeliehen.")
             return
         daten[name]["verfügbar"] = False
         daten[name]["ausgeliehen_von"] = self.username
-        with open(GERÄTE_DATEI, "w") as f:
+        with open(GERÄTE_DATEI, "w", encoding="utf-8") as f:
             json.dump(daten, f, indent=2)
         self.lade_geraete()
 
@@ -98,7 +98,7 @@ class Modul:
         name = self.get_selected_geraet()
         if not name:
             return
-        with open(GERÄTE_DATEI, "r") as f:
+        with open(GERÄTE_DATEI, "r", encoding="utf-8") as f:
             daten = json.load(f)
         if daten[name]["verfügbar"]:
             messagebox.showinfo("Info", "Gerät ist bereits verfügbar.")
@@ -134,7 +134,7 @@ class Modul:
                 return
 
             if os.path.exists(GERÄTE_DATEI):
-                with open(GERÄTE_DATEI, "r") as f:
+                with open(GERÄTE_DATEI, "r", encoding="utf-8") as f:
                     daten = json.load(f)
             else:
                 daten = {}
@@ -149,7 +149,7 @@ class Modul:
                 "ausgeliehen_von": None
             }
 
-            with open(GERÄTE_DATEI, "w") as f:
+            with open(GERÄTE_DATEI, "w", encoding="utf-8") as f:
                 json.dump(daten, f, indent=2)
             messagebox.showinfo("Erfolg", "Gerät hinzugefügt.", parent=win)
             win.destroy()
