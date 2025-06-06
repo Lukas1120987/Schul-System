@@ -20,7 +20,7 @@ class Modul:
 
     def load_schedule(self):
         try:
-            with open("data/schedule.json", "r") as f:
+            with open("data/schedule.json", "r", encoding="utf-8") as f:
                 schedule_data = json.load(f)
         except FileNotFoundError:
             tk.Label(self.table_frame, text="Kein Stundenplan gefunden.", bg="white").pack()
