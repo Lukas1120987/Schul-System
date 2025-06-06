@@ -1,138 +1,151 @@
-import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
-import os
 import json
-
-CLOUD_DB = "data/cloud.json"
-USERS_DB = "data/users.json"
+import os
+import tkinter as tk
+from tkinter import ttk, messagebox
+from datetime import datetime
 
 class Modul:
-    def __init__(self, master, username, user_data):
-        self.master = master
+    def __init__(self, parent, username, user_data):
+        self.parent = parent
         self.username = username
-        self.group = user_data["group"]
+        self.group = user_data.get("group", "alle")
+        self.is_admin = user_data.get("is_admin", False)
 
-        self.frame = tk.Frame(master, bg="white")
-        tk.Label(self.frame, text="☁️ Cloud-Dateien", font=("Arial", 16), bg="white").pack(pady=10)
+        self.frame = tk.Frame(parent, bg="white")
 
-        self.load_data()
-        self.setup_ui()
+        self.user_tasks_file = "data/aufgaben_user.json"
+        self.group_tasks_file = "data/aufgaben_gruppen.json"
+
+        self.load_tasks()
+        self.create_widgets()
 
     def get_frame(self):
         return self.frame
 
-    def load_data(self):
+    def load_tasks(self):
         try:
-            with open(CLOUD_DB, "r") as f:
-                self.files = json.load(f)
+            with open(self.user_tasks_file, "r", encoding="utf-8") as f:
+                self.user_tasks = json.load(f)
         except:
-            self.files = []
+            self.user_tasks = {}
 
         try:
-            with open(USERS_DB, "r") as f:
-                data = json.load(f)
-                self.userlist = [name for name in data if not name.startswith("_group_")]
-                self.grouplist = list(set(user["group"] for user in data.values() if "group" in user))
+            with open(self.group_tasks_file, "r", encoding="utf-8") as f:
+                self.group_tasks = json.load(f)
         except:
-            self.userlist = []
-            self.grouplist = []
+            self.group_tasks = {}
 
+    def save_tasks(self):
+        with open(self.user_tasks_file, "w", encoding="utf-8") as f:
+            json.dump(self.user_tasks, f, indent=2)
+        with open(self.group_tasks_file, "w", encoding="utf-8") as f:
+            json.dump(self.group_tasks, f, indent=2)
 
+    def create_widgets(self):
+        title = tk.Label(self.frame, text="Aufgaben & ToDos", font=("Segoe UI", 18), bg="white")
+        title.pack(pady=10)
 
-    def setup_ui(self):
-        # Upload-Bereich
-        upload_frame = tk.LabelFrame(self.frame, text="Datei hochladen & freigeben", bg="white")
-        upload_frame.pack(padx=10, pady=10, fill="x")
+        self.notebook = ttk.Notebook(self.frame)
+        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
 
-        tk.Button(upload_frame, text="Datei auswählen", command=self.choose_file).pack(pady=5)
-        self.file_label = tk.Label(upload_frame, text="Keine Datei ausgewählt", bg="white")
-        self.file_label.pack()
+        self.personal_tab = tk.Frame(self.notebook, bg="white")
+        self.group_tab = tk.Frame(self.notebook, bg="white")
 
-        # Freigabe
-        tk.Label(upload_frame, text="Freigeben für Gruppe:", bg="white").pack()
-        self.group_select = ttk.Combobox(upload_frame, values=self.grouplist, state="readonly")
-        self.group_select.pack(pady=2)
+        self.notebook.add(self.personal_tab, text="Aufgaben")
+        self.notebook.add(self.group_tab, text="Gruppenaufgaben")
 
-        tk.Label(upload_frame, text="...oder Nutzer:", bg="white").pack()
-        self.user_select = ttk.Combobox(upload_frame, values=self.userlist, state="readonly")
-        self.user_select.pack(pady=2)
+        self.build_personal_tab()
+        self.build_group_tab()
 
-        tk.Button(upload_frame, text="Hochladen", command=self.upload_file).pack(pady=5)
+    def build_personal_tab(self):
+        self.personal_tasks_box = tk.Listbox(self.personal_tab, width=80, height=10)
+        self.personal_tasks_box.pack(pady=5)
 
-        # Dateiübersicht
-        self.file_table = ttk.Treeview(self.frame, columns=("file", "from", "to"), show="headings")
-        self.file_table.heading("file", text="Datei")
-        self.file_table.heading("from", text="Von")
-        self.file_table.heading("to", text="Für")
-        self.file_table.pack(padx=10, pady=10, fill="both", expand=True)
+        self.refresh_personal_tasks()
 
-        # Download-Button
-        tk.Button(self.frame, text="Ausgewählte Datei herunterladen", command=self.download_file).pack(pady=5)
+        entry_frame = tk.Frame(self.personal_tab, bg="white")
+        entry_frame.pack(pady=5)
 
+        self.personal_entry = tk.Entry(entry_frame, width=50)
+        self.personal_entry.pack(side="left", padx=5)
+        tk.Button(entry_frame, text="Hinzufügen", command=self.add_personal_task).pack(side="left")
 
-        self.refresh_table()
+        btn_frame = tk.Frame(self.personal_tab, bg="white")
+        btn_frame.pack()
 
-    def choose_file(self):
-        filepath = filedialog.askopenfilename()
-        if filepath:
-            self.selected_path = filepath
-            self.file_label.config(text=os.path.basename(filepath))
+        tk.Button(btn_frame, text="Erledigt", command=self.mark_personal_done).pack(side="left", padx=5)
+        tk.Button(btn_frame, text="Löschen", command=self.delete_personal_task).pack(side="left", padx=5)
 
-    def download_file(self):
-        selected = self.file_table.selection()
-        if not selected:
-            return messagebox.showwarning("Hinweis", "Bitte eine Datei auswählen.")
-        
-        file_name = self.file_table.item(selected[0], "values")[0]
+    def build_group_tab(self):
+        self.group_tasks_box = tk.Listbox(self.group_tab, width=80, height=10)
+        self.group_tasks_box.pack(pady=5)
 
-        for f in self.files:
-            if f["filename"] == file_name and (
-                f["to_user"] == self.username or f["to_group"] == self.group or f["from"] == self.username
-            ):
-                save_path = filedialog.asksaveasfilename(initialfile=f["filename"])
-                if save_path:
-                    try:
-                        with open(f["path"], "rb") as src, open(save_path, "wb") as dst:
-                            dst.write(src.read())
-                        messagebox.showinfo("Erfolg", f"Datei gespeichert unter:\n{save_path}")
-                    except:
-                        messagebox.showerror("Fehler", "Fehler beim Kopieren der Datei.")
-                return
+        self.refresh_group_tasks()
 
+        if self.is_admin:
+            separator = ttk.Separator(self.group_tab, orient="horizontal")
+            separator.pack(fill="x", pady=10)
 
-    def upload_file(self):
-        if not hasattr(self, "selected_path"):
-            return messagebox.showerror("Fehler", "Bitte zuerst eine Datei auswählen.")
+            form_frame = tk.LabelFrame(self.group_tab, text="Neue Gruppenaufgabe", bg="white")
+            form_frame.pack(fill="x", padx=10, pady=5)
 
-        group = self.group_select.get()
-        user = self.user_select.get()
+            self.group_title_entry = tk.Entry(form_frame, width=40)
+            self.group_title_entry.insert(0, "Titel der Aufgabe")
+            self.group_title_entry.pack(pady=2)
 
-        if not group and not user:
-            return messagebox.showerror("Fehler", "Bitte eine Gruppe oder einen Nutzer auswählen.")
+            self.group_target_entry = tk.Entry(form_frame, width=30)
+            self.group_target_entry.insert(0, "Zielgruppe (z. B. 10A oder alle)")
+            self.group_target_entry.pack(pady=2)
 
-        new_file = {
-            "filename": os.path.basename(self.selected_path),
-            "path": self.selected_path,
-            "from": self.username,
-            "to_group": group if group else None,
-            "to_user": user if user else None
-        }
-        self.files.append(new_file)
+            tk.Button(form_frame, text="Veröffentlichen", command=self.add_group_task).pack(pady=5)
 
-        with open(CLOUD_DB, "w") as f:
-            json.dump(self.files, f, indent=2)
+    def refresh_personal_tasks(self):
+        self.personal_tasks_box.delete(0, "end")
+        for task in self.user_tasks.get(self.username, []):
+            status = "[✓]" if task.get("done") else "[  ]"
+            self.personal_tasks_box.insert("end", f"{status} {task['text']}")
 
-        self.selected_path = ""
-        self.file_label.config(text="Keine Datei ausgewählt")
-        self.group_select.set("")
-        self.user_select.set("")
-        self.refresh_table()
+    def refresh_group_tasks(self):
+        self.group_tasks_box.delete(0, "end")
+        for task in self.group_tasks.get(self.group, []) + self.group_tasks.get("alle", []):
+            date = task.get("date", "")
+            self.group_tasks_box.insert("end", f"- {task['title']} ({date})")
 
-    def refresh_table(self):
-        for i in self.file_table.get_children():
-            self.file_table.delete(i)
+    def add_personal_task(self):
+        text = self.personal_entry.get().strip()
+        if not text:
+            return
+        self.user_tasks.setdefault(self.username, []).append({"text": text, "done": False})
+        self.save_tasks()
+        self.refresh_personal_tasks()
+        self.personal_entry.delete(0, "end")
 
-        for f in self.files:
-            if (f["to_user"] == self.username or f["to_group"] == self.group) or f["from"] == self.username:
-                freigabe = f["to_user"] if f["to_user"] else f["to_group"]
-                self.file_table.insert("", "end", values=(f["filename"], f["from"], freigabe))
+    def mark_personal_done(self):
+        idx = self.personal_tasks_box.curselection()
+        if not idx:
+            return
+        index = idx[0]
+        self.user_tasks[self.username][index]["done"] = True
+        self.save_tasks()
+        self.refresh_personal_tasks()
+
+    def delete_personal_task(self):
+        idx = self.personal_tasks_box.curselection()
+        if not idx:
+            return
+        index = idx[0]
+        del self.user_tasks[self.username][index]
+        self.save_tasks()
+        self.refresh_personal_tasks()
+
+    def add_group_task(self):
+        title = self.group_title_entry.get().strip()
+        target = self.group_target_entry.get().strip().lower()
+        if not title or not target:
+            messagebox.showerror("Fehler", "Bitte Titel und Zielgruppe angeben.")
+            return
+        task = {"title": title, "date": datetime.now().strftime("%d.%m.%Y")}
+        self.group_tasks.setdefault(target, []).append(task)
+        self.save_tasks()
+        self.refresh_group_tasks()
+        messagebox.showinfo("Gespeichert", "Aufgabe wurde veröffentlicht.")
