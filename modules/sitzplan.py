@@ -112,7 +112,7 @@ class Modul:
             }
         }
         os.makedirs(os.path.dirname(PLAN_JSON_PATH), exist_ok=True)
-        with open(PLAN_JSON_PATH, "w") as f:
+        with open(PLAN_JSON_PATH, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
         messagebox.showinfo("Gespeichert", "Sitzplan wurde gespeichert.")
 
@@ -121,7 +121,7 @@ class Modul:
             messagebox.showerror("Fehler", "Kein gespeicherter Sitzplan vorhanden.")
             return
 
-        with open(PLAN_JSON_PATH, "r") as f:
+        with open(PLAN_JSON_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         self.rows_entry.delete(0, tk.END)
@@ -149,10 +149,10 @@ class Modul:
     def load_users(self):
         if not os.path.exists(USER_JSON_PATH):
             return {}
-        with open(USER_JSON_PATH, "r") as f:
+        with open(USER_JSON_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def save_users(self, users):
         os.makedirs(os.path.dirname(USER_JSON_PATH), exist_ok=True)
-        with open(USER_JSON_PATH, "w") as f:
+        with open(USER_JSON_PATH, "w", encoding="utf-8") as f:
             json.dump(users, f, indent=2)
