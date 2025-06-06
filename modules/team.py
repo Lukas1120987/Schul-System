@@ -79,7 +79,7 @@ class Modul:
         users_datei = os.path.join(DATA_DIR, "users.json")
         if not os.path.exists(users_datei):
             return False
-        with open(users_datei, "r") as f:
+        with open(users_datei, "r", encoding="utf-8") as f:
             users = json.load(f)
             return users.get(self.username, {}).get("is_admin", False)
 
