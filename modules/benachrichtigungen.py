@@ -37,10 +37,10 @@ class Modul:
 
         # Stelle sicher, dass die Datei existiert
         if not os.path.exists("data/notifications.json"):
-            with open("data/notifications.json", "w") as f:
+            with open("data/notifications.json", "w", encoding="utf-8") as f:
                 json.dump({}, f)
 
-        with open("data/notifications.json", "r") as f:
+        with open("data/notifications.json", "r", encoding="utf-8") as f:
             daten = json.load(f)
 
         # Wenn 'alle' gewählt wurde, alle User aus users.json laden und ansprechen
@@ -49,7 +49,7 @@ class Modul:
             if not os.path.exists("data/users.json"):
                 tk.messagebox.showerror("Fehler", "users.json nicht gefunden.")
                 return
-            with open("data/users.json", "r") as f:
+            with open("data/users.json", "r", encoding="utf-8") as f:
                 users_data = json.load(f)
                 empfaenger_liste = list(users_data.keys())
         else:
@@ -63,7 +63,7 @@ class Modul:
                 "gelesen": False
             })
 
-        with open("data/notifications.json", "w") as f:
+        with open("data/notifications.json", "w", encoding="utf-8") as f:
             json.dump(daten, f, indent=4)
 
         tk.messagebox.showinfo("Erfolg", f"Nachricht an {', '.join(empfaenger_liste)} gesendet.")
