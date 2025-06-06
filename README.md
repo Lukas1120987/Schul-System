@@ -1,5 +1,8 @@
 # 📚 SchulSystem – Das digitale Schulverwaltungssystem
 
+![Alternativtext](https://cdn.discordapp.com/attachments/1380542231135653980/1380542276371087440/Set_UP_Screen.jpg?ex=684441af&is=6842f02f&hm=4ca683862616f2e9ef03e4e6ee4a5b126b8aab4e79d96a6bd8b4bc51b166fc9c&)
+
+
 **SchulSystem** ist ein modulares Schulverwaltungssystem in Python, das IServ, WebUntis und andere Tools kombiniert – mit Fokus auf einfache Bedienung, erweiterbare Module und lokale Datenhaltung.
 
 ---
