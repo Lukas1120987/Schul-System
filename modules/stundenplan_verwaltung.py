@@ -56,7 +56,7 @@ class Modul:
         self.entries = {}
 
         try:
-            with open("data/schedule.json", "r") as f:
+            with open("data/schedule.json", "r", encoding="utf-8") as f:
                 schedule_data = json.load(f)
         except FileNotFoundError:
             schedule_data = {}
@@ -87,14 +87,14 @@ class Modul:
             updated_schedule.setdefault(day, {})[hour] = entry.get()
 
         try:
-            with open("data/schedule.json", "r") as f:
+            with open("data/schedule.json", "r", encoding="utf-8") as f:
                 all_schedules = json.load(f)
         except FileNotFoundError:
             all_schedules = {}
 
         all_schedules[group] = updated_schedule
 
-        with open("data/schedule.json", "w") as f:
+        with open("data/schedule.json", "w", encoding="utf-8") as f:
             json.dump(all_schedules, f, indent=2)
 
         tk.messagebox.showinfo("Gespeichert", f"Stundenplan für Gruppe '{group}' wurde gespeichert.")
