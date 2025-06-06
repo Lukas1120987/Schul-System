@@ -35,10 +35,10 @@ class Modul:
         def update_username():
             new_name = new_name_entry.get().strip()
             if new_name:
-                with open(USERS_PATH, "r") as f:
+                with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
                 users[new_name] = users.pop(self.nutzername)
-                with open(USERS_PATH, "w") as f:
+                with open(USERS_PATH, "w", encoding="utf-8") as f:
                     json.dump(users, f, indent=2)
                 messagebox.showinfo("Erfolg", "Benutzername geändert – bitte neu einloggen.")
             else:
@@ -56,10 +56,10 @@ class Modul:
         def update_password():
             new_pw = new_pw_entry.get().strip()
             if new_pw:
-                with open(USERS_PATH, "r") as f:
+                with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
                 users[self.nutzername]["password"] = new_pw
-                with open(USERS_PATH, "w") as f:
+                with open(USERS_PATH, "w", encoding="utf-8") as f:
                     json.dump(users, f, indent=2)
                 messagebox.showinfo("Erfolg", "Passwort aktualisiert.")
             else:
@@ -78,12 +78,12 @@ class Modul:
             content = text.get("1.0", "end").strip()
             if content:
                 if not os.path.exists(SUPPORT_PATH):
-                    with open(SUPPORT_PATH, "w") as f:
+                    with open(SUPPORT_PATH, "w", encoding="utf-8") as f:
                         json.dump([], f)
-                with open(SUPPORT_PATH, "r") as f:
+                with open(SUPPORT_PATH, "r", encoding="utf-8") as f:
                     tickets = json.load(f)
                 tickets.append({"user": self.nutzername, "content": content, "status": "offen"})
-                with open(SUPPORT_PATH, "w") as f:
+                with open(SUPPORT_PATH, "w", encoding="utf-8") as f:
                     json.dump(tickets, f, indent=2)
                 messagebox.showinfo("Erfolg", "Support-Ticket gesendet.")
                 text.delete("1.0", "end")
@@ -103,12 +103,12 @@ class Modul:
             feedback = text.get("1.0", "end").strip()
             if feedback:
                 if not os.path.exists(FEEDBACK_PATH):
-                    with open(FEEDBACK_PATH, "w") as f:
+                    with open(FEEDBACK_PATH, "w", encoding="utf-8") as f:
                         json.dump([], f)
-                with open(FEEDBACK_PATH, "r") as f:
+                with open(FEEDBACK_PATH, "r", encoding="utf-8") as f:
                     feedbacks = json.load(f)
                 feedbacks.append({"user": self.nutzername, "feedback": feedback})
-                with open(FEEDBACK_PATH, "w") as f:
+                with open(FEEDBACK_PATH, "w", encoding="utf-8") as f:
                     json.dump(feedbacks, f, indent=2)
                 messagebox.showinfo("Erfolg", "Feedback gesendet.")
                 text.delete("1.0", "end")
@@ -129,10 +129,10 @@ class Modul:
         def update_email():
             email = email_entry.get().strip()
             if "@" in email and "." in email:
-                with open(USERS_PATH, "r") as f:
+                with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
                 users[self.nutzername]["email"] = email
-                with open(USERS_PATH, "w") as f:
+                with open(USERS_PATH, "w", encoding="utf-8") as f:
                     json.dump(users, f, indent=2)
                 messagebox.showinfo("Erfolg", "E-Mail-Adresse gespeichert.")
                 messagebox.showwarning("Hinweis", "Dies ist eine BETA-Funktion, welche zur Zeit nicht funktioniert.")
