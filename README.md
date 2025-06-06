@@ -82,7 +82,7 @@ per Discord: https://discord.gg/NHgr4FKXE3
 ## 🏗️ Aufbau
 
 ```plaintext
-EduClass/
+SchulSystem/
 ├── main.py                 # Hauptstartdatei
 ├── login.py                # Loginfenster
 ├── dashboard.py            # Zentrale Oberfläche
