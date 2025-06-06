@@ -7,7 +7,7 @@ DB = "data/elearning.json"
 USERS_DB = "data/users.json"
 
 class Modul:
-    def __init__(self, master, username, user_data):
+    def __init__(self, master, username, user_data,):
         self.master = master
         self.username = username
         self.group = user_data["group"]
@@ -30,17 +30,21 @@ class Modul:
                 json.dump([], f)
 
     def load_data(self):
+        # Nutzergruppen laden
+        try:
+            with open(USERS_DB, "r", encoding="utf-8") as f:
+                users = json.load(f)
+                self.groups = list(set(user["group"] for user in users.values()))
+        except:
+            self.groups = []
+
+        # Tests laden
         try:
             with open(DB, "r", encoding="utf-8") as f:
                 self.tests = json.load(f)
         except:
             self.tests = []
 
-        try:
-            with open(USERS_DB, "r", encoding="utf-8") as f:
-                self.groups = list(set(u["group"] for u in json.load(f)))
-        except:
-            self.groups = []
 
     def setup_ui(self):
         if self.is_admin or self.group == "Lehrer":
