@@ -134,7 +134,7 @@ class Modul:
                 users[self.nutzername]["email"] = email
                 with open(USERS_PATH, "w") as f:
                     json.dump(users, f, indent=2)
-                messagebox.showinfo("Erfolg", "E-Mail-Adresse gespeichert.")
+                messagebox.showinfo("Erfolg", "E-Mail-Adresse gespeichert.", "Dies ist eine BETA-Funktion, welche zur Zeit nicht funktioniert.")
             else:
                 messagebox.showwarning("Fehler", "Bitte eine gültige E-Mail-Adresse eingeben.")
 
