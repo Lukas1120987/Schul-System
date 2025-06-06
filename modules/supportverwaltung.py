@@ -64,7 +64,7 @@ class Modul:
         self.ticket_listbox.delete(0, tk.END)
 
         if os.path.exists(SUPPORT_PATH):
-            with open(SUPPORT_PATH, "r") as f:
+            with open(SUPPORT_PATH, "r", encoding="utf-8") as f:
                 self.tickets = json.load(f)
 
         for i, ticket in enumerate(self.tickets):
@@ -86,7 +86,7 @@ class Modul:
             return
         new_status = self.status_var.get()
         self.tickets[index[0]]["status"] = new_status
-        with open(SUPPORT_PATH, "w") as f:
+        with open(SUPPORT_PATH, "w", encoding="utf-8") as f:
             json.dump(self.tickets, f, indent=2)
         self.load_tickets()
         messagebox.showinfo("Erfolg", "Ticketstatus aktualisiert.")
@@ -94,7 +94,7 @@ class Modul:
     def load_feedback(self):
         feedbacks = []
         if os.path.exists(FEEDBACK_PATH):
-            with open(FEEDBACK_PATH, "r") as f:
+            with open(FEEDBACK_PATH, "r", encoding="utf-8") as f:
                 feedbacks = json.load(f)
 
         self.feedback_text.config(state="normal")
