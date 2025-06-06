@@ -31,20 +31,20 @@ class Modul:
         os.makedirs("data", exist_ok=True)
         for path, default in [(SPRECHSTUNDEN_DB, {}), (SPRECHZEITEN_DB, {}), (NOTIFICATIONS_DB, {})]:
             if not os.path.exists(path):
-                with open(path, "w") as f:
+                with open(path, "w", encoding="utf-8") as f:
                     json.dump(default, f)
 
     def load_data(self):
-        with open(SPRECHSTUNDEN_DB, "r") as f:
+        with open(SPRECHSTUNDEN_DB, "r", encoding="utf-8") as f:
             self.sprechstunden = json.load(f)
 
-        with open(SPRECHZEITEN_DB, "r") as f:
+        with open(SPRECHZEITEN_DB, "r", encoding="utf-8") as f:
             self.sprechzeiten = json.load(f)
 
-        with open(USERS_DB, "r") as f:
+        with open(USERS_DB, "r", encoding="utf-8") as f:
             self.users = json.load(f)
 
-        with open(NOTIFICATIONS_DB, "r") as f:
+        with open(NOTIFICATIONS_DB, "r", encoding="utf-8") as f:
             self.notifications = json.load(f)
 
         self.lehrer = [k for k, u in self.users.items() if u.get("group") == "Lehrer"]
@@ -92,7 +92,7 @@ class Modul:
 
     def buche_termin(self, lehrer, zeit):
         self.sprechstunden.setdefault(lehrer, {}).setdefault(self.username, []).append(zeit)
-        with open(SPRECHSTUNDEN_DB, "w") as f:
+        with open(SPRECHSTUNDEN_DB, "w", encoding="utf-8") as f:
             json.dump(self.sprechstunden, f, indent=2)
         self.zeige_zeiten()
         self.update_meine_termine()
@@ -117,7 +117,7 @@ class Modul:
                 self.sprechstunden[lehrer][self.username].remove(zeit)
                 if not self.sprechstunden[lehrer][self.username]:
                     del self.sprechstunden[lehrer][self.username]
-                with open(SPRECHSTUNDEN_DB, "w") as f:
+                with open(SPRECHSTUNDEN_DB, "w", encoding="utf-8") as f:
                     json.dump(self.sprechstunden, f, indent=2)
                 self.zeige_zeiten()
                 self.update_meine_termine()
@@ -164,7 +164,7 @@ class Modul:
             return
 
         self.sprechzeiten.setdefault(self.username, []).append(neue_zeit)
-        with open(SPRECHZEITEN_DB, "w") as f:
+        with open(SPRECHZEITEN_DB, "w", encoding="utf-8") as f:
             json.dump(self.sprechzeiten, f, indent=2)
         self.neue_zeit_entry.delete(0, "end")
         self.update_zeiten_liste()
@@ -174,7 +174,7 @@ class Modul:
         if auswahl:
             index = auswahl[0]
             del self.sprechzeiten[self.username][index]
-            with open(SPRECHZEITEN_DB, "w") as f:
+            with open(SPRECHZEITEN_DB, "w", encoding="utf-8") as f:
                 json.dump(self.sprechzeiten, f, indent=2)
             self.update_zeiten_liste()
 
@@ -202,7 +202,7 @@ class Modul:
             self.sprechstunden[self.username][schueler].remove(zeit)
             if not self.sprechstunden[self.username][schueler]:
                 del self.sprechstunden[self.username][schueler]
-            with open(SPRECHSTUNDEN_DB, "w") as f:
+            with open(SPRECHSTUNDEN_DB, "w", encoding="utf-8") as f:
                 json.dump(self.sprechstunden, f, indent=2)
             self.zeige_buchungen()
             self.send_notification(schueler, f"{self.username} hat den Termin am {zeit} abgesagt.")
@@ -214,5 +214,5 @@ class Modul:
             "datum": datum,
             "gelesen": False
         })
-        with open(NOTIFICATIONS_DB, "w") as f:
+        with open(NOTIFICATIONS_DB, "w", encoding="utf-8") as f:
             json.dump(self.notifications, f, indent=2)
