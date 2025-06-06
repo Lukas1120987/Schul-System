@@ -88,13 +88,13 @@ class Modul:
     def load_users(self):
         if not os.path.exists(USER_JSON_PATH):
             return {}
-        with open(USER_JSON_PATH, "r") as f:
+        with open(USER_JSON_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def load_krank(self):
         if not os.path.exists(KRANK_JSON_PATH):
             return {}
-        with open(KRANK_JSON_PATH, "r") as f:
+        with open(KRANK_JSON_PATH, "r", encoding="utf-8") as f:
             try:
                 return json.load(f)
             except json.JSONDecodeError:
@@ -102,5 +102,5 @@ class Modul:
 
     def save_krank(self, data):
         os.makedirs(os.path.dirname(KRANK_JSON_PATH), exist_ok=True)
-        with open(KRANK_JSON_PATH, "w") as f:
+        with open(KRANK_JSON_PATH, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
