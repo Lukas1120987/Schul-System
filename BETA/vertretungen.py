@@ -12,7 +12,7 @@ class Modul:
         self.is_admin = user_data.get("is_admin", False)
 
         self.frame = tk.Frame(master, bg="white")
-        tk.Label(self.frame, text="🧑‍🏫 Vertretungen verwalten", font=("Arial", 16), bg="white").pack(pady=10)
+        tk.Label(self.frame, text="🧑‍🏫 Vertretungsverwaltung", font=("Arial", 16), bg="white").pack(pady=10)
 
         if not self.is_admin:
             tk.Label(self.frame, text="Nur Administratoren können dieses Modul verwenden.", fg="red", bg="white").pack()
@@ -50,86 +50,99 @@ class Modul:
         with open("data/vertretungen.json", "r", encoding="utf-8") as f:
             self.vertretungen = json.load(f)
 
-        # Lehrer & Klassen
         self.lehrer = [u for u in self.users if self.users[u].get("group") == "Lehrer"]
-        self.klassen = list(set(self.users[u]["second_group"] for u in self.users if self.users[u].get("second_group")))
+        self.klassen = sorted(set(self.users[u]["second_group"] for u in self.users if self.users[u].get("second_group")))
 
     def build_gui(self):
-        # Klasse wählen
-        tk.Label(self.frame, text="🎓 Klasse", bg="white").pack(anchor="w", padx=10)
+        # Abschnitt Auswahl
+        frame_input = tk.Frame(self.frame, bg="white")
+        frame_input.pack(pady=5)
+
+        # Klasse
+        tk.Label(frame_input, text="🎓 Klasse:", bg="white").grid(row=0, column=0, sticky="w")
         self.klasse_var = tk.StringVar()
-        self.klasse_dropdown = ttk.Combobox(self.frame, textvariable=self.klasse_var, values=self.klassen, state="readonly")
-        self.klasse_dropdown.pack(anchor="w", padx=20, pady=2)
+        ttk.Combobox(frame_input, textvariable=self.klasse_var, values=self.klassen, state="readonly").grid(row=0, column=1, padx=5)
 
         # Datum
-        tk.Label(self.frame, text="📅 Datum (YYYY-MM-DD)", bg="white").pack(anchor="w", padx=10)
-        self.datum_entry = tk.Entry(self.frame)
+        tk.Label(frame_input, text="📅 Datum:", bg="white").grid(row=1, column=0, sticky="w")
+        self.datum_entry = tk.Entry(frame_input)
         self.datum_entry.insert(0, str(date.today()))
-        self.datum_entry.pack(anchor="w", padx=20, pady=2)
+        self.datum_entry.grid(row=1, column=1)
 
         # Stunde
-        tk.Label(self.frame, text="⏰ Stunde (z. B. 1–8)", bg="white").pack(anchor="w", padx=10)
+        tk.Label(frame_input, text="⏰ Stunde:", bg="white").grid(row=2, column=0, sticky="w")
         self.stunde_var = tk.StringVar()
-        self.stunde_dropdown = ttk.Combobox(self.frame, textvariable=self.stunde_var, values=[str(i) for i in range(1, 9)], state="readonly")
-        self.stunde_dropdown.pack(anchor="w", padx=20, pady=2)
+        ttk.Combobox(frame_input, textvariable=self.stunde_var, values=[str(i) for i in range(1, 9)], state="readonly").grid(row=2, column=1)
 
-        # Neuer Lehrer
-        tk.Label(self.frame, text="👨‍🏫 Vertretungslehrer", bg="white").pack(anchor="w", padx=10)
+        # Lehrerwahl
+        tk.Label(frame_input, text="👨‍🏫 Lehrer:", bg="white").grid(row=3, column=0, sticky="w")
         self.lehrer_var = tk.StringVar()
-        self.lehrer_dropdown = ttk.Combobox(self.frame, textvariable=self.lehrer_var, values=self.lehrer, state="readonly")
-        self.lehrer_dropdown.pack(anchor="w", padx=20, pady=2)
+        ttk.Combobox(frame_input, textvariable=self.lehrer_var, values=self.lehrer, state="readonly").grid(row=3, column=1)
 
-        # Fach (optional)
-        tk.Label(self.frame, text="📚 Fach (optional)", bg="white").pack(anchor="w", padx=10)
+        # Fachwahl
+        tk.Label(frame_input, text="📚 Fach:", bg="white").grid(row=4, column=0, sticky="w")
         self.fach_var = tk.StringVar()
-        self.fach_dropdown = ttk.Combobox(self.frame, textvariable=self.fach_var, values=self.subjects, state="readonly")
-        self.fach_dropdown.pack(anchor="w", padx=20, pady=2)
+        ttk.Combobox(frame_input, textvariable=self.fach_var, values=self.subjects, state="readonly").grid(row=4, column=1)
 
-        # Raum (optional)
-        tk.Label(self.frame, text="🏫 Raum (optional)", bg="white").pack(anchor="w", padx=10)
+        # Raumwahl
+        tk.Label(frame_input, text="🏫 Raum:", bg="white").grid(row=5, column=0, sticky="w")
         self.raum_var = tk.StringVar()
-        self.raum_dropdown = ttk.Combobox(self.frame, textvariable=self.raum_var, values=[r["name"] for r in self.rooms], state="readonly")
-        self.raum_dropdown.pack(anchor="w", padx=20, pady=2)
+        ttk.Combobox(frame_input, textvariable=self.raum_var, values=[r["name"] for r in self.rooms], state="readonly").grid(row=5, column=1)
 
-        # Button hinzufügen
-        tk.Button(self.frame, text="➕ Vertretung eintragen", command=self.add_vertretung).pack(pady=5)
+        # Buttons
+        frame_buttons = tk.Frame(self.frame, bg="white")
+        frame_buttons.pack(pady=10)
 
-        # Liste bestehender Vertretungen
+        tk.Button(frame_buttons, text="➕ Komplettvertretung", command=self.add_full).grid(row=0, column=0, padx=5)
+        tk.Button(frame_buttons, text="👨‍🏫 Nur Lehrerwechsel", command=self.add_teacher).grid(row=0, column=1, padx=5)
+        tk.Button(frame_buttons, text="🏫 Nur Raumwechsel", command=self.add_room).grid(row=0, column=2, padx=5)
+
+        # Liste + Aktionen
         self.vertretungsliste = tk.Listbox(self.frame, height=8)
         self.vertretungsliste.pack(padx=20, pady=10, fill="x")
+
+        tk.Button(self.frame, text="🗑️ Ausgewählte löschen", command=self.delete_entry).pack(pady=3)
+        tk.Button(self.frame, text="💾 Speichern", command=self.save, bg="green", fg="white").pack(pady=5)
+
         self.refresh_list()
 
-        # Löschen
-        tk.Button(self.frame, text="🗑️ Ausgewählte Vertretung löschen", command=self.delete_vertretung).pack()
-
-        # Speichern
-        tk.Button(self.frame, text="💾 Speichern", bg="green", fg="white", command=self.save).pack(pady=10)
-
-    def add_vertretung(self):
-        klasse = self.klasse_var.get()
-        datum = self.datum_entry.get()
-        stunde = self.stunde_var.get()
-        lehrer = self.lehrer_var.get()
-        fach = self.fach_var.get()
-        raum = self.raum_var.get()
-
-        if not (klasse and datum and stunde and lehrer):
-            messagebox.showerror("Fehler", "Bitte Klasse, Datum, Stunde und Lehrer angeben.")
+    def add_full(self):
+        if not self.check_required(["klasse", "datum", "stunde", "lehrer"]):
             return
-
-        eintrag = {
-            "klasse": klasse,
-            "datum": datum,
-            "stunde": stunde,
-            "lehrer": lehrer
+        entry = {
+            "klasse": self.klasse_var.get(),
+            "datum": self.datum_entry.get(),
+            "stunde": self.stunde_var.get(),
+            "lehrer": self.lehrer_var.get()
         }
-        if fach: eintrag["fach"] = fach
-        if raum: eintrag["raum"] = raum
-
-        self.vertretungen.append(eintrag)
+        if self.fach_var.get(): entry["fach"] = self.fach_var.get()
+        if self.raum_var.get(): entry["raum"] = self.raum_var.get()
+        self.vertretungen.append(entry)
         self.refresh_list()
 
-    def delete_vertretung(self):
+    def add_teacher(self):
+        if not self.check_required(["klasse", "datum", "stunde", "lehrer"]):
+            return
+        self.vertretungen.append({
+            "klasse": self.klasse_var.get(),
+            "datum": self.datum_entry.get(),
+            "stunde": self.stunde_var.get(),
+            "lehrer": self.lehrer_var.get()
+        })
+        self.refresh_list()
+
+    def add_room(self):
+        if not self.check_required(["klasse", "datum", "stunde", "raum"]):
+            return
+        self.vertretungen.append({
+            "klasse": self.klasse_var.get(),
+            "datum": self.datum_entry.get(),
+            "stunde": self.stunde_var.get(),
+            "raum": self.raum_var.get()
+        })
+        self.refresh_list()
+
+    def delete_entry(self):
         index = self.vertretungsliste.curselection()
         if index:
             del self.vertretungen[index[0]]
@@ -138,12 +151,20 @@ class Modul:
     def refresh_list(self):
         self.vertretungsliste.delete(0, tk.END)
         for eintrag in self.vertretungen:
-            zeile = f"{eintrag['datum']} – {eintrag['klasse']} – {eintrag['stunde']}. Std → {eintrag['lehrer']}"
-            if 'fach' in eintrag: zeile += f" ({eintrag['fach']})"
-            if 'raum' in eintrag: zeile += f", Raum {eintrag['raum']}"
+            zeile = f"{eintrag['datum']} | {eintrag['klasse']} | {eintrag['stunde']} Std"
+            if "lehrer" in eintrag: zeile += f" → {eintrag['lehrer']}"
+            if "fach" in eintrag: zeile += f" ({eintrag['fach']})"
+            if "raum" in eintrag: zeile += f", Raum {eintrag['raum']}"
             self.vertretungsliste.insert(tk.END, zeile)
 
     def save(self):
         with open("data/vertretungen.json", "w", encoding="utf-8") as f:
             json.dump(self.vertretungen, f, indent=2)
-        messagebox.showinfo("Gespeichert", "Vertretungen gespeichert.")
+        messagebox.showinfo("Gespeichert", "Vertretungen wurden gespeichert.")
+
+    def check_required(self, fields):
+        for field in fields:
+            if getattr(self, f"{field}_var", self.datum_entry).get().strip() == "":
+                messagebox.showerror("Fehlende Eingabe", f"{field.capitalize()} fehlt.")
+                return False
+        return True
