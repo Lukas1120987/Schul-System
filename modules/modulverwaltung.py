@@ -37,7 +37,7 @@ class Modul:
 
     def load_config(self):
         try:
-            with open("data/modules.json", "r") as f:
+            with open("data/modules.json", "r", encoding="utf-8") as f:
                 return json.load(f)
         except:
             return {}
@@ -45,7 +45,7 @@ class Modul:
     def save_config(self):
         for modul in self.module_config:
             self.module_config[modul]["aktiv"] = self.check_vars[modul].get()
-        with open("data/modules.json", "w") as f:
+        with open("data/modules.json", "w", encoding="utf-8") as f:
             json.dump(self.module_config, f, indent=4)
         tk.Label(self.frame, text="Gespeichert. Änderungen werden beim nächsten Start wirksam.",
                  fg="green", bg="white", font=("Segoe UI", 10)).pack(pady=5)
