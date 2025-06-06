@@ -8,9 +8,6 @@ from updater import check_and_update
 import smtplib
 import ssl
 import os
-from dotenv import load_dotenv
-import smtplib
-from email.message import EmailMessage
 
 # Farben
 PRIMARY_BLUE = "#1a73e8"
@@ -128,10 +125,10 @@ class LoginWindow:
                                    relief="flat", padx=10, pady=5)
         self.login_btn.grid(row=3, column=0, columnspan=2, pady=20)
 
-        self.reset_pw_btn = tk.Button(self.frame, text="Passwort zurücksetzen", bg="#f44336", fg="white",
-                                      font=("Segoe UI", 10, "bold"), command=self.reset_password,
-                                      relief="flat", padx=10, pady=5)
-        self.reset_pw_btn.grid(row=4, column=0, columnspan=2, pady=(0, 20))
+        #self.reset_pw_btn = tk.Button(self.frame, text="Passwort zurücksetzen", bg="#f44336", fg="white",
+        #                              font=("Segoe UI", 10, "bold"), command=self.reset_password,
+        #                              relief="flat", padx=10, pady=5)
+        #self.reset_pw_btn.grid(row=4, column=0, columnspan=2, pady=(0, 20))
 
     def toggle_password_visibility(self):
         if self.entry_password.cget('show') == '':
@@ -140,82 +137,6 @@ class LoginWindow:
         else:
             self.entry_password.config(show='')
             self.eye_button.config(text="🚫  ")
-
-
-
-    def reset_password(self):
-        username = tk.simpledialog.askstring("Passwort zurücksetzen", "Bitte gib deinen Benutzernamen ein:")
-        if not username:
-            return  # Abbruch
-
-        try:
-            with open("data/users.json", "r", encoding="utf-8") as f:
-                users = json.load(f)
-
-            if username not in users:
-                messagebox.showerror("Fehler", "Benutzername nicht gefunden.")
-                return
-
-            user_data = users[username]
-            email = user_data.get("email", None)
-            if not email:
-                messagebox.showwarning("Fehler", "Für diesen Benutzer ist keine E-Mail-Adresse hinterlegt.")
-                return
-
-            # Rücksetzcode generieren
-            reset_code = "".join([str(random.randint(0, 9)) for _ in range(6)])
-
-            # E-Mail senden (hier SMTP-Config anpassen!)
-            if self.send_reset_email(email, reset_code):
-                # Passwort auf den Rücksetzcode ändern
-                users[username]["password"] = reset_code
-
-                # Optional: Reset-Code ebenfalls speichern (z.B. für Prüfung)
-                users[username]["reset_code"] = reset_code
-
-                with open("data/users.json", "w", encoding="utf-8") as f:
-                    json.dump(users, f, indent=2)
-
-                messagebox.showinfo("Erfolg", f"Ein Rücksetzcode wurde an {email} gesendet und als neues Passwort gesetzt.")
-            else:
-                messagebox.showerror("Fehler", "E-Mail konnte nicht gesendet werden.")
-        except Exception as e:
-            messagebox.showerror("Fehler", f"Fehler beim Zurücksetzen: {e}")
-
-
-    
-
-    def send_reset_email(self, to_email, reset_code):
-        load_dotenv()  # .env-Datei laden
-
-        SMTP_SERVER = "smtp.mail.yahoo.com"
-        SMTP_PORT = 587
-        SMTP_USER = os.getenv("SMTP_USER")
-        SMTP_PASS = os.getenv("SMTP_PASS")
-
-        msg = EmailMessage()
-        msg["Subject"] = "Passwort-Rücksetzcode für SchulSystem"
-        msg["From"] = SMTP_USER
-        msg["To"] = to_email
-        msg.set_content(f"Hallo,\n\nDein Rücksetzcode lautet: {reset_code}\n\n"
-                        "Bitte gib diesen Code im Programm ein.\n\n"
-                        "Falls du diese Mail nicht angefordert hast, ignoriere sie bitte.")
-
-        try:
-            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as smtp:
-                smtp.ehlo()
-                smtp.starttls()
-                smtp.ehlo()
-                smtp.login(SMTP_USER, SMTP_PASS)
-                smtp.send_message(msg)
-            print("E-Mail gesendet!")
-            return True
-        except Exception as e:
-            print(f"Fehler beim Senden der E-Mail: {e}")
-            return False
-
-
-
 
 
 
