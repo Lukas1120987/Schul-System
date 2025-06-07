@@ -33,7 +33,7 @@ class InstallAssistantSplash:
         # 🔄 LOGO mit PIL laden
         try:
             image = Image.open("logo.png")
-            image = image.resize((200, 200), Image.ANTIALIAS)  # Größe anpassen
+            image = image.resize((200, 200))  # Größe anpassen
             self.logo_photo = ImageTk.PhotoImage(image)
             self.logo_label = tk.Label(self.container, image=self.logo_photo, bg="#1e2a45")
             self.logo_label.pack(pady=(0, 30))
