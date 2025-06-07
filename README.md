@@ -68,6 +68,7 @@ Hier kannst du deinen Benutzernamen ändern, dein Passwort anpassen, Feedback ge
 
 1. 🔽 **Downloade** das Repositories
 2. 📂 **Extrahieren** der `ZIP`-Datei aus deinem Download-Ordner
+3. 🖇️ **Download** der externen Pakete aus `requirements.txt`. 
 
 ---
 ## Kontakt
