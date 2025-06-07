@@ -66,12 +66,8 @@ Hier kannst du deinen Benutzernamen ändern, dein Passwort anpassen, Feedback ge
 ---
 ## 🚀 Nutzung
 
-1. 🔽 **Download oder Clone** des Repositories:
-   
-bash
-   git clone https://github.com/Lukas1120987/SchulSystem
-
-2. 📂 **Extrahieren** der `ZIP`-Datei
+1. 🔽 **Downloade** das Repositories
+2. 📂 **Extrahieren** der `ZIP`-Datei aus deinem Download-Ordner
 
 ---
 ## Kontakt
