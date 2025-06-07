@@ -19,6 +19,8 @@ class Modul:
 
         tk.Button(self.frame, text="📋 Schnell Benutzer erstellen", bg="#e0e0e0", command=self.open_quick_create_window).pack(pady=(0, 10))
 
+        tk.Button(self.frame, text="👥 Alle Nutzer anzeigen", bg="#e0e0e0", command=self.open_user_list_window).pack(pady=(0, 10))
+
         tk.Label(self.frame, text="👤 Neuen Benutzer anlegen", font=("Arial", 12, "bold"), bg="white").pack(pady=5)
         tk.Label(self.frame, text="Benutzername", bg="white").pack()
         self.user_entry = tk.Entry(self.frame)
@@ -272,3 +274,68 @@ class Modul:
     def get_all_groups(self):
         users = self.load_users()
         return sorted(set(u["group"] for u in users.values()))
+
+    def open_user_list_window(self):
+        users = self.load_users()
+        user_list = [user for user in users.keys() if not user.startswith("_group_")]
+
+        win = tk.Toplevel(self.master)
+        win.title("Alle Nutzer")
+        win.geometry("400x300")
+        win.configure(bg="white")
+
+        tk.Label(win, text="👥 Nutzerübersicht", font=("Arial", 14, "bold"), bg="white").pack(pady=10)
+
+        listbox = tk.Listbox(win, width=40)
+        listbox.pack(pady=5, expand=True, fill=tk.BOTH)
+
+        user_map = {}
+
+        for user in user_list:
+            info = users[user]
+            display_text = f"{user} — {info.get('group', '')} | {info.get('second_group', '')}"
+            listbox.insert(tk.END, display_text)
+            user_map[display_text] = user
+
+        def on_select(event):
+            selection = listbox.curselection()
+            if not selection:
+                return
+            display = listbox.get(selection[0])
+            username = user_map[display]
+            self.edit_user_window(username)
+
+        listbox.bind("<<ListboxSelect>>", on_select)
+
+    def edit_user_window(self, username):
+        users = self.load_users()
+        user_data = users.get(username)
+        if not user_data:
+            messagebox.showerror("Fehler", "Benutzer nicht gefunden.")
+            return
+
+        win = tk.Toplevel(self.master)
+        win.title(f"Benutzer bearbeiten: {username}")
+        win.geometry("300x250")
+        win.configure(bg="white")
+
+        tk.Label(win, text=f"Benutzer: {username}", font=("Arial", 12, "bold"), bg="white").pack(pady=10)
+
+        tk.Label(win, text="Gruppe", bg="white").pack()
+        group_var = tk.StringVar(value=user_data.get("group", ""))
+        group_dropdown = tk.OptionMenu(win, group_var, *self.get_all_groups())
+        group_dropdown.pack()
+
+        tk.Label(win, text="Zweite Gruppe", bg="white").pack()
+        group2_var = tk.StringVar(value=user_data.get("second_group", ""))
+        group2_dropdown = tk.OptionMenu(win, group2_var, *self.get_all_groups())
+        group2_dropdown.pack()
+
+        def save_changes():
+            users[username]["group"] = group_var.get().strip()
+            users[username]["second_group"] = group2_var.get().strip()
+            self.save_users(users)
+            messagebox.showinfo("Erfolg", "Änderungen gespeichert.", parent=win)
+            win.destroy()
+
+        tk.Button(win, text="Speichern", command=save_changes).pack(pady=10)
