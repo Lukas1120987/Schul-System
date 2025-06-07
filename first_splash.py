@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image, ImageTk  # <--- NEU
 import random
 import time
 
@@ -12,30 +13,28 @@ class InstallAssistantSplash:
         self.dot_count = 0
 
         self.start_time = time.time()
-        self.min_duration = 1     # Sekunden
-        self.max_duration = 500    # Sekunden
+        self.min_duration = 1
+        self.max_duration = 500
 
-        # Bildschirmgröße & Stil
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
         root.overrideredirect(True)
         root.geometry(f"{screen_width}x{screen_height}+0+0")
         root.configure(bg="#1e2a45")
 
-        # ttk Style für modernen Balken
         style = ttk.Style()
         style.theme_use('clam')
         style.configure("blue.Horizontal.TProgressbar", troughcolor='#32415e',
                         background='#6fa8dc', thickness=20, bordercolor='#1e2a45')
 
-        # Container für zentrierten Inhalt
         self.container = tk.Frame(root, bg="#1e2a45")
         self.container.place(relx=0.5, rely=0.5, anchor="center")
 
-        # Logo
+        # 🔄 LOGO mit PIL laden
         try:
-            self.logo_photo = tk.PhotoImage(file="logo.png")
-            self.logo_photo = self.logo_photo.subsample(2, 2)
+            image = Image.open("logo.png")
+            image = image.resize((200, 200), Image.ANTIALIAS)  # Größe anpassen
+            self.logo_photo = ImageTk.PhotoImage(image)
             self.logo_label = tk.Label(self.container, image=self.logo_photo, bg="#1e2a45")
             self.logo_label.pack(pady=(0, 30))
         except Exception as e:
@@ -57,7 +56,6 @@ class InstallAssistantSplash:
                                       fg="lightgray", bg="#1e2a45")
         self.loading_label.pack(pady=10)
 
-        # Fortschrittsbalken + Prozentanzeige
         self.progress_frame = tk.Frame(self.container, bg="#1e2a45")
         self.progress_frame.pack(pady=20)
 
@@ -75,18 +73,17 @@ class InstallAssistantSplash:
 
         root.bind("<h>", lambda e: self.continue_now())
 
-        # Starte den Fortschrittsbalken
         self.load_progress()
 
     def load_progress(self):
         if self.progress_value < self.progress_max:
-            step = random.randint(1, 2)  # Langsame, aber leicht variierende Schritte
+            step = random.randint(1, 2)
             self.progress_value = min(self.progress_value + step, self.progress_max)
             self.progress["value"] = self.progress_value
             self.percent_label.config(text=f"{self.progress_value}%")
             self.animate_loading_text()
 
-            delay = random.randint(10, 130)  # Delay zwischen 0.9 und 1.3 Sekunden
+            delay = random.randint(10, 130)
             self.root.after(delay, self.load_progress)
         else:
             self.continue_now()
@@ -97,13 +94,12 @@ class InstallAssistantSplash:
 
     def continue_now(self):
         self.root.unbind("<h>")
-
         elapsed = time.time() - self.start_time
 
         if elapsed < self.min_duration:
             remaining = int((self.min_duration - elapsed) * 1000)
             self.root.after(remaining, self.on_continue_callback)
         elif elapsed > self.max_duration:
-            self.on_continue_callback()  # Falls etwas extrem lange dauert
+            self.on_continue_callback()
         else:
             self.on_continue_callback()
