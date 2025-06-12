@@ -13,10 +13,10 @@ def load_or_create_json(path, default_data):
         return json.load(f)
 
 # === Daten laden ===
-users = load_or_create_json("users.json", {})
-stundenplan = load_or_create_json("schedule.json", {})
-vertretungen = load_or_create_json("vertretungen.json", {})
-organisation = load_or_create_json("organisation.json", {})
+users = load_or_create_json("data/users.json", {})
+stundenplan = load_or_create_json("data/schedule.json", {})
+vertretungen = load_or_create_json("data/vertretungen.json", {})
+organisation = load_or_create_json("data/organisation.json", {})
 
 klassen = list({user["second_group"] for user in users.values() if user.get("second_group")})
 
