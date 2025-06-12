@@ -33,12 +33,11 @@ class Modul:
         self.username = username
         self.user_data = user_data
 
-        self.frame = tk.Frame(master, bg="white")  # Hauptcontainer
+        self.frame = tk.Frame(master, bg="white")
         self.frame.place(x=0, y=50, relwidth=1, relheight=1) 
 
         self.tabs = ttk.Notebook(self.frame)
         self.tabs.place(x=0, y=55, relwidth=1, relheight=1, height=-50)
-
 
         self.setup_stammdaten_tab()
         self.setup_lehrer_tab()
@@ -47,12 +46,10 @@ class Modul:
     def get_frame(self):
         return self.frame
 
-    # --- Stammdaten ---
     def setup_stammdaten_tab(self):
         tab = tk.Frame(self.tabs)
         self.tabs.add(tab, text="📚 Stammdaten")
 
-        # Fächer
         self.subjects = load_json("subjects")
         tk.Label(tab, text="Fächer").grid(row=0, column=0, padx=10, pady=5, sticky="w")
         self.subject_entry = tk.Entry(tab)
@@ -60,11 +57,9 @@ class Modul:
         tk.Button(tab, text="➕ Hinzufügen", command=self.add_subject).grid(row=1, column=1)
         self.subject_list = tk.Listbox(tab, height=5)
         self.subject_list.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
-
         for s in self.subjects:
             self.subject_list.insert(tk.END, s)
 
-        # Räume
         self.rooms = load_json("rooms")
         tk.Label(tab, text="Räume").grid(row=3, column=0, padx=10, pady=5, sticky="w")
         self.room_entry = tk.Entry(tab)
@@ -72,11 +67,9 @@ class Modul:
         tk.Button(tab, text="➕ Hinzufügen", command=self.add_room).grid(row=4, column=1)
         self.room_list = tk.Listbox(tab, height=5)
         self.room_list.grid(row=5, column=0, columnspan=2, padx=10, pady=5)
-
         for r in self.rooms:
             self.room_list.insert(tk.END, r)
 
-        # Zeiten
         self.times = load_json("timeslots")
         tk.Label(tab, text="Unterrichtszeiten (z.B. 08:00-08:45)").grid(row=6, column=0, padx=10, pady=5, sticky="w")
         self.timeslots_entries = []
@@ -109,14 +102,13 @@ class Modul:
         save_json("timeslots", new_times)
         messagebox.showinfo("Gespeichert", "Zeiten gespeichert.")
 
-    # --- Lehrkräfte ---
     def setup_lehrer_tab(self):
         tab = tk.Frame(self.tabs)
         self.tabs.add(tab, text="👨‍🏫 Lehrer")
 
         self.users = load_json("users")
         self.subjects = load_json("subjects")
-        self.teachers_data = load_json("teachers")
+        self.teachers_data = load_json("teachers")  # Speichert individuelle Fächer/Nichtverfügbarkeit
 
         self.lehrer_liste = [u for u, d in self.users.items() if d.get("group") == "Lehrer"]
 
@@ -171,7 +163,6 @@ class Modul:
         save_json("teachers", self.teachers_data)
         messagebox.showinfo("Gespeichert", f"Lehrkraft {name} gespeichert.")
 
-    # --- Stundenplan ---
     def setup_stundenplan_tab(self):
         tab = tk.Frame(self.tabs)
         self.tabs.add(tab, text="📅 Stundenplan")
@@ -237,7 +228,7 @@ class Modul:
         save_json("schedule", self.schedule_data)
         messagebox.showinfo("Gespeichert", f"Stundenplan für {group} gespeichert.")
 
-# Start der Anwendung
+# Start
 if __name__ == "__main__":
     root = tk.Tk()
     app = Modul(root)
