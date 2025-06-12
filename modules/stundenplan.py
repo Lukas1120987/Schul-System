@@ -13,14 +13,10 @@ def load_or_create_json(path, default_data):
         return json.load(f)
 
 # === Daten laden ===
-users = load_or_create_json("data/users.json", {})
-stundenplan = load_or_create_json("data/schedule.json", {})
-vertretungen = load_or_create_json("data/vertretungen.json", {})
-organisation = load_or_create_json("data/organisation.json", {
-    "tage": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"],
-    "stunden": ["08:00-08:45", "08:55-09:40", "10:00-10:45", "10:55-11:40",
-                "12:00-12:45", "12:55-13:40", "14:00-14:45", "14:55-15:40"]
-})
+users = load_or_create_json("users.json", {})
+stundenplan = load_or_create_json("schedule.json", {})
+vertretungen = load_or_create_json("vertretungen.json", {})
+organisation = load_or_create_json("organisation.json", {})
 
 klassen = list({user["second_group"] for user in users.values() if user.get("second_group")})
 
