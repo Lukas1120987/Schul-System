@@ -5,23 +5,27 @@ import os
 
 DATA_DIR = "data"
 FILES = {
-    "subjects": "data/subjects.json",
-    "rooms": "data/rooms.json",
-    "timeslots": "data/timeslots.json",
-    "teachers": "data/teachers.json",
-    "schedule": "data/schedule.json",
-    "users": "data/users.json",
-    "vertretungen": "data/vertretungen.json",
-    "organisation": "data/organisation.json"
+    "subjects": "subjects.json",
+    "rooms": "rooms.json",
+    "timeslots": "timeslots.json",
+    "teachers": "teachers.json",
+    "schedule": "schedule.json",
+    "users": "users.json",
+    "vertretungen": "vertretungen.json",
+    "organisation": "organisation.json"
 }
 
 
 def load_json(name):
     try:
         with open(os.path.join(DATA_DIR, FILES[name]), "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            if name in ["subjects", "rooms"]:  # Diese sollen Listen sein
+                return data if isinstance(data, list) else []
+            return data
     except:
-        return {}
+        return [] if name in ["subjects", "rooms"] else {}
+
 
 def save_json(name, data):
     with open(os.path.join(DATA_DIR, FILES[name]), "w", encoding="utf-8") as f:
