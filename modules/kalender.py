@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox
+from tkcalendar import Calendar
 
 class Modul:
     def __init__(self, parent, username, user_data):
@@ -25,24 +26,11 @@ class Modul:
         title = tk.Label(self.frame, text="Kalender", font=("Segoe UI", 18), bg="white")
         title.pack(pady=10)
 
-        # Datumsauswahl
-        date_frame = tk.Frame(self.frame, bg="white")
-        date_frame.pack(pady=10)
+        # Kalender-Widget
+        self.calendar = Calendar(self.frame, selectmode="day", date_pattern="dd.mm.yyyy")
+        self.calendar.pack(pady=10)
 
-        today = datetime.today()
-        self.day_var = tk.StringVar(value=str(today.day))
-        self.month_var = tk.StringVar(value=str(today.month))
-        self.year_var = tk.StringVar(value=str(today.year))
-
-        days = [str(i) for i in range(1, 32)]
-        months = [str(i) for i in range(1, 13)]
-        years = [str(i) for i in range(today.year, today.year + 3)]
-
-        ttk.Combobox(date_frame, textvariable=self.day_var, values=days, width=4).pack(side="left", padx=2)
-        ttk.Combobox(date_frame, textvariable=self.month_var, values=months, width=4).pack(side="left", padx=2)
-        ttk.Combobox(date_frame, textvariable=self.year_var, values=years, width=6).pack(side="left", padx=2)
-
-        tk.Button(date_frame, text="Anzeigen", command=self.update_display).pack(side="left", padx=10)
+        tk.Button(self.frame, text="Anzeigen", command=self.update_display).pack(pady=5)
 
         # Anzeige
         self.display = tk.Text(self.frame, width=90, height=15, state="disabled", bg="#f9f9f9")
@@ -82,14 +70,17 @@ class Modul:
         with open(self.data_file, "w", encoding="utf-8") as f:
             json.dump(self.dates, f, indent=2)
 
+    def get_selected_date_key(self):
+        return self.calendar.get_date()  # Format: dd.mm.yyyy
+
     def update_display(self):
-        key = f"{self.day_var.get()}.{self.month_var.get()}.{self.year_var.get()}"
+        key = self.get_selected_date_key()
         self.display.config(state="normal")
         self.display.delete(1.0, "end")
 
         if key in self.dates:
             for entry in self.dates[key]:
-                if entry["target"] == self.group or entry["target"] == "alle":
+                if entry["target"] == self.group or entry["target"].lower() == "alle":
                     self.display.insert("end", f"- {entry['title']} ({entry['category']}): {entry['desc']}\n")
         else:
             self.display.insert("end", "Keine Termine für diesen Tag.")
@@ -97,12 +88,12 @@ class Modul:
         self.display.config(state="disabled")
 
     def save_entry(self):
-        key = f"{self.day_var.get()}.{self.month_var.get()}.{self.year_var.get()}"
+        key = self.get_selected_date_key()
         entry = {
-            "title": self.entry_title.get(),
-            "desc": self.entry_desc.get(),
-            "category": self.entry_category.get(),
-            "target": self.entry_target.get()
+            "title": self.entry_title.get().strip(),
+            "desc": self.entry_desc.get().strip(),
+            "category": self.entry_category.get().strip(),
+            "target": self.entry_target.get().strip()
         }
 
         if not all(entry.values()):
@@ -113,4 +104,3 @@ class Modul:
         self.save_dates()
         self.update_display()
         messagebox.showinfo("Gespeichert", "Termin wurde gespeichert.")
-
