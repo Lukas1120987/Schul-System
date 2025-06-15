@@ -3,6 +3,7 @@ from tkinter import ttk
 import importlib
 import os
 import json
+from PIL import Image, ImageTk
 
 class Dashboard:
     def __init__(self, master, username, user_data):
@@ -67,6 +68,9 @@ class Dashboard:
         self.add_module_buttons()
         self.add_logout_button()
         self.add_help_button()
+
+        self.icon_cache = {}  # damit Bilder nicht vom Garbage Collector gelöscht werden
+
 
     def load_module_config(self):
         standard_module_config = {
@@ -269,6 +273,7 @@ class Dashboard:
             if not einstellungen.get("aktiv", False):
                 continue
 
+            # Zugriffsregeln (deine bestehenden)
             if modulname == "adminbereich" and not self.user_data.get("is_admin"):
                 continue
             if modulname == "krankmeldungen" and self.user_data.get("group") != "Lehrer":
@@ -291,35 +296,48 @@ class Dashboard:
             if modulname == "sitzplan" and self.user_data.get("group") != "Lehrer":
                 continue
 
-            # Stilvolle Buttons mit Hover-Effekt
-            btn = tk.Label(
+            # Icon laden (get_icon musst du in deiner Klasse definiert haben)
+            icon = self.get_icon(modulname)
+            if icon:
+                self.icon_cache[modulname] = icon  # Bild-Referenz behalten
+
+            btn = tk.Button(
                 self.sidebar,
-                text=f"📁 {modulname.replace('_', '').title()}",
+                text=modulname.replace('_', ' ').title(),
+                image=icon,
+                compound="left",
                 bg=self.sidebar_bg,
                 fg=self.button_fg,
                 font=("Segoe UI", 10, "bold"),
                 anchor="w",
-                padx=15,
+                padx=10,
                 pady=10,
-                cursor="hand2"
+                relief="flat",
+                cursor="hand2",
+                activebackground=self.sidebar_hover,
+                command=lambda m=modulname: self.load_module(m)
             )
             btn.pack(fill="x", pady=2)
 
-            # Hover-Farben
-            btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.sidebar_hover))
-            btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.sidebar_bg))
-            btn.bind("<Button-1>", lambda e, m=modulname: self.load_module(m))
+            # Hover-Effekt (Button muss bg ändern)
+            def on_enter(e, b=btn):
+                b['bg'] = self.sidebar_hover
+            def on_leave(e, b=btn):
+                b['bg'] = self.sidebar_bg
+
+            btn.bind("<Enter>", on_enter)
+            btn.bind("<Leave>", on_leave)
 
 
-    def get_icon(self, modulname):
-        icons = {
-            "stundenplan": "📅", "nachrichten": "💬", "dateiablage": "📂", "einstellungen": "⚙️",
-            "cloud": "☁️", "kalender": "📜", "ToDo": "🗓", "e_learning": "📝",
-            "adminbereich": "🛠️", "supportverwaltung": "💬", "stundenplan_verwaltung": "📊",
-            "modulverwaltung": "🧩", "meldungen": "🛡", "sitzplan": "💻", "krankmeldungen": "🤒",
-            "benachrichtigungen": "🔔", "sprechstunden": "📠", "ausleihe": "🖨️", "meldungen_verwaltung": "🛡", "team": "🛡"
-        }
-        return icons.get(modulname, "📁")
+
+    def get_icon(self, modulname, size=(20, 20)):
+        try:
+            path = os.path.join("icons", f"{modulname}.png")
+            image = Image.open(path).resize(size, Image.ANTIALIAS)
+            return ImageTk.PhotoImage(image)
+        except Exception as e:
+            print(f"Kein Icon für {modulname}: {e}")
+            return None
 
     def load_module(self, modulname):
         if self.current_frame is not None:
