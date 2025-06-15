@@ -10,10 +10,12 @@ class Modul:
         self.username = username
         self.user_data = user_data
         self.group = user_data.get("group", "all")
+        self.second_group = user_data.get("second_group", "")
         self.is_admin = user_data.get("is_admin", False)
 
         self.frame = tk.Frame(parent, bg="white")
         self.data_file = "data/kalender.json"
+        self.users_file = "data/users.json"
 
         self.create_widgets()
         self.load_dates()
@@ -26,17 +28,14 @@ class Modul:
         title = tk.Label(self.frame, text="Kalender", font=("Segoe UI", 18), bg="white")
         title.pack(pady=10)
 
-        # Kalender-Widget
         self.calendar = Calendar(self.frame, selectmode="day", date_pattern="dd.mm.yyyy")
         self.calendar.pack(pady=10)
 
         tk.Button(self.frame, text="Anzeigen", command=self.update_display).pack(pady=5)
 
-        # Anzeige
         self.display = tk.Text(self.frame, width=90, height=15, state="disabled", bg="#f9f9f9")
         self.display.pack(pady=10)
 
-        # Nur für Admins: Termin hinzufügen
         if self.is_admin:
             add_frame = tk.LabelFrame(self.frame, text="Neuen Termin hinzufügen", bg="white")
             add_frame.pack(pady=10, padx=10, fill="x")
@@ -53,11 +52,31 @@ class Modul:
             self.entry_category.insert(0, "Kategorie (z. B. Klausur)")
             self.entry_category.pack(pady=2)
 
-            self.entry_target = tk.Entry(add_frame, width=30)
-            self.entry_target.insert(0, "Zielgruppe (z. B. 10A, alle)")
-            self.entry_target.pack(pady=2)
+            # Wenn aus Verwaltung, zeige Dropdown für Gruppenwahl
+            if self.group.lower() == "verwaltung":
+                self.group_list = self.get_all_groups()
+                self.selected_target = tk.StringVar()
+                self.selected_target.set("alle")  # Default-Wert
+                tk.Label(add_frame, text="Zielgruppe:", bg="white").pack(pady=(5,0))
+                self.target_dropdown = ttk.Combobox(add_frame, values=self.group_list, textvariable=self.selected_target, state="readonly")
+                self.target_dropdown.pack(pady=2)
+            else:
+                # Bei anderen Admins: Nur Eingabe
+                self.entry_target = tk.Entry(add_frame, width=30)
+                self.entry_target.insert(0, "Zielgruppe (z. B. 10A, alle)")
+                self.entry_target.pack(pady=2)
 
             tk.Button(add_frame, text="Termin speichern", command=self.save_entry).pack(pady=5)
+
+    def get_all_groups(self):
+        try:
+            with open(self.users_file, "r", encoding="utf-8") as f:
+                users = json.load(f)
+            groups = {data.get("group", "") for data in users.values()}
+            groups.update({data.get("second_group", "") for data in users.values()})
+            return sorted(list(g for g in groups if g))
+        except:
+            return ["alle"]
 
     def load_dates(self):
         try:
@@ -80,7 +99,8 @@ class Modul:
 
         if key in self.dates:
             for entry in self.dates[key]:
-                if entry["target"] == self.group or entry["target"].lower() == "alle":
+                target = entry.get("target", "").lower()
+                if target in [self.group.lower(), self.second_group.lower(), "alle"]:
                     self.display.insert("end", f"- {entry['title']} ({entry['category']}): {entry['desc']}\n")
         else:
             self.display.insert("end", "Keine Termine für diesen Tag.")
@@ -93,8 +113,13 @@ class Modul:
             "title": self.entry_title.get().strip(),
             "desc": self.entry_desc.get().strip(),
             "category": self.entry_category.get().strip(),
-            "target": self.entry_target.get().strip()
         }
+
+        # Zielgruppe abhängig vom Admin-Typ
+        if self.group.lower() == "verwaltung":
+            entry["target"] = self.selected_target.get().strip()
+        else:
+            entry["target"] = self.entry_target.get().strip()
 
         if not all(entry.values()):
             messagebox.showerror("Fehler", "Bitte alle Felder ausfüllen.")
