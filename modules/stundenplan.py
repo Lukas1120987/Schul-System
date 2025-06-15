@@ -16,7 +16,11 @@ def load_or_create_json(path, default_data):
 users = load_or_create_json("data/users.json", {})
 stundenplan = load_or_create_json("data/schedule.json", {})
 vertretungen = load_or_create_json("data/vertretungen.json", {})
-organisation = load_or_create_json("data/organisation.json", {})
+organisation = load_or_create_json("data/organisation.json", {
+  "tage": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"],
+  "stunden": ["1", "2", "3", "4", "5", "6", "7", "8"]
+}
+)
 
 klassen = list({user["second_group"] for user in users.values() if user.get("second_group")})
 
