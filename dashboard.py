@@ -269,11 +269,13 @@ class Dashboard:
 
 
     def add_module_buttons(self):
+        self.button_images = {}
+
         for modulname, einstellungen in self.module_config.items():
             if not einstellungen.get("aktiv", False):
                 continue
 
-            # Zugriffsregeln (deine bestehenden)
+            # Zugriffsregeln
             if modulname == "adminbereich" and not self.user_data.get("is_admin"):
                 continue
             if modulname == "krankmeldungen" and self.user_data.get("group") != "Lehrer":
@@ -288,7 +290,7 @@ class Dashboard:
                 continue
             if modulname == "stundenplan_verwaltung" and self.user_data.get("group") != "Verwaltung":
                 continue
-            if modulname == "modulverwaltung " and self.user_data.get("group") != "Verwaltung":
+            if modulname == "modulverwaltung" and self.user_data.get("group") != "Verwaltung":
                 continue
             if modulname == "team" and self.user_data.get("group") != "SchulSystem-Team":
                 print("Debug")
@@ -296,15 +298,16 @@ class Dashboard:
             if modulname == "sitzplan" and self.user_data.get("group") != "Lehrer":
                 continue
 
-            # Icon laden (get_icon musst du in deiner Klasse definiert haben)
+            # Icon laden
             icon = self.get_icon(modulname)
-            if icon:
-                self.icon_cache[modulname] = icon  # Bild-Referenz behalten
+            if not icon:
+                icon = self.get_icon("leer")
 
-            btn = tk.Button(
+            # Button mit Icon und Text
+            btn = tk.Label(
                 self.sidebar,
-                text=modulname.replace('_', ' ').title(),
                 image=icon,
+                text=f"  {modulname.replace('_', ' ').title()}",
                 compound="left",
                 bg=self.sidebar_bg,
                 fg=self.button_fg,
@@ -312,32 +315,39 @@ class Dashboard:
                 anchor="w",
                 padx=10,
                 pady=10,
-                relief="flat",
-                cursor="hand2",
-                activebackground=self.sidebar_hover,
-                command=lambda m=modulname: self.load_module(m)
+                cursor="hand2"
             )
+            btn.image = icon  # Referenz speichern
             btn.pack(fill="x", pady=2)
 
-            # Hover-Effekt (Button muss bg ändern)
-            def on_enter(e, b=btn):
-                b['bg'] = self.sidebar_hover
-            def on_leave(e, b=btn):
-                b['bg'] = self.sidebar_bg
-
-            btn.bind("<Enter>", on_enter)
-            btn.bind("<Leave>", on_leave)
+            # Hover-Effekt
+            btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.sidebar_hover))
+            btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.sidebar_bg))
+            btn.bind("<Button-1>", lambda e, m=modulname: self.load_module(m))
 
 
+
+
+
+    # from PIL import Image, ImageTk -> In die requirements.txt!!!
 
     def get_icon(self, modulname, size=(20, 20)):
         try:
             path = os.path.join("icons", f"{modulname}.png")
-            image = Image.open(path).resize(size, Image.ANTIALIAS)
+            image = Image.open(path).resize(size, Image.Resampling.LANCZOS)
+            print(f"Prüfe Modul: {modulname}")  # Debug
             return ImageTk.PhotoImage(image)
         except Exception as e:
             print(f"Kein Icon für {modulname}: {e}")
-            return None
+            try:
+                leer_icon = os.path.join("icons", "leer.png")
+                image = Image.open(leer_icon).resize(size, Image.Resampling.LANCZOS)
+                return ImageTk.PhotoImage(image)
+            except Exception as e2:
+                print(f"Kein Fallback-Icon verfügbar: {e2}")
+                return None
+
+
 
     def load_module(self, modulname):
         if self.current_frame is not None:
