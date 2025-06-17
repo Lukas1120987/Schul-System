@@ -74,16 +74,17 @@ class Modul:
         for r in self.rooms:
             self.room_list.insert(tk.END, r)
 
-        self.times = load_json("timeslots")
+        self.times = load_json("organisation").get("stunden", [])
         tk.Label(tab, text="Unterrichtszeiten (z.B. 08:00-08:45)").grid(row=6, column=0, padx=10, pady=5, sticky="w")
         self.timeslots_entries = []
+
         for i in range(8):
             e = tk.Entry(tab)
-            e.insert(0, self.times.get(str(i+1), ""))
+            if i < len(self.times):
+                e.insert(0, self.times[i])
             e.grid(row=7+i, column=0, padx=10)
             self.timeslots_entries.append(e)
 
-        tk.Button(tab, text="💾 Zeiten speichern", command=self.save_times).grid(row=15, column=0, pady=10)
 
     def add_subject(self):
         s = self.subject_entry.get().strip()
