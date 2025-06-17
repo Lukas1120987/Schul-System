@@ -85,6 +85,7 @@ class Modul:
             e.grid(row=7+i, column=0, padx=10)
             self.timeslots_entries.append(e)
 
+        tk.Button(tab, text="💾 Zeiten speichern", command=self.save_times).grid(row=15, column=0, pady=10)
 
     def add_subject(self):
         s = self.subject_entry.get().strip()
