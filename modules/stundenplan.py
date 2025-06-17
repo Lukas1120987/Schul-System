@@ -17,9 +17,25 @@ users = load_or_create_json("data/users.json", {})
 stundenplan = load_or_create_json("data/schedule.json", {})
 vertretungen = load_or_create_json("data/vertretungen.json", {})
 organisation = load_or_create_json("data/organisation.json", {
-  "tage": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"],
-  "stunden": ["1", "2", "3", "4", "5", "6", "7", "8"]
+    "tage": [
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag"
+    ],
+    "stunden": [
+        "08:00-08:45",
+        "08:55-09:40",
+        "10:00-10:45",
+        "10:55-11:40",
+        "12:00-12:45",
+        "12:55-13:40",
+        "14:00-14:45",
+        "14:55-15:40"
+    ]
 }
+
 )
 
 klassen = list({user["second_group"] for user in users.values() if user.get("second_group")})
