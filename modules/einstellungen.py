@@ -6,6 +6,9 @@ import os
 USERS_PATH = "data/users.json"
 SUPPORT_PATH = "data/support.json"
 FEEDBACK_PATH = "data/feedback.json"
+CONFIG_PATH = "data/config.json"
+
+
 
 class Modul:
     def __init__(self, master, nutzername, nutzerdaten):
@@ -21,6 +24,8 @@ class Modul:
         self.add_support_ticket()
         self.add_feedback_form()
         self.add_email_field()
+        self.add_fullscreen_toggle()
+
 
     def get_frame(self):
         return self.frame
@@ -141,4 +146,51 @@ class Modul:
 
         tk.Button(section, text="Speichern", command=update_email).pack(side="right", padx=5, pady=5)
 
+    def add_fullscreen_toggle(self):
+        section = tk.LabelFrame(self.frame, text="Vollbildmodus")
+        section.pack(padx=10, pady=5, fill="x")
 
+        var = tk.BooleanVar()
+        current = False
+
+        if os.path.exists(CONFIG_PATH):
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                config = json.load(f)
+            current = config.get(self.nutzername, {}).get("vollbild", False)
+
+        var.set(current)
+
+        checkbox = tk.Checkbutton(section, text="Dashboard im Vollbild starten", variable=var)
+        checkbox.pack(side="left", padx=5, pady=5)
+
+        def save_fullscreen():
+            # Konfig-Datei ggf. erstellen
+            if not os.path.exists(CONFIG_PATH):
+                with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                    json.dump({}, f)
+
+            # Konfiguration laden
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                config = json.load(f)
+
+            # Nutzerbereich setzen
+            if self.nutzername not in config:
+                config[self.nutzername] = {}
+
+            config[self.nutzername]["vollbild"] = var.get()
+
+            # Speichern
+            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                json.dump(config, f, indent=2)
+
+            # Hinweis
+            messagebox.showinfo("Neu laden", "Die Einstellung wurde gespeichert.\nDas Dashboard wird neu geladen.")
+
+            # Fenster schließen
+            self.frame.winfo_toplevel().destroy()
+
+            # Dashboard starten
+            from login import start
+            start()
+
+        tk.Button(section, text="Speichern", command=save_fullscreen).pack(side="right", padx=5, pady=5)
