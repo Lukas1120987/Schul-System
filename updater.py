@@ -14,7 +14,7 @@ import threading
 # === Konfiguration ===
 GITHUB_ZIP_URL = "https://github.com/Lukas1120987/SchulSystem/archive/refs/heads/main.zip"
 UPDATE_DIR = "update_temp"
-EXCLUDE_DIRS = ["data", "__pycache__"]
+EXCLUDE_DIRS = ["data", "__pycache__", "web"]
 EXCLUDE_FILES = ["main.exe"]
 
 # === Ladebildschirm-Klasse ===
