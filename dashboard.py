@@ -5,12 +5,32 @@ import os
 import json
 from PIL import Image, ImageTk
 
+CONFIG_PATH = "data/config.json"
+
 class Dashboard:
     def __init__(self, master, username, user_data):
         self.master = master
+        self.username = username
+        self.user_data = user_data
+
+        # --- Konfigurationsdatei laden oder erstellen ---
+        if not os.path.exists(CONFIG_PATH):
+            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                json.dump({}, f)
+
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
+
+        user_config = config.get(self.username, {})
+
+        # --- Fenstergröße anpassen je nach Einstellung ---
+        if user_config.get("vollbild", False):
+            self.master.attributes('-fullscreen', True)
+        else:
+            self.master.geometry(f"{self.master.winfo_screenwidth()}x{self.master.winfo_screenheight()}")
+            self.master.attributes('-fullscreen', False)
+
         self.master.title("SchulSystem – Dashboard")
-        self.master.attributes('-fullscreen', True)
-        #self.master.geometry("1080x600")
         self.master.minsize(800, 500)
 
         self.username = username
