@@ -19,12 +19,17 @@ class Modul:
 
         tk.Label(self.frame, text="🔧 Einstellungen", font=("Arial", 16, "bold")).pack(pady=10)
 
+        self.add_userinfo_display()
         self.add_username_change()
         self.add_password_change()
         self.add_support_ticket()
         self.add_feedback_form()
         self.add_email_field()
         self.add_fullscreen_toggle()
+        self.add_profile_reset()
+        self.add_darkmode_toggle()
+        self.add_account_delete()
+
 
 
     def get_frame(self):
@@ -194,3 +199,70 @@ class Modul:
             start()
 
         tk.Button(section, text="Speichern", command=save_fullscreen).pack(side="right", padx=5, pady=5)
+
+    def add_profile_reset(self):
+        section = tk.LabelFrame(self.frame, text="Profil zurücksetzen")
+        section.pack(padx=10, pady=5, fill="x")
+
+        def reset_profile():
+            if messagebox.askyesno("Zurücksetzen", "Willst du wirklich alle Einstellungen zurücksetzen?"):
+                with open(USERS_PATH, "r", encoding="utf-8") as f:
+                    users = json.load(f)
+                if self.nutzername in users:
+                    users[self.nutzername]["email"] = ""
+                    users[self.nutzername]["password"] = ""
+                with open(USERS_PATH, "w", encoding="utf-8") as f:
+                    json.dump(users, f, indent=2)
+
+                if os.path.exists(CONFIG_PATH):
+                    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                        config = json.load(f)
+                    config[self.nutzername] = {"vollbild": False}
+                    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                        json.dump(config, f, indent=2)
+
+                messagebox.showinfo("Erfolg", "Profil wurde zurückgesetzt.\nBitte erneut einloggen.")
+                messagebox.showerror("Wichtig", "Dein Passwort wurde zurückgesetzt! \n Um dich anzumelden, lass das Passwort-Feld leer.")
+
+                self.frame.winfo_toplevel().destroy()
+                from login import start
+                start()
+
+        tk.Button(section, text="Zurücksetzen", command=reset_profile, fg="red").pack(padx=5, pady=5)
+
+    def add_darkmode_toggle(self):
+        section = tk.LabelFrame(self.frame, text="Dark Mode")
+        section.pack(padx=10, pady=5, fill="x")
+
+        var = tk.BooleanVar(value=False)
+        checkbox = tk.Checkbutton(section, text="Dark Mode aktivieren (Beta)", variable=var)
+        checkbox.pack(side="left", padx=5, pady=5)
+
+        def save_darkmode():
+            # Optional: hier Konfiguration speichern für späteres UI-Styling
+            messagebox.showinfo("Hinweis", "Dark Mode wird beim nächsten Start aktiviert (funktioniert bald).")
+
+        tk.Button(section, text="Speichern", command=save_darkmode).pack(side="right", padx=5, pady=5)
+
+    def add_account_delete(self):
+        section = tk.LabelFrame(self.frame, text="Konto löschen")
+        section.pack(padx=10, pady=5, fill="x")
+
+        def delete_account():
+            if messagebox.askyesno("Konto löschen", "Willst du dein Konto unwiderruflich löschen?"):
+                with open(USERS_PATH, "r", encoding="utf-8") as f:
+                    users = json.load(f)
+                if self.nutzername in users:
+                    users.pop(self.nutzername)
+                with open(USERS_PATH, "w", encoding="utf-8") as f:
+                    json.dump(users, f, indent=2)
+                messagebox.showinfo("Gelöscht", "Dein Konto wurde gelöscht.")
+                self.frame.winfo_toplevel().destroy()
+                from login import start
+                start()
+
+        tk.Button(section, text="Konto löschen", command=delete_account, fg="red").pack(padx=5, pady=5)
+
+    def add_userinfo_display(self):
+        info = f"👤 Angemeldet als: {self.nutzername} | Gruppe: {self.nutzerdaten.get('group')} | Sekundär/Klasse: {self.nutzerdaten.get('second_group')}"
+        tk.Label(self.frame, text=info, font=("Arial", 10), fg="gray").pack(pady=(5, 0))
