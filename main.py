@@ -6,6 +6,7 @@ from tkinter import simpledialog, messagebox, ttk
 import random
 from login import SplashScreen, open_login_window, start
 from first_splash import InstallAssistantSplash
+from datetime import datetime
 
 # Farbdefinitionen (falls nicht zentral vorhanden)
 PRIMARY_BLUE = "#2a4d8f"
@@ -56,22 +57,12 @@ def setup_databases(admin_name, admin_password):
     )
 
     create_file_if_missing(
-        "data/schedule.json",
-        {
-            "default": {
-                "Montag": {"1": "-", "2": "-", "3": "-"},
-                "Dienstag": {"1": "-", "2": "-", "3": "-"},
-            }
-        },
-    )
-
-    create_file_if_missing(
         "data/messages.json",
         [
             {
                 "absender": "System",
                 "empfänger": admin_name,
-                "datum": "13.05.2025 08:00",
+                "datum": datetime.now().strftime("%d.%m.%Y %H:%M"),
                 "betreff": "Willkommen",
                 "inhalt": (
                     f"Hallo {admin_name}, willkommen im SchulSystem! \n"
