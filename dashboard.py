@@ -113,7 +113,8 @@ class Dashboard:
             "ausleihe" : {"aktiv": True, "beschreibung": "Ausleihen von Geräten und Unterrichtsmaterialien"},
             "meldungen": {"aktiv": False, "beschreibung": "Melden von Nutzern "},
             "meldungen_verwaltung": {"aktiv": False, "beschreibung": "Meldungen von Nutzern verwalten (Admin)"},
-            "team": {"aktiv": True, "beschreibung": "Development-Bereich zum beheben von Fehlern"}
+            "team": {"aktiv": True, "beschreibung": "Development-Bereich zum beheben von Fehlern"},
+            "statistiken": {"aktiv": True, "beschreibung": "Anzeigen von Statistiken"}
         }
 
         if not os.path.exists("data/modules.json"):
