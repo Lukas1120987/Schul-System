@@ -8,7 +8,7 @@ from login import SplashScreen, open_login_window, start
 from first_splash import InstallAssistantSplash
 from datetime import datetime
 
-# Farbdefinitionen (falls nicht zentral vorhanden)
+# Farbdefinitionen 
 PRIMARY_BLUE = "#2a4d8f"
 WHITE = "#ffffff"
 LIGHT_BLUE = "#aaccff"
