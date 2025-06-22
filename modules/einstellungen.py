@@ -249,7 +249,7 @@ class Modul:
         section.pack(padx=10, pady=5, fill="x")
 
         def delete_account():
-            SCHÜTZEN = ["SchulSystem", "default_user1", "default_user2"]
+            SCHÜTZEN = ["SchulSystem", "default_user1", "default_user2", "default_user3"]
             if self.nutzername in SCHÜTZEN:
                 messagebox.showwarning("Nicht erlaubt", "Dieses Konto kann nicht gelöscht werden.")
                 return
