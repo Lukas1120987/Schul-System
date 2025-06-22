@@ -249,15 +249,24 @@ class Modul:
         section.pack(padx=10, pady=5, fill="x")
 
         def delete_account():
+            SCHÜTZEN = ["SchulSystem", "default_user1", "default_user2"]
+            if self.nutzername in SCHÜTZEN:
+                messagebox.showwarning("Nicht erlaubt", "Dieses Konto kann nicht gelöscht werden.")
+                return
+
             if messagebox.askyesno("Konto löschen", "Willst du dein Konto unwiderruflich löschen?"):
                 with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
+                
                 if self.nutzername in users:
                     users.pop(self.nutzername)
+
                 with open(USERS_PATH, "w", encoding="utf-8") as f:
                     json.dump(users, f, indent=2)
+
                 messagebox.showinfo("Gelöscht", "Dein Konto wurde gelöscht.")
                 self.frame.winfo_toplevel().destroy()
+
                 from login import start
                 start()
 
