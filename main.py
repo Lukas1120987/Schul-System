@@ -52,6 +52,12 @@ def setup_databases(admin_name, admin_password):
                 "group": "SchulSystem-Team",
                 "second_group": "Verwaltung",
                 "is_admin": True,
+            },
+            "default_user3": {
+                "password": admin_password,
+                "group": "Verwaltung",
+                "second_group": "Musterklasse",
+                "is_admin": True,
             }
         },
     )
