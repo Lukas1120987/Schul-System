@@ -22,6 +22,7 @@ class Modul:
         self.add_userinfo_display()
         self.add_username_change()
         self.add_password_change()
+        self.add_update()
         self.add_support_ticket()
         self.add_feedback_form()
         self.add_email_field()
@@ -29,6 +30,7 @@ class Modul:
         self.add_profile_reset()
         self.add_darkmode_toggle()
         self.add_account_delete()
+        
 
 
 
@@ -101,6 +103,16 @@ class Modul:
                 messagebox.showwarning("Fehler", "Ticket darf nicht leer sein.")
 
         tk.Button(section, text="Absenden", command=send_ticket).pack(padx=5, pady=5)
+
+    def add_update(self):
+        from updater import check_and_update
+        
+        section = tk.LabelFrame(self.frame, text="Konto löschen")
+        section.pack(padx=10, pady=5, fill="x")
+
+        tk.Button(section, text="Auf Update prüfen", command=check_and_update, fg="red").pack(padx=5, pady=5)
+
+        
 
     def add_feedback_form(self):
         section = tk.LabelFrame(self.frame, text="Feedback geben")
