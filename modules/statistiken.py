@@ -5,17 +5,17 @@ from collections import Counter
 
 class Modul:
     def __init__(self, parent, nutzername, user_data=None):
-        self.frame = ctk.CTkFrame(parent, corner_radius=15, fg_color="#1f2937")  # moderner dunkler Hintergrund
+        self.frame = ctk.CTkFrame(parent, corner_radius=15, fg_color="#ffffff")  # moderner dunkler Hintergrund
         self.nutzername = nutzername
         self.user_data = user_data or {}
 
         # Scrollbar und Canvas, falls später mehr Daten kommen
-        self.canvas = ctk.CTkCanvas(self.frame, bg="#1f2937", highlightthickness=0)
+        self.canvas = ctk.CTkCanvas(self.frame, bg="#ffffff", highlightthickness=0)
         self.scrollbar = ctk.CTkScrollbar(self.frame, orientation="vertical", command=self.canvas.yview)
-        self.scrollable_frame = ctk.CTkFrame(self.canvas, fg_color="#1f2937")
+        self.scrollable_frame = ctk.CTkFrame(self.canvas, fg_color="#ffffff")
 
         self.scrollable_frame.bind(
-            "<Configure>",
+            "<MouseWheel>",
             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
@@ -92,13 +92,13 @@ class Modul:
         titel_label.pack(pady=(20, 10), anchor="w", padx=20)
 
         for schluessel, wert in daten.items():
-            zeile_frame = ctk.CTkFrame(self.scrollable_frame, fg_color="#374151", corner_radius=8)
+            zeile_frame = ctk.CTkFrame(self.scrollable_frame, fg_color="#FFFFFF", corner_radius=8)
             zeile_frame.pack(fill="x", padx=25, pady=6)
 
             beschriftung = ctk.CTkLabel(zeile_frame, text=f"{schluessel} ({wert})", width=120, anchor="w")
             beschriftung.pack(side="left", padx=(10, 5))
 
             balken_laenge = int(200 * wert / max_wert)  # max 200px breit
-            balken = ctk.CTkFrame(zeile_frame, fg_color="#3b82f6", width=balken_laenge, height=24, corner_radius=8)
+            balken = ctk.CTkFrame(zeile_frame, fg_color="#000000", width=balken_laenge, height=24, corner_radius=8)
             balken.pack(side="left", pady=4)
 
