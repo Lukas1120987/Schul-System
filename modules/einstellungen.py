@@ -105,12 +105,30 @@ class Modul:
         tk.Button(section, text="Absenden", command=send_ticket).pack(padx=5, pady=5)
 
     def add_update(self):
-        from updater import check_and_update
+        # JSON-Dateipfad
+        config_path = os.path.join("data", "config.json")
         
         section = tk.LabelFrame(self.frame, text="Auf Update überprüfen")
         section.pack(padx=10, pady=5, fill="x")
 
-        tk.Button(section, text="Auf Update prüfen", command=check_and_update, fg="red").pack(padx=5, pady=5)
+        def check_versions():
+            try:
+                with open(config_path, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+                
+                local_version = config.get("local_version", "")
+                latest_version = config.get("latest_github_version", "")
+                
+                if local_version != latest_version:
+                    messagebox.showinfo("Update", "Es wird ein Update gemacht...")
+                else:
+                    messagebox.showinfo("Update", "Es gibt nichts Neues.")
+            except FileNotFoundError:
+                messagebox.showerror("Fehler", f"Datei {config_path} nicht gefunden.")
+            except json.JSONDecodeError:
+                messagebox.showerror("Fehler", "Fehler beim Lesen der JSON-Datei.")
+
+        tk.Button(section, text="Auf Update prüfen", command=check_versions, fg="red").pack(padx=5, pady=5)
 
         
 
