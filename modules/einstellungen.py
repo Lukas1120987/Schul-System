@@ -121,6 +121,8 @@ class Modul:
                 
                 if local_version != latest_version:
                     messagebox.showinfo("Update", "Es wird ein Update gemacht...")
+                    from updater import check_and_update
+                    check_and_update()
                 else:
                     messagebox.showinfo("Update", "Es gibt nichts Neues.")
             except FileNotFoundError:
