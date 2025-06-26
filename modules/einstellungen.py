@@ -262,14 +262,23 @@ class Modul:
 
         def delete_account():
             SCHÜTZEN = ["SchulSystem", "default_user1", "default_user2", "default_user3"]
-            if self.nutzername in SCHÜTZEN:
+
+            # Adminname aus config.json laden
+            try:
+                with open("data/config.json", "r", encoding="utf-8") as f:
+                    admin_info = json.load(f)
+                    admin_name = admin_info.get("admin_name", "")
+            except FileNotFoundError:
+                admin_name = ""
+
+            if self.nutzername in SCHÜTZEN or self.nutzername == admin_name:
                 messagebox.showwarning("Nicht erlaubt", "Dieses Konto kann nicht gelöscht werden.")
                 return
 
             if messagebox.askyesno("Konto löschen", "Willst du dein Konto unwiderruflich löschen?"):
                 with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
-                
+
                 if self.nutzername in users:
                     users.pop(self.nutzername)
 
@@ -281,6 +290,7 @@ class Modul:
 
                 from login import start
                 start()
+
 
         tk.Button(section, text="Konto löschen", command=delete_account, fg="red").pack(padx=5, pady=5)
 
