@@ -1,0 +1,4 @@
+- Hilfe aus hilfe.md (GitHub) nehmen
+- Update Check anzeigen (Einstellungen)
+- Benachrichtigungen global schreiben (wenn in GitHub eine Änderung kommt)
+-> Feature in EInstellungen.py an und aus schalten
