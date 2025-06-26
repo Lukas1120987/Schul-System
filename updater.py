@@ -10,7 +10,6 @@ from tkinter import ttk
 import random
 import time
 import threading
-import json
 
 # === Konfiguration ===
 GITHUB_ZIP_URL = "https://github.com/Lukas1120987/SchulSystem/archive/refs/heads/main.zip"
@@ -185,42 +184,12 @@ def check_and_update():
         download_and_extract_update()
         with open("version.txt", "w") as f:
             f.write(remote)
-            try:
-                config_path = "data/config.json"
-                config = {}
-                if os.path.exists(config_path):
-                    with open(config_path, "r", encoding="utf-8") as f:
-                        config = json.load(f)
-
-                config["local_version"] = remote
-                config["latest_github_version"] = remote
-
-                with open(config_path, "w", encoding="utf-8") as f:
-                    json.dump(config, f, indent=2)
-            except Exception as e:
-                print(f"[Updater] Fehler beim Schreiben von config.json: {e}")
         print("[Updater] Update abgeschlossen. Starte Anwendung neu...")
         APP_TO_START = "main.exe" if os.path.exists("main.exe") else "main.py"
         subprocess.Popen([sys.executable, APP_TO_START] if APP_TO_START.endswith(".py") else [APP_TO_START])
         force_exit_all_windows()
     else:
         print("[Updater] Version ist aktuell: " + local)
-        # Auch hier config.json aktualisieren
-        try:
-            config_path = "data/config.json"
-            config = {}
-            if os.path.exists(config_path):
-                with open(config_path, "r", encoding="utf-8") as f:
-                    config = json.load(f)
-
-            config["local_version"] = local
-            config["latest_github_version"] = remote
-
-            with open(config_path, "w", encoding="utf-8") as f:
-                json.dump(config, f, indent=2)
-        except Exception as e:
-            print(f"[Updater] Fehler beim Schreiben von config.json: {e}")
-
 
 # === Hauptprogrammstart mit Splashscreen ===
 def start_update():
