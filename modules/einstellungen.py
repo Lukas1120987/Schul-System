@@ -107,7 +107,7 @@ class Modul:
     def add_update(self):
         from updater import check_and_update
         
-        section = tk.LabelFrame(self.frame, text="Konto löschen")
+        section = tk.LabelFrame(self.frame, text="Auf Update überprüfen")
         section.pack(padx=10, pady=5, fill="x")
 
         tk.Button(section, text="Auf Update prüfen", command=check_and_update, fg="red").pack(padx=5, pady=5)
