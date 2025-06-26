@@ -359,6 +359,9 @@ def main():
             splash_root.destroy()
             return
         setup_databases(admin_name, admin_password)
+        # setup_databases.py oder direkt in main()
+        with open("data/config.json", "w", encoding="utf-8") as f:
+            json.dump({"admin_name": admin_name}, f, indent=2)
         splash_root.destroy()  # Splash schließen
         show_tutorial(admin_name)
         open_login_window()
