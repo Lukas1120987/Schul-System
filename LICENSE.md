@@ -1,3 +1,5 @@
+![Alternativtext](https://img.shields.io/badge/license-MIT-blue)
+
 MIT License
 
 Copyright (c) 2025 Lukas1120987
