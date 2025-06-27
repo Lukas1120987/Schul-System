@@ -78,6 +78,11 @@ per Discord: https://discord.gg/NHgr4FKXE3
 
 ## Module und neue Features 
 
+| Version          | Feauture | Status |
+|------------------|-------------------|------------------|
+| Version 2.1   |                               |. |
+| Vor  Version 2.0         |                             |. |
+| Version 1.3 |  |. |
 
 ---
 
