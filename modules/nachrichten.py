@@ -166,7 +166,6 @@ class Modul:
         betreff_entry.pack(fill="x", pady=5)
 
         textfeld = tk.Text(senden_frame, height=6)
-        add_placeholder(textfeld, "Nachricht eingeben...")
         textfeld.pack(fill="both", expand=True, pady=5)
 
         tk.Button(senden_frame, text="✅ Nachricht senden", command=senden, bg="#4CAF50", fg="white").pack(pady=5)
