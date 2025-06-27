@@ -3,7 +3,7 @@
 ![Alternativtext](https://cdn.discordapp.com/attachments/1380542231135653980/1380571204146167980/IMG_1509.jpeg?ex=68445ca0&is=68430b20&hm=5a68ff33fab0c76685586cc88a0778e9b98da0728d1716287372605e6ac7fdf3&)
 
 **Wichtiges:**
-![BETA][https://img.shields.io/badge/BETA-red)
+![BETA](https://img.shields.io/badge/BETA-red)
 
 **SchulSystem** ist ein modulares Schulverwaltungssystem in Python, das IServ, WebUntis und andere Tools kombiniert – mit Fokus auf einfache Bedienung, erweiterbare Module und lokale Datenhaltung.
 
