@@ -81,7 +81,7 @@ per Discord: https://discord.gg/NHgr4FKXE3
 | Version          | Feauture | Status |
 |------------------|-------------------|------------------|
 | Version 2.1   |                               | ![Alternativtext](https://img.shields.io/badge/BETA-red) |
-| Vor  Version 2.0         |                             |. |
+| Vor  Version 2.0         |                             |![Alternativtext](https://img.shields.io/badge/Published-green) |
 | Version 1.3 |  |. |
 
 ---
