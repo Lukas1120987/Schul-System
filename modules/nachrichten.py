@@ -153,7 +153,7 @@ class Modul:
         senden_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         empfänger_entry = tk.Entry(senden_frame)
-        add_placeholder(empfänger_entry, "Empfänger")
+        add_placeholder(empfänger_entry, "Empfänger eingeben...")
         empfänger_entry.pack(fill="x", pady=5)
         empfänger_entry.bind("<KeyRelease>", autocomplete_empfänger)
 
@@ -162,10 +162,11 @@ class Modul:
         vorschlagsbox.bind("<Double-1>", set_empfänger)
 
         betreff_entry = tk.Entry(senden_frame)
-        add_placeholder(betreff_entry, "Betreff")
+        add_placeholder(betreff_entry, "Betreff eingeben...")
         betreff_entry.pack(fill="x", pady=5)
 
         textfeld = tk.Text(senden_frame, height=6)
+        add_placeholder(textfeld, "Nachricht eingeben...")
         textfeld.pack(fill="both", expand=True, pady=5)
 
         tk.Button(senden_frame, text="✅ Nachricht senden", command=senden, bg="#4CAF50", fg="white").pack(pady=5)
