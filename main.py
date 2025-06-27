@@ -324,7 +324,7 @@ Dies ist dein erstes Setup. Hier werden die wichtigsten Features erklärt:
 Bitte aktiviere im Verwaltungstool alle gewünschten Module.
 Diese kannst du jederzeit anpassen.
 
-Klicke auf 'Weiter', um SchulSystem zu starten.
+Klicke auf „Weiter“, um SchulSystem zu starten.
 """
 
     label = tk.Label(root, text=tutorial_text, padx=20, pady=20, justify="left")
