@@ -30,7 +30,7 @@ class Modul:
         self.add_profile_reset()
         self.add_darkmode_toggle()
         self.add_account_delete()
-        
+        self.add_version_display()
 
 
 
@@ -317,3 +317,21 @@ class Modul:
     def add_userinfo_display(self):
         info = f"👤 Angemeldet als: {self.nutzername} | Gruppe: {self.nutzerdaten.get('group')} | Sekundär/Klasse: {self.nutzerdaten.get('second_group')}"
         tk.Label(self.frame, text=info, font=("Arial", 10), fg="gray").pack(pady=(5, 0))
+
+
+    def add_version_display(self):
+        config_path = os.path.join("data", "config.json")
+        
+        section = tk.LabelFrame(self.frame, text="Auf Update überprüfen")
+        section.pack(padx=10, pady=5, fill="x")
+
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+
+            local_version = config.get("local_version", "")
+        except FileNotFoundError:
+            messagebox.showerror("config.json nicht gefunden")
+
+        version = f"Version:\n    {local_version}"
+        tk.Label(self.frame, text=version, font=("Arial", 10), fg="gray").pack(pady=(5, 0))
