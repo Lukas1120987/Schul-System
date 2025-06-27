@@ -124,7 +124,7 @@ class Modul:
                     from updater import check_and_update
                     check_and_update()
                 else:
-                    messagebox.showinfo("Update", "Es gibt nichts Neues.")
+                    messagebox.showinfo("Update", f"Es gibt nichts Neues. Die aktuelle Version ist: {latest_version}.")
             except FileNotFoundError:
                 messagebox.showerror("Fehler", f"Datei {config_path} nicht gefunden.")
             except json.JSONDecodeError:
