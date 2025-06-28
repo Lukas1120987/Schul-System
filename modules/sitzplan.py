@@ -1,24 +1,17 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import json
-import os
-
-USER_JSON_PATH = "data/users.json"
-PLAN_JSON_PATH = "data/plan.json"
-
+import json, os
 
 class Modul:
-    def __init__(self, master, user_json_path="data/users.json", plan_json_path="data/plan.json"):
+    def __init__(self, master, user_json_path="data/users.json", plan_dir="data/sitzplaene"):
         self.master = master
         self.user_json_path = user_json_path
-        self.plan_json_path = plan_json_path
-        #...
+        self.plan_dir = plan_dir
+        os.makedirs(self.plan_dir, exist_ok=True)
 
         self.frame = tk.Frame(master, bg="white")
-
         tk.Label(self.frame, text="🛋 Sitzplan erstellen", font=("Arial", 16), bg="white").pack(pady=10)
 
-        # Einstellungen
         settings_frame = tk.Frame(self.frame, bg="white")
         settings_frame.pack(pady=10)
 
@@ -40,9 +33,9 @@ class Modul:
         button_frame = tk.Frame(self.frame, bg="white")
         button_frame.pack(pady=10)
 
-        tk.Button(button_frame, text="🆕 Sitzplan generieren", command=self.generate_seating).grid(row=0, column=0, padx=5)
-        tk.Button(button_frame, text="💾 Sitzplan speichern", command=self.save_seating_plan).grid(row=0, column=1, padx=5)
-        tk.Button(button_frame, text="📂 Sitzplan laden", command=self.load_seating_plan).grid(row=0, column=2, padx=5)
+        tk.Button(button_frame, text="🆕 Generieren", command=self.generate_seating).grid(row=0, column=0, padx=5)
+        tk.Button(button_frame, text="💾 Speichern", command=self.save_seating_plan).grid(row=0, column=1, padx=5)
+        tk.Button(button_frame, text="📂 Laden", command=self.load_seating_plan).grid(row=0, column=2, padx=5)
 
         self.user_listbox = tk.Listbox(self.frame, width=30)
         self.user_listbox.pack(side=tk.LEFT, padx=10, pady=10)
@@ -57,7 +50,6 @@ class Modul:
 
     def refresh_groups(self):
         users = self.load_users()
-        # Nur Gruppen aus tatsächlichen Nutzern, nicht aus _group_ oder Testkonten
         groups = sorted(set(user["second_group"] for name, user in users.items()
                             if not name.startswith("_group_")))
         self.group_dropdown["values"] = groups
@@ -89,39 +81,49 @@ class Modul:
                 self.seats[(r, c)] = btn
 
     def assign_user_by_position(self, position):
-        selection = self.user_listbox.curselection()
-        if not selection:
-            messagebox.showwarning("Keine Auswahl", "Bitte wähle zuerst einen Benutzer aus der Liste.")
-            return
-        username = self.user_listbox.get(selection[0])
-        self.seats[position]["text"] = username
-        self.user_listbox.delete(selection[0])
+        current_text = self.seats[position]["text"]
+        if current_text != "Leer":
+            # Rückgabe an Liste
+            self.user_listbox.insert(tk.END, current_text)
+            self.seats[position]["text"] = "Leer"
+        else:
+            selection = self.user_listbox.curselection()
+            if not selection:
+                messagebox.showwarning("Keine Auswahl", "Bitte wähle zuerst einen Benutzer aus der Liste.")
+                return
+            username = self.user_listbox.get(selection[0])
+            self.seats[position]["text"] = username
+            self.user_listbox.delete(selection[0])
 
     def save_seating_plan(self):
         if not hasattr(self, "seats"):
-            messagebox.showerror("Fehler", "Kein Sitzplan generiert. Bitte zuerst Sitzplan erstellen.")
+            messagebox.showerror("Fehler", "Kein Sitzplan generiert.")
             return
 
+        group = self.group_var.get()
+        filename = os.path.join(self.plan_dir, f"sitzplan_{group}.json")
         data = {
             "rows": int(self.rows_entry.get()),
             "cols": int(self.cols_entry.get()),
-            "group": self.group_var.get(),
+            "group": group,
             "seats": {
                 f"{r},{c}": self.seats[(r, c)]["text"]
                 for (r, c) in self.seats
             }
         }
-        os.makedirs(os.path.dirname(PLAN_JSON_PATH), exist_ok=True)
-        with open(PLAN_JSON_PATH, "w", encoding="utf-8") as f:
+
+        with open(filename, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-        messagebox.showinfo("Gespeichert", "Sitzplan wurde gespeichert.")
+        messagebox.showinfo("Gespeichert", f"Sitzplan für Gruppe '{group}' gespeichert.")
 
     def load_seating_plan(self):
-        if not os.path.exists(PLAN_JSON_PATH):
-            messagebox.showerror("Fehler", "Kein gespeicherter Sitzplan vorhanden.")
+        group = self.group_var.get()
+        filename = os.path.join(self.plan_dir, f"sitzplan_{group}.json")
+        if not os.path.exists(filename):
+            messagebox.showerror("Fehler", f"Kein gespeicherter Sitzplan für Gruppe '{group}'.")
             return
 
-        with open(PLAN_JSON_PATH, "r", encoding="utf-8") as f:
+        with open(filename, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         self.rows_entry.delete(0, tk.END)
@@ -133,13 +135,12 @@ class Modul:
         self.generate_seating()
 
         for key, username in data.get("seats", {}).items():
-            if username != "Leer":
-                r, c = map(int, key.split(","))
-                if (r, c) in self.seats:
-                    self.seats[(r, c)]["text"] = username
-                    if username in self.user_listbox.get(0, tk.END):
-                        index = self.user_listbox.get(0, tk.END).index(username)
-                        self.user_listbox.delete(index)
+            r, c = map(int, key.split(","))
+            if (r, c) in self.seats:
+                self.seats[(r, c)]["text"] = username
+                if username in self.user_listbox.get(0, tk.END):
+                    idx = self.user_listbox.get(0, tk.END).index(username)
+                    self.user_listbox.delete(idx)
 
     def get_users_by_group(self, group):
         users = self.load_users()
@@ -147,12 +148,7 @@ class Modul:
                 if data.get("second_group") == group and not name.startswith("_group_")]
 
     def load_users(self):
-        if not os.path.exists(USER_JSON_PATH):
+        if not os.path.exists(self.user_json_path):
             return {}
-        with open(USER_JSON_PATH, "r", encoding="utf-8") as f:
+        with open(self.user_json_path, "r", encoding="utf-8") as f:
             return json.load(f)
-
-    def save_users(self, users):
-        os.makedirs(os.path.dirname(USER_JSON_PATH), exist_ok=True)
-        with open(USER_JSON_PATH, "w", encoding="utf-8") as f:
-            json.dump(users, f, indent=2)
