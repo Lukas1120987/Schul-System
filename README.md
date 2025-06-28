@@ -51,7 +51,7 @@ Bevor du `main.py` startest:
 ## 🚀 Schnellstart
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Lukas1120987/Schul-System.git
 cd SchulSystem
 pip install -r requirements.txt
 python main.py
