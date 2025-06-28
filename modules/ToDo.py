@@ -42,7 +42,7 @@ class Modul:
             json.dump(self.group_tasks, f, indent=2)
 
     def create_widgets(self):
-        title = tk.Label(self.frame, text="Aufgaben & ToDos", font=("Segoe UI", 18), bg="white")
+        title = tk.Label(self.frame, text="ToDos", font=("Segoe UI", 18), bg="white")
         title.pack(pady=10)
 
         self.notebook = ttk.Notebook(self.frame)
