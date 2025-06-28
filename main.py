@@ -352,6 +352,7 @@ def main():
 
     # Erststart: InstallAssistantSplash + Admin-Einrichtung
     splash_root = tk.Tk()
+    from updater import check_and_update
 
     def start_setup_wrapper():
         admin_name, admin_password = show_admin_creation_dialog()
@@ -364,6 +365,7 @@ def main():
             json.dump({"admin_name": admin_name}, f, indent=2)
         splash_root.destroy()  # Splash schließen
         show_tutorial(admin_name)
+        check_and_update()
         open_login_window()
 
     # Jetzt korrekt: InstallAssistantSplash für Erststart
