@@ -13,7 +13,7 @@ class Modul:
         self.group = user_data["group"]
 
         self.frame = tk.Frame(master, bg="white")
-        tk.Label(self.frame, text="☁️ Cloud-Dateien", font=("Arial", 16), bg="white").pack(pady=10)
+        tk.Label(self.frame, text="☁️ Cloud", font=("Arial", 16), bg="white").pack(pady=10)
 
         self.load_data()
         self.setup_ui()
