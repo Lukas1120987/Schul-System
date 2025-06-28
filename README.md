@@ -1,7 +1,6 @@
 
 # 📚 SchulSystem – Das digitale Schulverwaltungssystem
 
-![SchulSystem Logo](https://cdn.discordapp.com/attachments/1380542231135653980/1380571204146167980/IMG_1509.jpeg?ex=68445ca0&is=68430b20&hm=5a68ff33fab0c76685586cc88a0778e9b98da0728d1716287372605e6ac7fdf3&)
 
 ![Version](https://img.shields.io/badge/Version-2.1-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-BETA-red?style=flat-square)
