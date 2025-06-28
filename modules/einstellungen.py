@@ -80,29 +80,97 @@ class Modul:
         tk.Button(section, text="Speichern", command=update_password).pack(side="right", padx=5, pady=5)
 
     def add_support_ticket(self):
-        section = tk.LabelFrame(self.frame, text="Support-Ticket erstellen")
+        section = tk.LabelFrame(self.frame, text="Support-Tickets")
         section.pack(padx=10, pady=5, fill="x")
 
-        text = tk.Text(section, height=4)
-        text.pack(padx=5, pady=5, fill="x")
+        # Neues Ticket
+        tk.Label(section, text="Neues Ticket").pack(anchor="w", padx=5)
+        new_text = tk.Text(section, height=3)
+        new_text.pack(padx=5, pady=(0, 5), fill="x")
 
         def send_ticket():
-            content = text.get("1.0", "end").strip()
+            content = new_text.get("1.0", "end").strip()
             if content:
                 if not os.path.exists(SUPPORT_PATH):
                     with open(SUPPORT_PATH, "w", encoding="utf-8") as f:
                         json.dump([], f)
                 with open(SUPPORT_PATH, "r", encoding="utf-8") as f:
                     tickets = json.load(f)
-                tickets.append({"user": self.nutzername, "content": content, "status": "offen"})
+                tickets.append({
+                    "user": self.nutzername,
+                    "content": content,
+                    "status": "offen"
+                })
                 with open(SUPPORT_PATH, "w", encoding="utf-8") as f:
                     json.dump(tickets, f, indent=2)
                 messagebox.showinfo("Erfolg", "Support-Ticket gesendet.")
-                text.delete("1.0", "end")
+                new_text.delete("1.0", "end")
+                update_ticket_list()
             else:
                 messagebox.showwarning("Fehler", "Ticket darf nicht leer sein.")
 
-        tk.Button(section, text="Absenden", command=send_ticket).pack(padx=5, pady=5)
+        # Zentriert platzierter Button
+        button_frame = tk.Frame(section)
+        button_frame.pack(pady=(0, 5))
+        tk.Button(button_frame, text="Absenden", command=send_ticket).pack()
+
+        # Ticket-Verlauf (wird erst sichtbar bei vorhandenen Tickets)
+        ticket_frame = tk.Frame(section)
+
+        ticket_scrollbar = tk.Scrollbar(ticket_frame)
+        ticket_listbox = tk.Listbox(ticket_frame, height=1, yscrollcommand=ticket_scrollbar.set)
+        ticket_scrollbar.config(command=ticket_listbox.yview)
+
+        ticket_text_display = tk.Text(ticket_frame, height=5, state="disabled")
+
+        def update_ticket_list():
+            if not os.path.exists(SUPPORT_PATH):
+                ticket_frame.pack_forget()
+                return
+            with open(SUPPORT_PATH, "r", encoding="utf-8") as f:
+                tickets = json.load(f)
+            user_tickets = [t for t in tickets if t["user"] == self.nutzername]
+
+            if not user_tickets:
+                ticket_frame.pack_forget()
+                return
+
+            ticket_listbox.delete(0, tk.END)
+            for i, ticket in enumerate(user_tickets):
+                short = ticket["content"][:50].replace("\n", " ") + ("..." if len(ticket["content"]) > 50 else "")
+                ticket_listbox.insert(tk.END, f"{i+1}. ({ticket['status']}) {short}")
+
+            visible_lines = min(len(user_tickets), 7)
+            ticket_listbox.config(height=visible_lines)
+
+
+            # Ticketframe anzeigen, falls es Tickets gibt
+            ticket_scrollbar.pack(side="right", fill="y")
+            ticket_frame.pack(padx=5, pady=(0, 5), fill="x")
+            
+
+
+        def show_ticket_details(event):
+            selection = ticket_listbox.curselection()
+            if selection:
+                index = selection[0]
+                with open(SUPPORT_PATH, "r", encoding="utf-8") as f:
+                    tickets = json.load(f)
+                user_tickets = [t for t in tickets if t["user"] == self.nutzername]
+                ticket = user_tickets[index]
+                ticket_text_display.config(state="normal")
+                ticket_text_display.delete("1.0", tk.END)
+                ticket_text_display.insert("1.0", f"Inhalt:\n{ticket['content']}\n\nStatus: {ticket['status']}")
+                ticket_text_display.config(state="disabled")
+                ticket_text_display.pack(padx=5, pady=(5, 0), fill="x")
+
+        # Widgets ins Ticket-Frame
+        tk.Label(ticket_frame, text="Deine bisherigen Tickets:").pack(anchor="w")
+        ticket_listbox.pack(fill="x", padx=0)
+        ticket_listbox.bind("<<ListboxSelect>>", show_ticket_details)
+
+        update_ticket_list()
+
 
     def add_update(self):
         # JSON-Dateipfad
