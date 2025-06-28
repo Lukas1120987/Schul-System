@@ -9,7 +9,7 @@ class Modul:
         self.username = username
         self.frame = tk.Frame(master, bg="white")
 
-        tk.Label(self.frame, text="📁 Dateiablage & Austausch", font=("Arial", 16), bg="white").pack(pady=10)
+        tk.Label(self.frame, text="📁 Dateiablage", font=("Arial", 16), bg="white").pack(pady=10)
 
         tk.Button(self.frame, text="Datei hochladen", command=self.upload_file).pack(pady=5)
 
