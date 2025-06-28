@@ -1,105 +1,102 @@
+
 # 📚 SchulSystem – Das digitale Schulverwaltungssystem
 
-![Alternativtext](https://cdn.discordapp.com/attachments/1380542231135653980/1380571204146167980/IMG_1509.jpeg?ex=68445ca0&is=68430b20&hm=5a68ff33fab0c76685586cc88a0778e9b98da0728d1716287372605e6ac7fdf3&)
+![SchulSystem Logo](https://cdn.discordapp.com/attachments/1380542231135653980/1380571204146167980/IMG_1509.jpeg?ex=68445ca0&is=68430b20&hm=5a68ff33fab0c76685586cc88a0778e9b98da0728d1716287372605e6ac7fdf3&)
 
+![Version](https://img.shields.io/badge/Version-2.1-blue?style=flat-square)
+![Status](https://img.shields.io/badge/Status-BETA-red?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+![Made with Python](https://img.shields.io/badge/Made%20with-Python-3776AB?logo=python&logoColor=white&style=flat-square)
 
-**SchulSystem** ist ein modulares Schulverwaltungssystem in Python, das IServ, WebUntis und andere Tools kombiniert – mit Fokus auf einfache Bedienung, erweiterbare Module und lokale Datenhaltung.
-
----
-## Wichtiges
-Bevor du main.py startest, achte bitte darauf, dass du die `ZIP` entpackt hast.
-
----
-## Enthaltene Module:
-
-💬 Nachrichten
-Versende und empfange schulinterne Nachrichten – mit Suchfunktion.
-
-☁️ Cloud
-Teile Dateien direkt mit Gruppen oder Einzelpersonen. Verwalte Freigaben und Zugriffsrechte komfortabel über eine übersichtliche Oberfläche.
-
-🗂️ Dateiablage
-Lade Dateien für alle hoch, speichere sie  ab und greife jederzeit lokal darauf zu.
-
-🪑 Sitzplan
-Erstelle Sitzpläne für Klassen mit Drag-and-Drop-Funktion – ideal zur Visualisierung und Organisation im Unterricht.
-
- 🧪 E-Learning
-Erstelle Tests, ordne sie Gruppen zu und werte Ergebnisse aus. Für digitales Lernen im Schulalltag.
-
- 📅 Stundenplan
-Zeigt deinen persönlichen Stundenplan (Wochenansicht), angepasst an deine Gruppenzugehörigkeit.
-
- 🛠️ Stundenplanverwaltung
-Erstelle, bearbeite und verwalte den Stundenplan zentral.
-
- 📢 Meldungen
-Erstelle neue Meldungen für Nachrichten oder Dateien.
-
- 📝 Meldungenverwaltung
-Anzeigen und bearbeiten von Meldungen.
-
- 🧑‍🏫 Sprechstunden
-Lehrkräfte können hier Sprechzeiten festlegen, Schüler buchen Termine.
-
-📚 Ausleihe
-Verwalte schulinterne Ausleihsysteme (z. B. Laptops, Bücher, Geräte) mit Ausleihe und Rückgabe.
-
-🧑‍💼 Adminbereich
-Zentraler Zugang für Administratoren zur Benutzerverwaltung und Gruppenzuweisung.
-
- 🤧 Krankmeldungen
-Ermöglicht einfache Abwesenheits- und Krankmeldungen mit Gruppenübersicht.
-
- ✅ ToDo‘s
-Persönliche Aufgabenverwaltung für Schüler, Lehrer und Verwaltung – mit Status und Gruppenbindung.
-
- 📆 Kalender
-Zeigt alle schulischen Termine, Veranstaltungen, Prüfungen und individuelle Einträge in einer Monats- oder Wochenübersicht des Nutzers.
-
- 🆘 Support
-Erstelle Supporttickets, verfolge Bearbeitungsstatus und gib Rückmeldung – direkt an das Admin-Team.
-
- ⚙️ Einstellungen
-Hier kannst du deinen Benutzernamen ändern, dein Passwort anpassen, Feedback geben oder das System personalisieren.
-
----
-## 🚀 Nutzung
-
-1. 🔽 **Downloade** das Repositories
-2. 📂 **Extrahieren** der `ZIP`-Datei aus deinem Download-Ordner
-3. 🖇️ **Download** der externen Pakete aus `requirements.txt`. 
-
----
-## Kontakt
-per Discord: https://discord.gg/NHgr4FKXE3
+**SchulSystem** ist ein modulares Schulverwaltungssystem in Python, das IServ, WebUntis und weitere Tools kombiniert – mit Fokus auf einfache Bedienung, modulare Erweiterung und lokale Datenhaltung.
 
 ---
 
-## Module und neue Features 
+## 🔧 Voraussetzungen
 
-| Version          | Feauture | Status |
-|------------------|-------------------|------------------|
-| Version 2.1   |                               | ![Alternativtext](https://img.shields.io/badge/BETA-red) |
-| Vor  Version 2.0         |                             |![Alternativtext](https://img.shields.io/badge/Published-green) |
-| Version 1.3 |  |. |
+Bevor du `main.py` startest:
+
+1. 📦 **ZIP-Datei entpacken**
+2. 📂 Verzeichnisstruktur beibehalten
+3. 🔁 Pakete aus `requirements.txt` installieren  
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ---
 
-## 🏗️ Aufbau
+## 🧩 Enthaltene Module
+
+| Modul | Beschreibung |
+|-------|--------------|
+| 💬 **Nachrichten** | Schulinterne Nachrichten mit Suchfunktion |
+| ☁️ **Cloud** | Dateien mit Gruppen oder Personen teilen |
+| 🗂️ **Dateiablage** | Öffentlicher Dateiupload für alle |
+| 🪑 **Sitzplan** | Drag-and-Drop Sitzplaneditor |
+| 🧪 **E-Learning** | Digitale Tests mit Ergebnisauswertung |
+| 📅 **Stundenplan** | Individuelle Anzeige nach Gruppe |
+| 🛠️ **Stundenplanverwaltung** | Verwaltung und Bearbeitung zentral |
+| 📢 **Meldungen** | Kurzmeldungen für Info & Datei-Uploads |
+| 📝 **Meldungsverwaltung** | Bestehende Meldungen bearbeiten |
+| 🧑‍🏫 **Sprechstunden** | Zeiten setzen und Termine buchen |
+| 📚 **Ausleihe** | Verwaltung von Schulmaterialien |
+| 🧑‍💼 **Adminbereich** | Benutzer- und Gruppenverwaltung |
+| 🤧 **Krankmeldungen** | Abwesenheiten mit Gruppenansicht |
+| ✅ **ToDo’s** | Persönliche Aufgabenverwaltung |
+| 📆 **Kalender** | Monats- & Wochenübersicht für alle Termine |
+| 🆘 **Support** | Ticketsystem für Hilfe & Feedback |
+| ⚙️ **Einstellungen** | Nutzerprofil anpassen & Rückmeldung geben |
+
+---
+
+## 🚀 Schnellstart
+
+```bash
+git clone <repository-url>
+cd SchulSystem
+pip install -r requirements.txt
+python main.py
+```
+
+---
+
+## 📌 Versionsübersicht
+
+| Version        | Features         | Status |
+|----------------|------------------|--------|
+| **v2.1**       | Viele neue Module, Rework        | ![Beta](https://img.shields.io/badge/BETA-red) |
+| **< 2.0**       | Erste stabile Hauptversion       | ![Published](https://img.shields.io/badge/Published-green) |
+| **v1.3**        | Basismodul mit Login und Nachrichtensystem | ✅ |
+
+---
+
+## 🏗️ Projektstruktur
 
 ```plaintext
 SchulSystem/
 ├── main.py                 # Hauptstartdatei
 ├── login.py                # Loginfenster
 ├── dashboard.py            # Zentrale Oberfläche
-├── updater.py       # Automatisches Update-System
+├── updater.py              # Auto-Updater
 ├── modules/                # Alle Funktionsmodule
 │   ├── stundenplan.py
 │   ├── nachrichten.py
 │   └── ...
-├── data/                   # JSON-Dateien zur Datenspeicherung (lokal)
+├── data/                   # Lokale JSON-Daten
 │   ├── users.json
 │   ├── messages.json
 │   └── ...
+```
 
+---
+
+## 💬 Kontakt
+
+📨 **Discord-Server**: [Beitreten](https://discord.gg/NHgr4FKXE3)  
+✉️ **Fragen / Ideen / Bugreports**? – Immer gern auf Discord oder als Git-Issue.
+
+---
+
+## 📃 Lizenz
+
+Dieses Projekt steht unter der [MIT License](https://opensource.org/licenses/MIT).
