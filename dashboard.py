@@ -190,7 +190,7 @@ class Dashboard:
                 msg_file = "data/message_notifications.json"
                 if os.path.exists(msg_file):
                     try:
-                        with open(msg_file, "r") as f:
+                        with open(msg_file, "r", encoding="utf-8") as f:
                             msg_data = json.load(f)
                         for msg in msg_data:
                             if msg.get("empfänger") == self.username and not msg.get("gelesen"):
