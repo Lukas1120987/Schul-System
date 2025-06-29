@@ -44,9 +44,28 @@ class Modul:
         new_name_entry = tk.Entry(section)
         new_name_entry.pack(side="left", padx=5, pady=5, expand=True, fill="x")
 
+        # Platzhalter setzen
+        def set_placeholder(entry, placeholder, color="grey", normal_color="black"):
+            def on_focus_in(event):
+                if entry.get() == placeholder:
+                    entry.delete(0, tk.END)
+                    entry.config(fg=normal_color)
+
+            def on_focus_out(event):
+                if not entry.get():
+                    entry.insert(0, placeholder)
+                    entry.config(fg=color)
+
+            entry.insert(0, placeholder)
+            entry.config(fg=color)
+            entry.bind("<FocusIn>", on_focus_in)
+            entry.bind("<FocusOut>", on_focus_out)
+
+        set_placeholder(new_name_entry, "Neuer Benutzername...")
+
         def update_username():
             new_name = new_name_entry.get().strip()
-            if new_name:
+            if new_name and new_name != "Neuer Benutzername...":
                 with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
                 users[new_name] = users.pop(self.nutzername)
@@ -58,16 +77,36 @@ class Modul:
 
         tk.Button(section, text="Speichern", command=update_username).pack(side="right", padx=5, pady=5)
 
+
     def add_password_change(self):
         section = tk.LabelFrame(self.frame, text="Passwort ändern")
         section.pack(padx=10, pady=5, fill="x")
 
-        new_pw_entry = tk.Entry(section, show="*")
+        new_pw_entry = tk.Entry(section)
         new_pw_entry.pack(side="left", padx=5, pady=5, expand=True, fill="x")
+
+        def set_password_placeholder(entry, placeholder, color="grey", normal_color="black"):
+            def on_focus_in(event):
+                if entry.get() == placeholder:
+                    entry.delete(0, tk.END)
+                    entry.config(fg=normal_color, show="*")
+
+            def on_focus_out(event):
+                if not entry.get():
+                    entry.insert(0, placeholder)
+                    entry.config(fg=color, show="")
+
+            entry.insert(0, placeholder)
+            entry.config(fg=color, show="")
+            entry.bind("<FocusIn>", on_focus_in)
+            entry.bind("<FocusOut>", on_focus_out)
+
+        # Aufruf der Funktion für das Passwortfeld
+        set_password_placeholder(new_pw_entry, "Neues Passwort...")
 
         def update_password():
             new_pw = new_pw_entry.get().strip()
-            if new_pw:
+            if new_pw and new_pw != "Neues Passwort...":
                 with open(USERS_PATH, "r", encoding="utf-8") as f:
                     users = json.load(f)
                 users[self.nutzername]["password"] = new_pw
@@ -84,7 +123,7 @@ class Modul:
         section.pack(padx=10, pady=5, fill="x")
 
         # Neues Ticket
-        tk.Label(section, text="Neues Ticket").pack(anchor="w", padx=5)
+        tk.Label(section, text="Neues Ticket:").pack(anchor="w", padx=5)
         new_text = tk.Text(section, height=3)
         new_text.pack(padx=5, pady=(0, 5), fill="x")
 
