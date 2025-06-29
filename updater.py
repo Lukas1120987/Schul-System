@@ -224,15 +224,15 @@ def add_update_notification(admin_name):
     notifications_url = "https://raw.githubusercontent.com/Lukas1120987/SchulSystem/main/notifications.txt"
     notifications_path = "data/notifications.json"
 
-    # 1. notifications.txt herunterladen
+
     try:
         with urllib.request.urlopen(notifications_url) as response:
-            message = response.read().decode('utf-8').strip()
+            message = response.read().decode("utf-8", errors="replace").strip()
     except Exception as e:
         print(f"[Updater] Fehler beim Laden der Benachrichtigungen: {e}")
         return
 
-    # 2. notifications.json laden (falls nicht vorhanden, leeres Dict)
+
     notifications = {}
     if os.path.exists(notifications_path):
         try:
@@ -242,11 +242,11 @@ def add_update_notification(admin_name):
             print(f"[Updater] Fehler beim Laden von notifications.json: {e}")
             notifications = {}
 
-    # 3. Neue Benachrichtigung hinzufügen (Liste anlegen, falls nicht da)
+
     if admin_name not in notifications:
         notifications[admin_name] = []
 
-    # Beispiel: Eintrag mit Zeitstempel und Text
+
     import datetime
     timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M") #29.06.2025 12:34
     new_entry = {
@@ -256,7 +256,7 @@ def add_update_notification(admin_name):
     }
     notifications[admin_name].append(new_entry)
 
-    # 4. notifications.json speichern
+
     try:
         with open(notifications_path, "w", encoding="utf-8") as f:
             json.dump(notifications, f, indent=2, ensure_ascii=False)
