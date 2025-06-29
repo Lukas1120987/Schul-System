@@ -374,7 +374,7 @@ class Dashboard:
         win.geometry("400x400")
 
         try:
-            with open("data/notifications.json", "r") as f:
+            with open("data/notifications.json", "r", encoding="utf-8") as f:
                 all_data = json.load(f)
             user_msgs = all_data.get(self.username, [])
         except:
@@ -385,7 +385,7 @@ class Dashboard:
             return
 
         for msg in reversed(user_msgs):
-            status = "🟢" if not msg.get("gelesen") else "⚪"
+            status = "❎" if not msg.get("gelesen") else "✅"
             text = f"{status} {msg['datum']} – {msg['text']}"
             tk.Label(win, text=text, wraplength=380, anchor="w", justify="left").pack(fill="x", padx=10, pady=5)
 
