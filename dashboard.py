@@ -117,7 +117,7 @@ class Dashboard:
             "meldungen": {"aktiv": False, "beschreibung": "Melden von Nutzern "},
             "meldungen_verwaltung": {"aktiv": False, "beschreibung": "Meldungen von Nutzern verwalten (Admin)"},
             "team": {"aktiv": True, "beschreibung": "Development-Bereich zum beheben von Fehlern"},
-            "umfragen": {"aktiv": True, "beschreibung": "Durchführen und Auswerten von Umfragen."},
+            "umfragen": {"aktiv": False, "beschreibung": "Durchführen und Auswerten von Umfragen."},
             "bibliothek": {"aktiv": True, "beschreibung": "Bchereisystem mit: Bücher hinzufügen, anzeigen, ausleihen und zurückgeben."},
             "statistiken": {"aktiv": True, "beschreibung": "Anzeigen von Statistiken"}
         }
