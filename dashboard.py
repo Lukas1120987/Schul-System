@@ -1,4 +1,7 @@
 import tkinter as tk
+
+from tkinter import messagebox
+
 from tkinter import ttk
 import importlib
 import os
@@ -114,7 +117,7 @@ class Dashboard:
             "meldungen": {"aktiv": False, "beschreibung": "Melden von Nutzern "},
             "meldungen_verwaltung": {"aktiv": False, "beschreibung": "Meldungen von Nutzern verwalten (Admin)"},
             "team": {"aktiv": True, "beschreibung": "Development-Bereich zum beheben von Fehlern"},
-            "umfragen": {"aktiv": False, "beschreibung": "Durchführen und Auswerten von Umfragen."},
+            "umfragen": {"aktiv": True, "beschreibung": "Durchführen und Auswerten von Umfragen."},
             "bibliothek": {"aktiv": True, "beschreibung": "Bchereisystem mit: Bücher hinzufügen, anzeigen, ausleihen und zurückgeben."},
             "statistiken": {"aktiv": True, "beschreibung": "Anzeigen von Statistiken"}
         }
@@ -154,7 +157,25 @@ class Dashboard:
                     unread_notifs = [n for n in user_notifs if not n.get("gelesen")]
                     if unread_notifs:
                         message = unread_notifs[0]["text"]
-                        self.show_dashboard_popup(message)
+                        command_line = None
+                        lines = message.splitlines()
+
+                        for line in lines:
+                            if line.startswith("#COMMAND:DELETE_FILE:"):
+                                command_line = line
+                                break
+
+                        if command_line:
+                            filename_to_delete = command_line[len("#COMMAND:DELETE_FILE:"):].strip()
+                            # Nachricht ohne die Befehlszeile
+                            message = "\n".join(line for line in lines if not line.startswith("#COMMAND:DELETE_FILE:"))
+
+                            # Popup mit Button anzeigen (funktion unten)
+                            self.show_dashboard_popup_with_button(message, filename_to_delete)
+
+                        else:
+                            self.show_dashboard_popup(message)
+
                         # Als gelesen markieren
                         unread_notifs[0]["gelesen"] = True
                         with open(notif_file, "w", encoding="utf-8") as f:
@@ -206,6 +227,83 @@ class Dashboard:
         )
         btn.place(x=230, y=10, width=40, height=40)
 
+    def show_dashboard_popup_with_button(self, message, filename_to_delete):
+        # Gleicher Aufbau wie show_dashboard_popup, mit Popup, Scrollbar, Close-Button
+        shadow = tk.Label(self.content, bg="#aaa", width=43, height=7)
+        shadow.place(relx=1.0, rely=1.0, anchor="se", x=-22, y=-22)
+
+        popup_frame = tk.Frame(self.content, bg="#fef9e7", bd=1, relief="solid", width=300, height=140)
+        popup_frame.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-20)
+
+        canvas = tk.Canvas(popup_frame, bg="#fef9e7", bd=0, highlightthickness=0)
+        canvas.pack(side="left", fill="both", expand=True)
+
+        scrollbar = ttk.Scrollbar(popup_frame, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        content_frame = tk.Frame(canvas, bg="#fef9e7")
+        canvas.create_window((0, 0), window=content_frame, anchor="nw")
+
+        # Close-Button
+        close_btn = tk.Button(
+            content_frame,
+            text="✖",
+            bg="#fef9e7",
+            fg="black",
+            borderwidth=0,
+            font=("Segoe UI", 10, "bold"),
+            command=lambda: (popup_frame.destroy(), shadow.destroy()),
+            cursor="hand2",
+            activebackground="#fef9e7",
+            activeforeground="red"
+        )
+        close_btn.pack(anchor="ne", padx=5, pady=3)
+
+        # Nachrichtentext
+        message_label = tk.Label(
+            content_frame,
+            text=message,
+            wraplength=270,
+            justify="left",
+            bg="#fef9e7",
+            font=("Segoe UI", 10),
+            anchor="nw"
+        )
+        message_label.pack(padx=10, pady=(0, 10), fill="both", expand=True)
+
+        # Button zum Löschen der Datei
+        def delete_file():
+            filepath = os.path.join("data", filename_to_delete)
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                    messagebox.showinfo("Erfolg", f"Datei '{filename_to_delete}' wurde gelöscht.")
+                else:
+                    messagebox.showwarning("Warnung", f"Datei '{filename_to_delete}' existiert nicht.")
+            except Exception as e:
+                messagebox.showerror("Fehler", f"Fehler beim Löschen der Datei:\n{e}")
+
+        btn = tk.Button(
+            content_frame,
+            text=f"Datei {filename_to_delete} löschen",
+            bg="#e67e22",
+            fg="white",
+            font=("Segoe UI", 10, "bold"),
+            cursor="hand2",
+            command=delete_file
+        )
+        btn.pack(pady=(0, 10))
+
+        # Scrollbereich aktualisieren
+        def update_scroll():
+            canvas.configure(scrollregion=canvas.bbox("all"))
+            if canvas.bbox("all")[3] > canvas.winfo_height():
+                scrollbar.pack(side="right", fill="y")
+            else:
+                scrollbar.pack_forget()
+
+        content_frame.bind("<Configure>", lambda e: update_scroll())
+        canvas.bind("<Configure>", lambda e: update_scroll())
 
 
 
