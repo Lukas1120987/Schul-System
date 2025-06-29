@@ -65,7 +65,7 @@ python main.py
 |----------------|------------------|--------|
 | **v2.1**       | Viele neue Module, Rework        | ![Beta](https://img.shields.io/badge/BETA-red) |
 | **< 2.0**       | Erste stabile Hauptversion       | ![Published](https://img.shields.io/badge/Published-green) |
-| **v1.3**        | Basismodul mit Login und Nachrichtensystem | ✅ |
+| **v1.3**        | Basismodul mit Login und Nachrichtensystem | ![Published](https://img.shields.io/badge/Published-green) |
 
 ---
 
