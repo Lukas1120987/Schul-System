@@ -1,2 +1,4 @@
-Bitte lösche die Datei modules.json aus dem System.
+Neues Update:
+Da es neue Module gibt, muss sich das Dashboard neu konfigurieren.
+Bitte lösche die Datei modules.json aus dem System. Und starte das Programm neu (Logout+Login).
 #COMMAND:DELETE_FILE:modules.json
