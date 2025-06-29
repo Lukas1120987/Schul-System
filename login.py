@@ -125,10 +125,10 @@ class LoginWindow:
                                    relief="flat", padx=10, pady=5)
         self.login_btn.grid(row=3, column=0, columnspan=2, pady=20)
 
-        #self.reset_pw_btn = tk.Button(self.frame, text="Passwort zurücksetzen", bg="#f44336", fg="white",
-        #                              font=("Segoe UI", 10, "bold"), command=self.reset_password,
-        #                              relief="flat", padx=10, pady=5)
-        #self.reset_pw_btn.grid(row=4, column=0, columnspan=2, pady=(0, 20))
+        self.reset_pw_btn = tk.Button(self.frame, text="Programm beenden", bg="#f44336", fg="white",
+                                      font=("Segoe UI", 10, "bold"), command=self.beenden,
+                                      relief="flat", padx=10, pady=5)
+        self.reset_pw_btn.grid(row=4, column=0, columnspan=2, pady=(0, 20))
 
     def toggle_password_visibility(self):
         if self.entry_password.cget('show') == '':
@@ -138,7 +138,8 @@ class LoginWindow:
             self.entry_password.config(show='')
             self.eye_button.config(text="🚫  ")
 
-
+    def beenden(self):
+        self.master.destroy()
 
     def login(self):
         username = self.entry_username.get()
