@@ -148,7 +148,7 @@ class Dashboard:
             notif_file = "data/notifications.json"
             if os.path.exists(notif_file):
                 try:
-                    with open(notif_file, "r") as f:
+                    with open(notif_file, "r", encoding="utf-8") as f:
                         notif_data = json.load(f)
                     user_notifs = notif_data.get(self.username, [])
                     unread_notifs = [n for n in user_notifs if not n.get("gelesen")]
