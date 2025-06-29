@@ -248,11 +248,11 @@ def add_update_notification(admin_name):
 
     # Beispiel: Eintrag mit Zeitstempel und Text
     import datetime
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M") #29.06.2025 12:34
     new_entry = {
-        "timestamp": timestamp,
-        "message": message,
-        "read": False
+        "text": message,
+        "datum": timestamp,
+        "gelesen": False
     }
     notifications[admin_name].append(new_entry)
 
