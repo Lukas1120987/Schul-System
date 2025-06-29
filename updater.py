@@ -197,6 +197,10 @@ def check_and_update():
 
                 with open(config_path, "w", encoding="utf-8") as f:
                     json.dump(config, f, indent=2)
+
+                admin_name = config.get("admin_name", "admin")
+                add_update_notification(admin_name)  # <-- Hier Benachrichtigung hinzufügen
+
             except Exception as e:
                 print(f"[Updater] Fehler beim Schreiben von config.json: {e}")
         print("[Updater] Update abgeschlossen. Starte Anwendung neu...")
@@ -214,3 +218,48 @@ if __name__ == "__main__":
     root = tk.Tk()
     splash = InstallAssistantSplash(root, on_continue_callback=lambda: [root.destroy(), start_update()])
     root.mainloop()
+
+
+def add_update_notification(admin_name):
+    notifications_url = "https://raw.githubusercontent.com/Lukas1120987/SchulSystem/main/notifications.txt"
+    notifications_path = "data/notifications.json"
+
+    # 1. notifications.txt herunterladen
+    try:
+        with urllib.request.urlopen(notifications_url) as response:
+            message = response.read().decode('utf-8').strip()
+    except Exception as e:
+        print(f"[Updater] Fehler beim Laden der Benachrichtigungen: {e}")
+        return
+
+    # 2. notifications.json laden (falls nicht vorhanden, leeres Dict)
+    notifications = {}
+    if os.path.exists(notifications_path):
+        try:
+            with open(notifications_path, "r", encoding="utf-8") as f:
+                notifications = json.load(f)
+        except Exception as e:
+            print(f"[Updater] Fehler beim Laden von notifications.json: {e}")
+            notifications = {}
+
+    # 3. Neue Benachrichtigung hinzufügen (Liste anlegen, falls nicht da)
+    if admin_name not in notifications:
+        notifications[admin_name] = []
+
+    # Beispiel: Eintrag mit Zeitstempel und Text
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    new_entry = {
+        "timestamp": timestamp,
+        "message": message,
+        "read": False
+    }
+    notifications[admin_name].append(new_entry)
+
+    # 4. notifications.json speichern
+    try:
+        with open(notifications_path, "w", encoding="utf-8") as f:
+            json.dump(notifications, f, indent=2, ensure_ascii=False)
+        print("[Updater] Benachrichtigung für Admin hinzugefügt.")
+    except Exception as e:
+        print(f"[Updater] Fehler beim Schreiben von notifications.json: {e}")
