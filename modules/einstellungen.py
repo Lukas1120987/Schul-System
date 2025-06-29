@@ -237,7 +237,7 @@ class Modul:
             except json.JSONDecodeError:
                 messagebox.showerror("Fehler", "Fehler beim Lesen der JSON-Datei.")
 
-        tk.Button(section, text="Auf Update prüfen", command=check_versions, fg="red").pack(padx=5, pady=5)
+        tk.Button(section, text="Auf Update prüfen", command=check_versions, fg="black").pack(padx=5, pady=5)
 
         
 
@@ -427,18 +427,27 @@ class Modul:
 
 
     def add_version_display(self):
+        import os
+        import json
+        import tkinter as tk
+        from tkinter import messagebox
+
         config_path = os.path.join("data", "config.json")
         
-        section = tk.LabelFrame(self.frame, text="Auf Update überprüfen")
+        section = tk.LabelFrame(self.frame, text="")
         section.pack(padx=10, pady=5, fill="x")
+
+        local_version = "Unbekannt"  # 
 
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 config = json.load(f)
-
-            local_version = config.get("local_version", "")
+                local_version = config.get("local_version", "Nicht angegeben")
         except FileNotFoundError:
-            messagebox.showerror("config.json nicht gefunden")
+            messagebox.showerror("Fehler", "Die Datei 'config.json' wurde nicht gefunden.")
+        except json.JSONDecodeError:
+            messagebox.showerror("Fehler", "Die Datei 'config.json' enthält ungültiges JSON.")
 
-        version = f"Version:\n    {local_version}"
-        tk.Label(self.frame, text=version, font=("Arial", 10), fg="gray").pack(pady=(5, 0))
+        version_text = f"  Version:\n    {local_version}"
+        tk.Label(section, text=version_text, font=("Arial", 10), fg="gray", justify="center").pack(pady=(5, 0), anchor="center")
+
