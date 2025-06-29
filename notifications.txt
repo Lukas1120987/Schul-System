@@ -1,1 +1,4 @@
 
+Es ist eine neue Version von SchulSystem verfügbar und wurde erfolgreich installiert.
+Bitte überprüfe die Änderungen und starte die Anwendung neu, falls sie noch läuft.
+Vielen Dank, dass du EduClass nutzt!
