@@ -4,7 +4,11 @@ import json
 import os
 
 class Modul:
-    def __init__(self, parent_frame):
+    
+    def __init__(self, parent_frame, username=None, user_data=None):
+        self.frame = tk.Frame(parent_frame)
+        # restlicher Code bleibt gleich...
+
         self.frame = tk.Frame(parent_frame)
         self.surveys_file = "data/surveys.json"
         self.umfragen = self.load_umfragen()
