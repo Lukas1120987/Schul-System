@@ -28,7 +28,7 @@ Bevor du `main.py` startest:
 
 | Modul | Beschreibung |
 |-------|--------------|
-| 💬 **Nachrichten** | ![Made with Python](https://img.shields.io/badge/Made%20with-Python-3776AB?logo=python&logoColor=white&style=flat-square) |
+| 💬 **Nachrichten** | ![Made with Python](https://img.shields.io/badge/Schulinterne%20Nachrichten%20mit%20Suchfunktion-lightgrey) |
 | ☁️ **Cloud** | Dateien mit Gruppen oder Personen teilen |
 | 🗂️ **Dateiablage** | Öffentlicher Dateiupload für alle |
 | 🪑 **Sitzplan** | Drag-and-Drop Sitzplaneditor |
