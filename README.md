@@ -28,7 +28,8 @@ Bevor du `main.py` startest:
 
 | Modul | Beschreibung |
 |-------|--------------|
-| 💬 **Nachrichten** | Schulinterne Nachrichten mit Suchfunktion |
+| 💬 **Nachrichten** | ![](https://img.shields.io/badge/Schulinterne%20Nachrichten%20mit%20Suchfunktion-grau-lightgrey
+) |
 | ☁️ **Cloud** | Dateien mit Gruppen oder Personen teilen |
 | 🗂️ **Dateiablage** | Öffentlicher Dateiupload für alle |
 | 🪑 **Sitzplan** | Drag-and-Drop Sitzplaneditor |
