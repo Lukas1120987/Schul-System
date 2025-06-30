@@ -18,15 +18,6 @@ Wir verpflichten uns dazu:
 
 ---
 
-## Unterstützte Versionen
-
-| Version          | Unterstützt mit Sicherheitsupdates |
-|------------------|-------------------------------------|
-| Version 2.1 und neuer   | ✅ Ja                              |
-| Vor  Version 2.0         | ❌ Nein                            |
-| Version 1.3 | 2FA-Authentifizierung und Passwort kann zurückgesetzt werden |
-
----
 
 ## Offenlegungsprinzip
 
