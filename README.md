@@ -26,25 +26,26 @@ Bevor du `main.py` startest:
 
 ## 🧩 Enthaltene Module
 
-| Modul | Beschreibung |
-|-------|--------------|
-| 💬 **Nachrichten** | ![Made with Python](https://img.shields.io/badge/Schulinterne%20Nachrichten%20mit%20Suchfunktion-lightgrey) |
-| ☁️ **Cloud** | Dateien mit Gruppen oder Personen teilen |
-| 🗂️ **Dateiablage** | Öffentlicher Dateiupload für alle |
-| 🪑 **Sitzplan** | Drag-and-Drop Sitzplaneditor |
-| 🧪 **E-Learning** | Digitale Tests mit Ergebnisauswertung |
-| 📅 **Stundenplan** | Individuelle Anzeige nach Gruppe |
-| 🛠️ **Stundenplanverwaltung** | Verwaltung und Bearbeitung zentral |
-| 📢 **Meldungen** | Kurzmeldungen für Info & Datei-Uploads |
-| 📝 **Meldungsverwaltung** | Bestehende Meldungen bearbeiten |
-| 🧑‍🏫 **Sprechstunden** | Zeiten setzen und Termine buchen |
-| 📚 **Ausleihe** | Verwaltung von Schulmaterialien |
-| 🧑‍💼 **Adminbereich** | Benutzer- und Gruppenverwaltung |
-| 🤧 **Krankmeldungen** | Abwesenheiten mit Gruppenansicht |
-| ✅ **ToDo’s** | Persönliche Aufgabenverwaltung |
-| 📆 **Kalender** | Monats- & Wochenübersicht für alle Termine |
-| 🆘 **Support** | Ticketsystem für Hilfe & Feedback |
-| ⚙️ **Einstellungen** | Nutzerprofil anpassen & Rückmeldung geben |
+| Modul | Badge |
+|-------|-------|
+| 💬 **Nachrichten** | ![Nachrichten](https://img.shields.io/badge/Schulinterne%20Nachrichten%20mit%20Suchfunktion-lightgrey) |
+| ☁️ **Cloud** | ![Cloud](https://img.shields.io/badge/Dateien%20mit%20Gruppen%20oder%20Personen%20teilen-lightgrey) |
+| 🗂️ **Dateiablage** | ![Dateiablage](https://img.shields.io/badge/%C3%96ffentlicher%20Dateiupload%20f%C3%BCr%20alle-lightgrey) |
+| 🪑 **Sitzplan** | ![Sitzplan](https://img.shields.io/badge/Drag--and--Drop%20Sitzplaneditor-lightgrey) |
+| 🧪 **E-Learning** | ![E-Learning](https://img.shields.io/badge/Digitale%20Tests%20mit%20Ergebnisauswertung-lightgrey) |
+| 📅 **Stundenplan** | ![Stundenplan](https://img.shields.io/badge/Individuelle%20Anzeige%20nach%20Gruppe-lightgrey) |
+| 🛠️ **Stundenplanverwaltung** | ![Stundenplanverwaltung](https://img.shields.io/badge/Verwaltung%20und%20Bearbeitung%20zentral-lightgrey) |
+| 📢 **Meldungen** | ![Meldungen](https://img.shields.io/badge/Kurzmeldungen%20f%C3%BCr%20Info%20%26%20Datei--Uploads-lightgrey) |
+| 📝 **Meldungsverwaltung** | ![Meldungsverwaltung](https://img.shields.io/badge/Bestehende%20Meldungen%20bearbeiten-lightgrey) |
+| 🧑‍🏫 **Sprechstunden** | ![Sprechstunden](https://img.shields.io/badge/Zeiten%20setzen%20und%20Termine%20buchen-lightgrey) |
+| 📚 **Ausleihe** | ![Ausleihe](https://img.shields.io/badge/Verwaltung%20von%20Schulmaterialien-lightgrey) |
+| 🧑‍💼 **Adminbereich** | ![Adminbereich](https://img.shields.io/badge/Benutzer--%20und%20Gruppenverwaltung-lightgrey) |
+| 🤧 **Krankmeldungen** | ![Krankmeldungen](https://img.shields.io/badge/Abwesenheiten%20mit%20Gruppenansicht-lightgrey) |
+| ✅ **ToDo’s** | ![ToDo's](https://img.shields.io/badge/Pers%C3%B6nliche%20Aufgabenverwaltung-lightgrey) |
+| 📆 **Kalender** | ![Kalender](https://img.shields.io/badge/Monats--%20%26%20Wochen%C3%BCbersicht%20f%C3%BCr%20alle%20Termine-lightgrey) |
+| 🆘 **Support** | ![Support](https://img.shields.io/badge/Ticketsystem%20f%C3%BCr%20Hilfe%20%26%20Feedback-lightgrey) |
+| ⚙️ **Einstellungen** | ![Einstellungen](https://img.shields.io/badge/Nutzerprofil%20anpassen%20%26%20R%C3%BCckmeldung%20geben-lightgrey) |
+
 
 ---
 
