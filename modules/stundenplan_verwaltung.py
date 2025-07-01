@@ -3,16 +3,18 @@ from tkinter import messagebox, ttk
 import json
 import os
 
-DATA_DIR = "data"
+from ordner import get_data_path
+
+DATA_DIR = get_data_path()
 FILES = {
-    "subjects": "subjects.json",
-    "rooms": "rooms.json",
-    "timeslots": "timeslots.json",
-    "teachers": "teachers.json",
-    "schedule": "schedule.json",
-    "users": "users.json",
-    "vertretungen": "vertretungen.json",
-    "organisation": "organisation.json"
+    "subjects": "data/subjects.json",
+    "rooms": "data/rooms.json",
+    "timeslots": "data/timeslots.json",
+    "teachers": "data/teachers.json",
+    "schedule": "data/schedule.json",
+    "users": "data/users.json",
+    "vertretungen": "data/vertretungen.json",
+    "organisation": "data/organisation.json"
 }
 
 
