@@ -17,9 +17,9 @@ def get_data_path():
         return DEFAULT_PATH
 
 
-
+# BEISPIEL --------------------------------------
 # import os
-# from ordner-finder import get_data_path
-
-#MUSTER_JSON_PATH = os.path.join(get_data_path(), "users.json")
+#from ordner import get_data_path
+#
+#USER_JSON_PATH = os.path.join(get_data_path(), "users.json")
 
