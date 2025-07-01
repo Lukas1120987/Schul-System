@@ -3,10 +3,16 @@ from tkinter import messagebox
 import json
 import os
 
-USERS_PATH = "data/users.json"
-SUPPORT_PATH = "data/support.json"
-FEEDBACK_PATH = "data/feedback.json"
-CONFIG_PATH = "data/config.json"
+#USERS_PATH = "data/users.json"
+#SUPPORT_PATH = "data/support.json"
+#FEEDBACK_PATH = "data/feedback.json"
+#CONFIG_PATH = "data/config.json"
+from ordner import get_data_path
+
+CONFIG_PATH = os.path.join(get_data_path(), "data/config.json")
+USERS_PATH = os.path.join(get_data_path(), "data/users.json")
+SUPPORT_PATH = os.path.join(get_data_path(), "data/support.json")
+FEEDBACK_PATH = os.path.join(get_data_path(), "data/feedback.json")
 
 
 
