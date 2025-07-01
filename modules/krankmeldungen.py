@@ -3,8 +3,10 @@ from tkinter import ttk, messagebox
 import json
 import os
 
-USER_JSON_PATH = "data/users.json"
-KRANK_JSON_PATH = "data/krank.json"
+from ordner import get_data_path
+
+USER_JSON_PATH = os.path.join(get_data_path(), "data/users.json")
+KRANK_JSON_PATH = os.path.join(get_data_path(), "data/krank.json")
 
 class Modul:
     def __init__(self, master, users_path, krank_path):
