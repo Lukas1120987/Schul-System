@@ -3,8 +3,11 @@ from tkinter import messagebox, ttk
 import json
 import os
 
-SUPPORT_PATH = "data/support.json"
-FEEDBACK_PATH = "data/feedback.json"
+from ordner import get_data_path
+
+SUPPORT_PATH = os.path.join(get_data_path(), "data/support.json")
+FEEDBACK_PATH = os.path.join(get_data_path(), "data/feedback.json")
+
 
 class Modul:
     def __init__(self, master, nutzername, nutzerdaten):
