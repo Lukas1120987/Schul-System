@@ -8,6 +8,7 @@ from updater import check_and_update
 import smtplib
 import ssl
 import os
+from ordner import get_data_path  # Import der Pfadfunktion
 
 # Farben
 PRIMARY_BLUE = "#1a73e8"
@@ -141,31 +142,35 @@ class LoginWindow:
     def beenden(self):
         self.master.destroy()
 
+    
+
     def login(self):
         username = self.entry_username.get()
         password = self.entry_password.get()
 
+        user_file_path = os.path.join(get_data_path(), "data/users.json")  # Dynamischer Pfad
+        print(user_file_path)
+
         try:
-            with open("data/users.json", "r") as f:
+            with open(user_file_path, "r", encoding="utf-8") as f:
                 users = json.load(f)
 
             if username in users:
                 if users[username]["password"] == "":
                     # Erster Login – Passwort setzen
-                    new_pw = tk.simpledialog.askstring("Neues Passwort", "Bitte neues Passwort eingeben:", show="*")
+                    new_pw = simpledialog.askstring("Neues Passwort", "Bitte neues Passwort eingeben:", show="*")
                     if not new_pw:
                         messagebox.showerror("Fehler", "Passwort darf nicht leer sein.")
                         return
                     users[username]["password"] = new_pw
-                    with open("data/users.json", "w") as f:
-                        json.dump(users, f, indent=2)
+                    with open(user_file_path, "w", encoding="utf-8") as f:
+                        json.dump(users, f, indent=2, ensure_ascii=False)
                     messagebox.showinfo("Erfolg", "Passwort gesetzt. Du bist jetzt eingeloggt.")
                     self.master.destroy()
                     root = tk.Tk()
                     root.attributes("-fullscreen", True)
                     app = Dashboard(root, username, users[username])
                     root.mainloop()
-
                     return
                 elif users[username]["password"] == password:
                     self.master.destroy()
@@ -173,10 +178,11 @@ class LoginWindow:
                     app = Dashboard(root, username, users[username])
                     root.mainloop()
                     return
+
             messagebox.showerror("Fehler", "Benutzername oder Passwort falsch.")
         except FileNotFoundError:
             messagebox.showerror("Fehler", "Benutzerdaten nicht gefunden.")
-
+        
 def open_login_window():
     root = tk.Tk()
     app = LoginWindow(root)
