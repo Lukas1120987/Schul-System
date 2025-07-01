@@ -2,9 +2,11 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import json
 import os
+from ordner import get_data_path
 
-DB = "data/elearning.json"
-USERS_DB = "data/users.json"
+USERS_DB = os.path.join(get_data_path(), "data/users.json")
+DB = os.path.join(get_data_path(), "data/elearning.json")
+#USERS_DB = "data/users.json"
 
 class Modul:
     def __init__(self, master, username, user_data,):
