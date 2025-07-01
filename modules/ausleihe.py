@@ -2,9 +2,12 @@ import tkinter as tk
 from tkinter import messagebox
 import json
 import os
+from ordner import get_data_path
 
-GERÄTE_DATEI = "data/geraete.json"
-USERS_DATEI = "data/users.json"
+GERÄTE_DATEI = os.path.join(get_data_path(), "data/geraete.json")
+USERS_DATEI = os.path.join(get_data_path(), "data/users.json")
+#GERÄTE_DATEI = "data/geraete.json"
+#USERS_DATEI = "data/users.json"
 
 class Modul:
     def __init__(self, master, username, user_data):
