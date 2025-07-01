@@ -5,7 +5,9 @@ import os
 
 #STANDARDGRUPPEN = ["Schüler", "Lehrer", "Verwaltung"]
 STANDARDGRUPPEN = ["Schüler", "Lehrer", "Verwaltung", "SchulSystem-Team"]
-USER_JSON_PATH = "data/users.json"
+from ordner import get_data_path
+
+USER_JSON_PATH = os.path.join(get_data_path(), "data/users.json")
 
 
 class Modul:
