@@ -3,8 +3,13 @@ from tkinter import filedialog, ttk, messagebox
 import os
 import json
 
-CLOUD_DB = "data/cloud.json"
-USERS_DB = "data/users.json"
+from ordner import get_data_path
+
+USERS_DB = os.path.join(get_data_path(), "data/users.json")
+CLOUD_DB = os.path.join(get_data_path(), "data/cloud.json")
+
+#CLOUD_DB = "data/cloud.json"
+
 
 class Modul:
     def __init__(self, master, username, user_data):
