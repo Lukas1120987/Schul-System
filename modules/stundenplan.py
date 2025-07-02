@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import json
 import os
 from datetime import datetime
+from ordner import get_data_path
 
 # === Hilfsfunktionen ===
 def load_or_create_json(filename, default_data):
