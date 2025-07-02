@@ -1,14 +1,17 @@
 import tkinter as tk
-
 from tkinter import messagebox
-
 from tkinter import ttk
 import importlib
-import os
+import os as os
 import json
 from PIL import Image, ImageTk
+from ordner import get_data_path
 
-CONFIG_PATH = "data/config.json"
+CONFIG_PATH = os.path.join(get_data_path(), "data/config.json")
+MODULE_PATH = os.path.join(get_data_path(), "data/modules.json")
+NOTIF_PATH = os.path.join(get_data_path(), "data/notifications.json")
+
+
 
 class Dashboard:
     def __init__(self, master, username, user_data):
@@ -122,12 +125,12 @@ class Dashboard:
             "statistiken": {"aktiv": True, "beschreibung": "Anzeigen von Statistiken"}
         }
 
-        if not os.path.exists("data/modules.json"):
-            with open("data/modules.json", "w") as f:
+        if not os.path.exists(MODULE_PATH):
+            with open(MODULE_PATH, "w") as f:
                 json.dump(standard_module_config, f, indent=4)
             print("modules.json wurde automatisch erstellt.")
 
-        with open("data/modules.json", "r") as f:
+        with open(MODULE_PATH, "r") as f:
             return json.load(f)
 
 
@@ -148,7 +151,7 @@ class Dashboard:
             notifications_found = False
 
             # --- notifications.json (strukturierter nach Benutzernamen) ---
-            notif_file = "data/notifications.json"
+            notif_file = NOTIF_PATH
             if os.path.exists(notif_file):
                 try:
                     with open(notif_file, "r", encoding="utf-8") as f:
@@ -374,7 +377,7 @@ class Dashboard:
         win.geometry("400x400")
 
         try:
-            with open("data/notifications.json", "r", encoding="utf-8") as f:
+            with open(NOTIF_PATH, "r", encoding="utf-8") as f:
                 all_data = json.load(f)
             user_msgs = all_data.get(self.username, [])
         except:
@@ -506,7 +509,9 @@ class Dashboard:
 
     def show_error(self, modulname, error_text):
         # Fehleranzeige
-        USER_INFO_PATH = "data/users.json"
+
+        USERE_PATH = os.path.join(get_data_path(), "data/users.json")
+        USER_INFO_PATH = USERE_PATH
         error_frame = tk.Frame(self.content, bg="#f8d7da")
         error_frame.pack(expand=True, fill="both")
 
