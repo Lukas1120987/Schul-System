@@ -4,6 +4,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import Calendar
 
+from ordner import get_data_path
+
+USER_JSON_PATH = os.path.join(get_data_path(), "data/users.json")
+
 class Modul:
     def __init__(self, parent, username, user_data):
         self.parent = parent
@@ -15,7 +19,7 @@ class Modul:
 
         self.frame = tk.Frame(parent, bg="white")
         self.data_file = "data/kalender.json"
-        self.users_file = "data/users.json"
+        self.users_file = USER_JSON_PATH
 
         self.create_widgets()
         self.load_dates()
