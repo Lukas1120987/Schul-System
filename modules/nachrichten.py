@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import json
 from datetime import datetime
-
+import os
 from ordner import get_data_path
 
 USER_JSON_PATH = os.path.join(get_data_path(), "data/users.json")
