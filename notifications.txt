@@ -1,4 +1,3 @@
 Neues Update:
-Da es neue Module gibt, muss sich das Dashboard neu konfigurieren.
-Bitte lösche die Datei modules.json aus dem System. Und starte das Programm neu (Logout+Login).
-#COMMAND:DELETE_FILE:modules.json
+Es gibt gerade verschiedene Umstellungen im System. Bitte warten Sie bei der Erstellung von neuen Nutzeraccount o.ä. bis das Update veröffentlicht wurde. Sollten Sie bereits die neuste Version haben und die Datei ordner.py sehen, dann löschen Sie bitte die users.json Datei mithilfe des folgenden Button:
+#COMMAND:DELETE_FILE:users.json
