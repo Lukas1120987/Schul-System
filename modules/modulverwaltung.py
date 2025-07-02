@@ -1,6 +1,6 @@
 import tkinter as tk
 import json
-
+import os
 from ordner import get_data_path
 
 MODUL_PATH = os.path.join(get_data_path(), "data/modules.json")
