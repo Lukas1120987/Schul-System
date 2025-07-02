@@ -4,6 +4,11 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
 
+from ordner import get_data_path
+
+AUFGABEN_USER_PATH = os.path.join(get_data_path(), "data/aufgaben_user.json")
+AUFGABEN_GRUPPE_PATH = os.path.join(get_data_path(), "data/aufgaben_gruppen.json")
+
 class Modul:
     def __init__(self, parent, username, user_data):
         self.parent = parent
@@ -13,8 +18,8 @@ class Modul:
 
         self.frame = tk.Frame(parent, bg="white")
 
-        self.user_tasks_file = "data/aufgaben_user.json"
-        self.group_tasks_file = "data/aufgaben_gruppen.json"
+        self.user_tasks_file = AUFGABEN_USER_PATH
+        self.group_tasks_file = AUFGABEN_GRUPPE_PATH
 
         self.load_tasks()
         self.create_widgets()
