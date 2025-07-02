@@ -3,11 +3,17 @@ from tkinter import messagebox, simpledialog
 import json
 import os
 
+from ordner import get_data_path
+
+LIB_PATH = os.path.join(get_data_path(), "data/library.json")
+
+
+
 class Modul:
     def __init__(self, parent_frame, username=None, user_data=None):
         self.frame = tk.Frame(parent_frame)
         self.frame = tk.Frame(parent_frame)
-        self.library_file = "data/library.json"
+        self.library_file = LIB_PATH
         self.buecher = self.load_buecher()
         self.create_widgets()
 
