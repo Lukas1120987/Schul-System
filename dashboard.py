@@ -10,7 +10,7 @@ from ordner import get_data_path
 CONFIG_PATH = os.path.join(get_data_path(), "data/config.json")
 MODULE_PATH = os.path.join(get_data_path(), "data/modules.json")
 NOTIF_PATH = os.path.join(get_data_path(), "data/notifications.json")
-
+HELP_PATH = os.path.join(get_data_path(), "data/help.json")
 
 
 class Dashboard:
@@ -604,7 +604,7 @@ class Dashboard:
 
     def show_help_window(self):
         try:
-            with open("data/help.json", "r", encoding="utf-8") as f:
+            with open(HELP_PATH, "r", encoding="utf-8") as f:
                 all_entries = json.load(f)
         except FileNotFoundError:
             tk.messagebox.showerror("Fehler", "Die Hilfedatei wurde nicht gefunden.")
