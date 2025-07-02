@@ -5,12 +5,15 @@ import os
 from datetime import datetime
 
 # === Hilfsfunktionen ===
-def load_or_create_json(path, default_data):
+def load_or_create_json(filename, default_data):
+    path = os.path.join(get_data_path(), filename)
     if not os.path.exists(path):
-        with open(path, 'w') as f:
-            json.dump(default_data, f, indent=4)
-    with open(path, 'r') as f:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w', encoding="utf-8") as f:
+            json.dump(default_data, f, indent=4, ensure_ascii=False)
+    with open(path, 'r', encoding="utf-8") as f:
         return json.load(f)
+
 
 # === Daten laden ===
 users = load_or_create_json("data/users.json", {})
