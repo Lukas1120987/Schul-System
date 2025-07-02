@@ -7,6 +7,7 @@ from tkcalendar import Calendar
 from ordner import get_data_path
 
 USER_JSON_PATH = os.path.join(get_data_path(), "data/users.json")
+KAL_JSON_PATH = os.path.join(get_data_path(), "data/kalender.json")
 
 class Modul:
     def __init__(self, parent, username, user_data):
@@ -18,7 +19,7 @@ class Modul:
         self.is_admin = user_data.get("is_admin", False)
 
         self.frame = tk.Frame(parent, bg="white")
-        self.data_file = "data/kalender.json"
+        self.data_file = KAL_JSON_PATH
         self.users_file = USER_JSON_PATH
 
         self.create_widgets()
