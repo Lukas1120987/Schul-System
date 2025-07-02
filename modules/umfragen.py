@@ -2,13 +2,19 @@ import tkinter as tk
 from tkinter import messagebox
 import json, os
 
+from ordner import get_data_path
+
+SURVEY_USER_PATH = os.path.join(get_data_path(), "data/surveys.json")
+GRUPPE_PATH = os.path.join(get_data_path(), "data/groups.json")
+
+
 class Modul:
     def __init__(self, parent, username=None, user_data=None):
         self.username = username
         self.user_data = user_data
         self.frame = tk.Frame(parent)
-        self.surveys_file = "data/surveys.json"
-        self.groups_file = "data/groups.json"
+        self.surveys_file = SURVEY_USER_PATH
+        self.groups_file = GRUPPE_PATH
         self.umfragen = self.load(self.surveys_file)  # direkt load() nutzen
         self.groups = self.load(self.groups_file)
         self.current = None
