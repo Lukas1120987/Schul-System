@@ -148,6 +148,8 @@ class LoginWindow:
         username = self.entry_username.get()
         password = self.entry_password.get()
 
+        from ordner import get_data_path  # Import der Pfadfunktion
+
         user_file_path = os.path.join(get_data_path(), "data/users.json")  # Dynamischer Pfad
         print(user_file_path)
 
