@@ -55,7 +55,7 @@ class Modul:
             if not os.path.exists(USER_PATH):
                 tk.messagebox.showerror("Fehler", "users.json nicht gefunden.")
                 return
-            with open("data/users.json", "r", encoding="utf-8") as f:
+            with open(USER_PATH, "r", encoding="utf-8") as f:
                 users_data = json.load(f)
                 empfaenger_liste = list(users_data.keys())
         else:
@@ -69,7 +69,7 @@ class Modul:
                 "gelesen": False
             })
 
-        with open("data/notifications.json", "w", encoding="utf-8") as f:
+        with open(NOTI_PATH, "w", encoding="utf-8") as f:
             json.dump(daten, f, indent=4)
 
         tk.messagebox.showinfo("Erfolg", f"Nachricht an {', '.join(empfaenger_liste)} gesendet.")
