@@ -2,3 +2,5 @@ requests
 Pillow
 customtkinter
 matplotlib
+pyotp
+qrcode
