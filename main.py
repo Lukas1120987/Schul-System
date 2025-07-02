@@ -2,7 +2,7 @@
 import os
 import json
 import tkinter as tk
-from tkinter import simpledialog, messagebox, ttk
+from tkinter import simpledialog, messagebox, ttk, filedialog
 import random
 from login import SplashScreen, open_login_window, start
 from first_splash import InstallAssistantSplash
@@ -14,11 +14,22 @@ WHITE = "#ffffff"
 LIGHT_BLUE = "#aaccff"
 
 
-def create_file_if_missing(path, content):
-    """Erstellt eine JSON-Datei mit content, falls sie noch nicht existiert."""
-    if not os.path.exists(path):
-        print(f"Erstelle {os.path.basename(path)}...")
-        with open(path, "w", encoding="utf-8") as f:
+
+def load_data_path():
+    """Lädt den Speicherort aus setup.json"""
+    with open("setup.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+        return data.get("data_path", ".")
+
+def create_file_if_missing(filename, content):
+    """Erstellt Datei im in setup.json angegebenen Ordner, falls sie nicht existiert."""
+    data_path = load_data_path()
+    full_path = os.path.join(data_path, filename)
+
+    if not os.path.exists(full_path):
+        print(f"Erstelle {filename} im Pfad {data_path}...")
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        with open(full_path, "w", encoding="utf-8") as f:
             json.dump(content, f, indent=4, ensure_ascii=False)
 
 
@@ -243,14 +254,23 @@ def setup_databases(admin_name, admin_password):
 
 
 def show_admin_creation_dialog():
-    """Zeigt ein gestaltetes Fenster zur Admin-Eingabe im Vollbild an."""
+    def choose_directory():
+        path = filedialog.askdirectory(parent=dialog, title="Speicherort wählen")
+        if path:
+            path_var.set(path)
+
     def submit():
         name = name_entry.get().strip()
         pw = pw_entry.get().strip()
+        path = path_var.get().strip()
 
-        if not name or not pw:
-            messagebox.showerror("Fehler", "Bitte fülle beide Felder aus.")
+        if not name or not pw or not path:
+            messagebox.showerror("Fehler", "Bitte fülle alle Felder aus.")
             return
+
+        # Speichere setup.json
+        with open("setup.json", "w", encoding="utf-8") as f:
+            json.dump({"data_path": path}, f, indent=4)
 
         result["name"] = name
         result["password"] = pw
@@ -259,21 +279,18 @@ def show_admin_creation_dialog():
     result = {"name": None, "password": None}
 
     parent = tk.Tk()
-    parent.withdraw()  # Unsichtbares Hauptfenster für modalen Dialog
+    parent.withdraw()
 
     dialog = tk.Toplevel(parent)
     dialog.title("Admin-Setup")
     dialog.configure(bg=PRIMARY_BLUE)
-    dialog.overrideredirect(True)  # Kein Fensterrand
+    dialog.overrideredirect(True)
 
-    # Vollbild aktivieren
     screen_width = dialog.winfo_screenwidth()
     screen_height = dialog.winfo_screenheight()
     dialog.geometry(f"{screen_width}x{screen_height}+0+0")
+    dialog.grab_set()
 
-    dialog.grab_set()  # Modalität erzwingen
-
-    # Inhalt mittig anzeigen
     frame = tk.Frame(dialog, bg=PRIMARY_BLUE)
     frame.place(relx=0.5, rely=0.5, anchor="center")
 
@@ -281,28 +298,38 @@ def show_admin_creation_dialog():
                      bg=PRIMARY_BLUE, fg=WHITE)
     title.pack(pady=(0, 40))
 
-    tk.Label(frame, text="Benutzername:", bg=PRIMARY_BLUE, fg=WHITE,
-             anchor="w", font=("Segoe UI", 14)).pack(fill="x")
+    # Benutzername
+    tk.Label(frame, text="Benutzername:", bg=PRIMARY_BLUE, fg=WHITE, font=("Segoe UI", 14)).pack(fill="x")
     name_entry = tk.Entry(frame, font=("Segoe UI", 14))
     name_entry.pack(fill="x", pady=(0, 20))
 
-    tk.Label(frame, text="Passwort:", bg=PRIMARY_BLUE, fg=WHITE,
-             anchor="w", font=("Segoe UI", 14)).pack(fill="x")
+    # Passwort
+    tk.Label(frame, text="Passwort:", bg=PRIMARY_BLUE, fg=WHITE, font=("Segoe UI", 14)).pack(fill="x")
     pw_entry = tk.Entry(frame, show="*", font=("Segoe UI", 14))
-    pw_entry.pack(fill="x", pady=(0, 30))
+    pw_entry.pack(fill="x", pady=(0, 20))
+
+    # Speicherort
+    tk.Label(frame, text="Datei-Speicherort:", bg=PRIMARY_BLUE, fg=WHITE, font=("Segoe UI", 14)).pack(fill="x")
+
+    path_frame = tk.Frame(frame, bg=PRIMARY_BLUE)
+    path_frame.pack(fill="x", pady=(0, 30))
+
+    path_var = tk.StringVar()
+    path_entry = tk.Entry(path_frame, textvariable=path_var, font=("Segoe UI", 14))
+    path_entry.pack(side="left", fill="x", expand=True)
+    browse_btn = tk.Button(path_frame, text="...", command=choose_directory, bg=LIGHT_BLUE)
+    browse_btn.pack(side="right")
 
     submit_btn = tk.Button(frame, text="Erstellen", command=submit,
                            bg=LIGHT_BLUE, fg="black", font=("Segoe UI", 14))
     submit_btn.pack()
 
-    # Escape zum Schließen
     dialog.bind("<Escape>", lambda e: dialog.destroy())
 
     parent.wait_window(dialog)
     parent.destroy()
 
     return result["name"], result["password"]
-
 
 
 
