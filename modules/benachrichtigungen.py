@@ -4,6 +4,12 @@ import json
 import os
 from datetime import datetime
 
+from ordner import get_data_path
+
+USER_PATH = os.path.join(get_data_path(), "data/users.json")
+NOTI_PATH = os.path.join(get_data_path(), "data/notifications.json")
+
+
 class Modul:
     def __init__(self, master, username, user_data):
         self.master = master
@@ -36,17 +42,17 @@ class Modul:
             return
 
         # Stelle sicher, dass die Datei existiert
-        if not os.path.exists("data/notifications.json"):
-            with open("data/notifications.json", "w", encoding="utf-8") as f:
+        if not os.path.exists(NOTI_PATH):
+            with open(NOTI_PATH, "w", encoding="utf-8") as f:
                 json.dump({}, f)
 
-        with open("data/notifications.json", "r", encoding="utf-8") as f:
+        with open(NOTI_PATH, "r", encoding="utf-8") as f:
             daten = json.load(f)
 
         # Wenn 'alle' gewählt wurde, alle User aus users.json laden und ansprechen
         empfaenger_liste = []
         if empfaenger.lower() == "alle":
-            if not os.path.exists("data/users.json"):
+            if not os.path.exists(USER_PATH):
                 tk.messagebox.showerror("Fehler", "users.json nicht gefunden.")
                 return
             with open("data/users.json", "r", encoding="utf-8") as f:
