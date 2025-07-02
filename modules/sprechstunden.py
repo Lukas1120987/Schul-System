@@ -5,10 +5,13 @@ import os
 import re
 from datetime import datetime
 
-SPRECHSTUNDEN_DB = "data/sprechstunden.json"
-SPRECHZEITEN_DB = "data/sprechzeiten.json"
-USERS_DB = "data/users.json"
-NOTIFICATIONS_DB = "data/notifications.json"
+from ordner import get_data_path
+
+
+SPRECHSTUNDEN_DB = os.path.join(get_data_path(), "data/sprechstunden.json")
+SPRECHZEITEN_DB = os.path.join(get_data_path(), "data/sprechzeiten.json")
+USERS_DB = os.path.join(get_data_path(), "data/users.json")
+NOTIFICATIONS_DB = os.path.join(get_data_path(), "data/notifications.json")
 
 class Modul:
     def __init__(self, master, username, user_data):
