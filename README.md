@@ -26,7 +26,7 @@ Bevor du `main.py` startest:
 
 ## 🧩 Enthaltene Module
 
-| Modul | Badge |
+| Modul | Funktion |
 |-------|-------|
 | 💬 **Nachrichten** | ![Nachrichten](https://img.shields.io/badge/Schulinterne%20Nachrichten%20mit%20Suchfunktion-lightgrey) |
 | ☁️ **Cloud** | ![Cloud](https://img.shields.io/badge/Dateien%20mit%20Gruppen%20oder%20Personen%20teilen-lightgrey) |
