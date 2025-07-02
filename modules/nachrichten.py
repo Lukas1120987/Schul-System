@@ -3,6 +3,12 @@ from tkinter import ttk, messagebox
 import json
 from datetime import datetime
 
+from ordner import get_data_path
+
+USER_JSON_PATH = os.path.join(get_data_path(), "data/users.json")
+NOTI_JSON_PATH = os.path.join(get_data_path(), "data/notifications.json")
+MESS_JSON_PATH = os.path.join(get_data_path(), "data/messages.json")
+
 class Modul:
     def __init__(self, parent, nutzername, user_data=None):
         self.frame = tk.Frame(parent, bg="#f0f2f5")
@@ -17,7 +23,7 @@ class Modul:
     def baue_gui(self):
         def lade_nutzer():
             try:
-                with open("data/users.json", "r", encoding="utf-8") as f:
+                with open(USER_JSON_PATH, "r", encoding="utf-8") as f:
                     nutzer_daten = json.load(f)
                 return list(nutzer_daten.keys())
             except:
@@ -25,7 +31,7 @@ class Modul:
 
         def lade_nachrichten():
             try:
-                with open("data/messages.json", "r", encoding="utf-8") as f:
+                with open(MESS_JSON_PATH, "r", encoding="utf-8") as f:
                     return json.load(f)
             except:
                 return []
@@ -82,7 +88,7 @@ class Modul:
             nachrichten = lade_nachrichten()
             nachrichten.append(neue_nachricht)
 
-            with open("data/messages.json", "w", encoding="utf-8") as f:
+            with open(MESS_JSON_PATH, "w", encoding="utf-8") as f:
                 json.dump(nachrichten, f, indent=2, ensure_ascii=False)
 
             benachrichtigung = {
@@ -93,7 +99,7 @@ class Modul:
             }
 
             try:
-                with open("data/notifications.json", "r", encoding="utf-8") as f:
+                with open(NOTI_JSON_PATH, "r", encoding="utf-8") as f:
                     benachrichtigungen = json.load(f)
             except:
                 benachrichtigungen = {}
@@ -104,7 +110,7 @@ class Modul:
 
             benachrichtigungen[empfänger].append(benachrichtigung)
 
-            with open("data/notifications.json", "w", encoding="utf-8") as f:
+            with open(NOTI_JSON_PATH, "w", encoding="utf-8") as f:
                 json.dump(benachrichtigungen, f, indent=2, ensure_ascii=False)
 
 
