@@ -92,7 +92,7 @@ SchulSystem/
 
 ## 💬 Kontakt
 
-📨 **Discord-Server**: [Beitreten](https://discord.gg/NHgr4FKXE3)  
+📨 **Discord-Server**: [Beitreten](https://discord.gg/UVZ7UWEJBZ)
 ✉️ **Fragen / Ideen / Bugreports**? – Immer gern auf Discord oder als Git-Issue.
 
 ---
