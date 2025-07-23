@@ -13,7 +13,7 @@ import threading
 import json
 
 # === Konfiguration ===
-GITHUB_ZIP_URL = "https://github.com/Lukas1120987/SchulSystem/archive/refs/heads/main.zip"
+GITHUB_ZIP_URL = "https://github.com/Lukas1120987/Schul-System/archive/refs/heads/main.zip"
 UPDATE_DIR = "update_temp"
 EXCLUDE_DIRS = ["data", "__pycache__", "web"]
 EXCLUDE_FILES = ["main.exe"]
@@ -117,7 +117,7 @@ def get_local_version():
 
 def get_remote_version():
     try:
-        with urllib.request.urlopen("https://raw.githubusercontent.com/Lukas1120987/SchulSystem/main/version.txt") as response:
+        with urllib.request.urlopen("https://raw.githubusercontent.com/Lukas1120987/Schul-System/main/version.txt") as response:
             return response.read().decode('utf-8').strip()
     except:
         return None
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
 
 def add_update_notification(admin_name):
-    notifications_url = "https://raw.githubusercontent.com/Lukas1120987/SchulSystem/main/notifications.txt"
+    notifications_url = "https://raw.githubusercontent.com/Lukas1120987/Schul-System/main/notifications.txt"
     notifications_path = "data/notifications.json"
 
 
