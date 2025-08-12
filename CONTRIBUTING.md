@@ -1,6 +1,7 @@
 # Wir suchen dich!
 
-Verbessere das SchulSystem!
+Verbessere das SchulSystem! Du kannst dich gerne per Discord melden.
 
 # Wie?
-Melde dich bei uns und wir schauen, was wir machen können.
+Informationen, wie du uns unterstützen kannst findest du hier: 
+https://lukas1120987.github.io/SchulSystem/entwickler.html
