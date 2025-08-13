@@ -1,19 +1,13 @@
-# internetverwaltung.py
 import tkinter as tk
 from tkinter import ttk, messagebox
 import json
 import os
 import re
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse
 import webbrowser
+import threading
+import webview  # pip install pywebview
 from ordner import get_data_path
-
-# Optionales Embedded-Browsing via tkinterweb
-_HTML_AVAILABLE = True
-try:
-    from tkinterweb import HtmlFrame  # pip install tkinterweb
-except Exception:
-    _HTML_AVAILABLE = False
 
 WHITELIST_PATH = os.path.join(get_data_path(), "data/internet_whitelist.json")
 
@@ -27,6 +21,8 @@ class Modul:
         # State
         self.history = []
         self.history_index = -1
+        self.webview_window = None
+        self.webview_thread = None
 
         self._build_ui()
         self._load_whitelist()
@@ -46,7 +42,6 @@ class Modul:
         try:
             with open(WHITELIST_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            # Normalisieren: Strings, keine Duplikate, Sortierung
             cleaned = []
             for item in data:
                 if not isinstance(item, str):
@@ -70,18 +65,10 @@ class Modul:
         if not url:
             return url
         if not re.match(r"^[a-zA-Z][a-zA-Z0-9+\-.]*://", url):
-            # Standard: https
             url = "https://" + url
         return url
 
     def _is_allowed(self, url: str) -> bool:
-        """
-        Erlaubt, wenn:
-        - URL beginnt mit einem Whitelist-Eintrag (wenn Eintrag ein vollständiges URL-Präfix ist), ODER
-        - die Domain (netloc) der URL exakt dem Whitelist-Eintrag (Domain) entspricht oder eine Subdomain davon ist.
-        Einträge dürfen entweder Domains (z. B. "example.com") oder vollständige URLs (z. B. "https://example.com/pfad")
-        sein.
-        """
         try:
             target = urlparse(self._ensure_scheme(url))
         except Exception:
@@ -94,20 +81,15 @@ class Modul:
             if not e:
                 continue
 
-            # Volle URL?
             if re.match(r"^[a-zA-Z][a-zA-Z0-9+\-.]*://", e):
                 try:
                     pe = urlparse(e)
                 except Exception:
                     continue
-                # Präfixprüfung (Schema + Netloc + Pfad-Beginn)
                 if target.scheme == pe.scheme and t_netloc == pe.netloc.lower():
                     if target.path.startswith(pe.path):
                         return True
-                # Wenn der Eintrag eine nackte Domain im Netloc hat, evtl. Subdomain erlauben:
-                # -> hier NICHT, da es ein genauer URL-Eintrag ist
             else:
-                # Domain-Eintrag
                 domain = e.lower()
                 if t_netloc == domain or t_netloc.endswith("." + domain):
                     return True
@@ -116,28 +98,23 @@ class Modul:
     # ---------- UI ----------
 
     def _build_ui(self):
-        # Überschrift
         tk.Label(self.frame, text="🌐 Internetverwaltung (Whitelist-Browser)",
                  font=("Arial", 18, "bold"), bg="#f0f2f5").pack(pady=(10, 6))
 
-        # Notebook: Browser + (optional) Verwaltung
         self.nb = ttk.Notebook(self.frame)
         self.nb.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
-        # Tab: Browser
         self.browser_tab = tk.Frame(self.nb, bg="#f0f2f5")
         self.nb.add(self.browser_tab, text="Browser")
 
         self._build_browser_tab(self.browser_tab)
 
-        # Tab: Verwaltung nur für second_group == "Verwaltung"
         if self.user_data.get("group") == "Verwaltung":
             self.admin_tab = tk.Frame(self.nb, bg="#f0f2f5")
             self.nb.add(self.admin_tab, text="Whitelist verwalten")
             self._build_admin_tab(self.admin_tab)
 
     def _build_browser_tab(self, parent):
-        # URL-Leiste + Buttons
         topbar = tk.Frame(parent, bg="#f0f2f5")
         topbar.pack(fill="x", padx=8, pady=(8, 6))
 
@@ -150,7 +127,6 @@ class Modul:
         self.btn_reload = tk.Button(topbar, text="⟳", width=3, command=self._reload_current)
         self.btn_reload.pack(side="left", padx=(0, 8))
 
-        # Dropdown mit Whitelist (schnell wählen)
         self.combo_whitelist = ttk.Combobox(topbar, state="readonly", width=40, values=[])
         self.combo_whitelist.set("Whitelist auswählen…")
         self.combo_whitelist.pack(side="left", padx=(0, 6))
@@ -163,45 +139,31 @@ class Modul:
         self.btn_go = tk.Button(topbar, text="Öffnen", command=self._on_go)
         self.btn_go.pack(side="left")
 
-        # Browser-Container
         container = tk.Frame(parent, bg="#dfe3e6")
         container.pack(fill="both", expand=True, padx=8, pady=(0, 8))
 
-        if _HTML_AVAILABLE:
-            # Eingebetteter Browser
-            self.html = HtmlFrame(container, messages_enabled=False)
-            self.html.pack(fill="both", expand=True)
-        else:
-            # Fallback: Hinweis + Button öffnet extern
-            fallback = tk.Frame(container, bg="#f0f2f5")
-            fallback.pack(fill="both", expand=True)
-
-            tk.Label(
-                fallback,
-                text=(
-                    "Der eingebettete Browser (tkinterweb) ist nicht verfügbar.\n"
-                    "Installiere optional 'tkinterweb', um Seiten hier im Fenster anzuzeigen.\n"
-                    "Erlaubte Seiten können weiterhin im Standardbrowser geöffnet werden."
-                ),
-                bg="#f0f2f5", justify="center"
-            ).pack(pady=12)
-
-            self.btn_open_external = tk.Button(
-                fallback, text="Erlaubte URL im Standardbrowser öffnen", command=self._open_external_current
+        # Starte pywebview in einem separaten Thread
+        def start_webview():
+            self.webview_window = webview.create_window(
+                "Browser",
+                "",
+                width=800,
+                height=600,
+                resizable=True
             )
-            self.btn_open_external.pack()
+            webview.start()
+
+        self.webview_thread = threading.Thread(target=start_webview, daemon=True)
+        self.webview_thread.start()
 
     def _build_admin_tab(self, parent):
-        # Liste
         list_frame = tk.Frame(parent, bg="#f0f2f5")
         list_frame.pack(side="left", fill="both", expand=True, padx=8, pady=8)
 
         tk.Label(list_frame, text="Whitelist", bg="#f0f2f5", font=("Arial", 12, "bold")).pack(anchor="w")
-
         self.listbox = tk.Listbox(list_frame, height=14)
         self.listbox.pack(fill="both", expand=True, pady=(4, 8))
 
-        # Bedienleiste
         edit_frame = tk.Frame(parent, bg="#f0f2f5")
         edit_frame.pack(side="right", fill="y", padx=8, pady=8)
 
@@ -218,11 +180,7 @@ class Modul:
 
         tk.Label(
             edit_frame,
-            text=(
-                "Beispiele:\n"
-                "• example.com  (alle Seiten dieser Domain inkl. Subdomains)\n"
-                "• https://example.com/lernportal  (nur dieser Pfad)"
-            ),
+            text="Beispiele:\n• example.com (alle Subdomains)\n• https://example.com/lernportal (nur dieser Pfad)",
             bg="#f0f2f5", justify="left"
         ).pack(anchor="w", pady=(10, 0))
 
@@ -231,7 +189,6 @@ class Modul:
             self.listbox.delete(0, tk.END)
             for item in self.whitelist:
                 self.listbox.insert(tk.END, item)
-        # Combobox im Browser-Tab
         if hasattr(self, "combo_whitelist"):
             self.combo_whitelist["values"] = self.whitelist
 
@@ -245,13 +202,12 @@ class Modul:
     def _add_entry(self):
         entry = self.entry_new.get().strip()
         if not entry:
-            messagebox.showerror("Fehler", "Bitte einen Eintrag (Domain oder URL) eingeben.")
+            messagebox.showerror("Fehler", "Bitte einen Eintrag eingeben.")
             return
         if entry in self.whitelist:
             messagebox.showwarning("Hinweis", "Dieser Eintrag ist bereits vorhanden.")
             return
         self.whitelist.append(entry)
-        # stabil und sortiert halten
         self.whitelist = sorted(list(dict.fromkeys(self.whitelist)))
         self._save_whitelist()
         self.entry_new.delete(0, tk.END)
@@ -260,10 +216,10 @@ class Modul:
     def _remove_entry(self):
         sel = self.listbox.curselection() if hasattr(self, "listbox") else ()
         if not sel:
-            messagebox.showwarning("Hinweis", "Bitte einen Eintrag in der Liste auswählen.")
+            messagebox.showwarning("Hinweis", "Bitte einen Eintrag auswählen.")
             return
         value = self.listbox.get(sel[0])
-        if messagebox.askyesno("Löschen bestätigen", f"„{value}“ von der Whitelist entfernen?"):
+        if messagebox.askyesno("Löschen bestätigen", f"„{value}“ entfernen?"):
             self.whitelist = [x for x in self.whitelist if x != value]
             self._save_whitelist()
             self._refresh_whitelist_listbox()
@@ -271,17 +227,16 @@ class Modul:
     def _edit_entry(self):
         sel = self.listbox.curselection() if hasattr(self, "listbox") else ()
         if not sel:
-            messagebox.showwarning("Hinweis", "Bitte einen Eintrag in der Liste auswählen.")
+            messagebox.showwarning("Hinweis", "Bitte einen Eintrag auswählen.")
             return
         old_value = self.listbox.get(sel[0])
         new_value = self.entry_new.get().strip()
         if not new_value:
-            messagebox.showerror("Fehler", "Bitte neuen Wert in das Eingabefeld schreiben und erneut klicken.")
+            messagebox.showerror("Fehler", "Bitte neuen Wert eingeben.")
             return
         if new_value in self.whitelist and new_value != old_value:
             messagebox.showwarning("Hinweis", "Dieser Eintrag existiert bereits.")
             return
-        # ersetzen
         idx = self.whitelist.index(old_value)
         self.whitelist[idx] = new_value
         self.whitelist = sorted(list(dict.fromkeys(self.whitelist)))
@@ -294,7 +249,6 @@ class Modul:
         value = self.combo_whitelist.get().strip()
         if not value or value == "Whitelist auswählen…":
             return
-        # Wenn es eine Domain ist, nehme Root-URL
         url = value
         if not re.match(r"^[a-zA-Z][a-zA-Z0-9+\-.]*://", url):
             url = "https://" + url
@@ -310,11 +264,9 @@ class Modul:
         url = self._ensure_scheme(url)
 
         if not self._is_allowed(url):
-            messagebox.showerror("Blockiert", "Diese Adresse ist nicht auf der Whitelist und kann nicht geöffnet werden.")
+            messagebox.showerror("Blockiert", "Diese Adresse ist nicht auf der Whitelist.")
             return
 
-        # Verlauf managen
-        # Abschneiden von „vorwärts“-Einträgen, wenn man in der Mitte steht
         if self.history_index < len(self.history) - 1:
             self.history = self.history[: self.history_index + 1]
         self.history.append(url)
@@ -326,14 +278,9 @@ class Modul:
         self._update_nav_buttons()
 
     def _load_url(self, url: str):
-        if _HTML_AVAILABLE:
-            try:
-                # tkinterweb akzeptiert strings via .load_website(url)
-                self.html.load_website(url)
-            except Exception as e:
-                messagebox.showerror("Fehler", f"Seite konnte nicht geladen werden.\n{e}")
+        if self.webview_window:
+            self.webview_window.load_url(url)
         else:
-            # Fallback: extern öffnen
             webbrowser.open(url)
 
     def _current_url(self):
@@ -344,19 +291,17 @@ class Modul:
     def _go_back(self):
         if self.history_index > 0:
             self.history_index -= 1
-            url = self.history[self.history_index]
-            self._load_url(url)
+            self._load_url(self.history[self.history_index])
             self.entry_url.delete(0, tk.END)
-            self.entry_url.insert(0, url)
+            self.entry_url.insert(0, self.history[self.history_index])
             self._update_nav_buttons()
 
     def _go_forward(self):
         if self.history_index < len(self.history) - 1:
             self.history_index += 1
-            url = self.history[self.history_index]
-            self._load_url(url)
+            self._load_url(self.history[self.history_index])
             self.entry_url.delete(0, tk.END)
-            self.entry_url.insert(0, url)
+            self.entry_url.insert(0, self.history[self.history_index])
             self._update_nav_buttons()
 
     def _reload_current(self):
@@ -367,22 +312,9 @@ class Modul:
                 return
             self._load_url(url)
 
-    def _open_external_current(self):
-        url = self.entry_url.get().strip() or self._current_url()
-        if not url:
-            return
-        url = self._ensure_scheme(url)
-        if not self._is_allowed(url):
-            messagebox.showerror("Blockiert", "Diese Adresse ist nicht auf der Whitelist.")
-            return
-        webbrowser.open(url)
-
     def _update_nav_buttons(self):
-        # Buttons aktiv/deaktiv basierend auf Verlauf
         can_back = self.history_index > 0
         can_forward = self.history_index < len(self.history) - 1
         self.btn_back.configure(state=("normal" if can_back else "disabled"))
         self.btn_forward.configure(state=("normal" if can_forward else "disabled"))
-
-        # Reload nur wenn es eine aktuelle Seite gibt
         self.btn_reload.configure(state=("normal" if self._current_url() else "disabled"))
