@@ -405,6 +405,7 @@ def main():
         # setup_databases.py oder direkt in main()
         with open("data/config.json", "w", encoding="utf-8") as f:
             json.dump({"admin_name": admin_name}, f, indent=2)
+        init_system_info()
         splash_root.destroy()  # Splash schließen
         show_tutorial(admin_name)
         
@@ -417,6 +418,50 @@ def main():
 
 
 
+from ordner import get_data_path
+import uuid
+SYSTEM_INFO_FILE = os.path.join(get_data_path(), "data/system_info.json")
+
+
+def get_current_version():
+    """Liest die Version aus version.txt."""
+    try:
+        with open("version.txt", "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return "unbekannt"
+
+def init_system_info():
+    """Erstellt oder lädt System-ID + Versionsinformationen."""
+    current_version = get_current_version()
+    if not os.path.exists(SYSTEM_INFO_FILE):
+        info = {
+            "system_id": str(uuid.uuid4()),
+            "version": current_version,
+            "created": datetime.now().isoformat(timespec="seconds")
+        }
+        with open(SYSTEM_INFO_FILE, "w", encoding="utf-8") as f:
+            json.dump(info, f, indent=4, ensure_ascii=False)
+        print(f"[INFO] Neue System-ID erstellt: {info['system_id']}")
+    else:
+        with open(SYSTEM_INFO_FILE, "r", encoding="utf-8") as f:
+            info = json.load(f)
+        # Falls Version abweicht, aktualisieren
+        if info.get("version") != current_version:
+            info["version"] = current_version
+            with open(SYSTEM_INFO_FILE, "w", encoding="utf-8") as f:
+                json.dump(info, f, indent=4, ensure_ascii=False)
+        print(f"[INFO] System-ID geladen: {info['system_id']} (Version: {info['version']})")
+
+def get_system_info():
+    """Liest Systeminformationen aus."""
+    with open(SYSTEM_INFO_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+
+
 if __name__ == "__main__":
     main()
+
 
