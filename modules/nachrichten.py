@@ -73,8 +73,21 @@ class Modul:
                 messagebox.showerror("Fehler", "Alle Felder müssen ausgefüllt werden.")
                 return
 
-            if empfänger not in lade_nutzer():
+            nutzer_daten = {}
+            try:
+                with open(USER_JSON_PATH, "r", encoding="utf-8") as f:
+                    nutzer_daten = json.load(f)
+            except:
+                messagebox.showerror("Fehler", "Benutzerdaten konnten nicht geladen werden.")
+                return
+
+            if empfänger not in nutzer_daten:
                 messagebox.showerror("Fehler", f"Der Nutzer '{empfänger}' existiert nicht.")
+                return
+
+            # Prüfen, ob Nutzer nicht kontaktiert werden möchte
+            if nutzer_daten[empfänger].get("kontaktierbar") is False:
+                messagebox.showwarning("Nicht möglich", f"Der Nutzer '{empfänger}' kann nicht kontaktiert werden.")
                 return
 
             neue_nachricht = {
@@ -93,7 +106,6 @@ class Modul:
 
             benachrichtigung = {
                 "text": f"Neue Nachricht von {self.nutzername} \n Betreff: {betreff} \n Inhalt der Nachricht: \n {inhalt}",
-                #"text": f"Betreff: {betreff}",
                 "datum": datetime.now().strftime("%d.%m.%Y %H:%M"),
                 "gelesen": False
             }
@@ -104,7 +116,6 @@ class Modul:
             except:
                 benachrichtigungen = {}
 
-            # Falls der Empfänger noch keinen Eintrag hat, erstelle eine neue Liste
             if empfänger not in benachrichtigungen:
                 benachrichtigungen[empfänger] = []
 
@@ -113,12 +124,12 @@ class Modul:
             with open(NOTI_JSON_PATH, "w", encoding="utf-8") as f:
                 json.dump(benachrichtigungen, f, indent=2, ensure_ascii=False)
 
-
             messagebox.showinfo("Erfolg", "Nachricht erfolgreich gesendet.")
             empfänger_entry.delete(0, tk.END)
             betreff_entry.delete(0, tk.END)
             textfeld.delete("1.0", tk.END)
             filter_nachrichten()
+
 
         def autocomplete_empfänger(event=None):
             empfänger_input = empfänger_entry.get().lower()
