@@ -4,3 +4,5 @@ customtkinter
 matplotlib
 pyotp
 qrcode
+webbrowser
+urllib.parse
