@@ -18,7 +18,7 @@ ABOUT_CONFIG = {
             "name": "Lukas1120987",
         },
     ],
-    # Kurzer, neutraler DSGVO-Text – bitte schul-/landesspezifisch anpassen
+
     "privacy_text": f"""
 Verantwortlich im Sinne der DSGVO für die Verarbeitung personenbezogener Daten im Rahmen der Anwendung „SchulSystem“ ist die
 Schule an der das System genutzt wird. Die Datenverarbeitung erfolgt zum Zweck der Schulorganisation, Kommunikation und
@@ -301,11 +301,10 @@ if __name__ == "__main__":
     toolbar = ctk.CTkFrame(root, corner_radius=16)
     toolbar.pack(fill="x", pady=(0, 12))
 
-    # Hier fügen wir den Über-Button ein
+
     about_btn = attach_about_button(toolbar)
     about_btn.pack(side="right", padx=6, pady=6)
 
-    # Dummy-Inhalt
     ctk.CTkTextbox(root, height=260, corner_radius=16).pack(fill="both", expand=True)
 
     app.geometry("900x600")
