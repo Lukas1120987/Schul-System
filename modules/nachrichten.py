@@ -50,13 +50,25 @@ class Modul:
                     self.nachrichtenliste.insert("", "end", iid=str(i), values=(
                         nachricht.get("datum", ""),
                         nachricht.get("absender", ""),
-                        nachricht.get("betreff", "")
+                        nachricht.get("betreff", ""),
+                        "🗑️"
                     ))
                     self.anzeigen_nachrichten.append(nachricht)
 
         def zeige_nachricht(event):
             ausgewählt = self.nachrichtenliste.selection()
             if ausgewählt:
+                col = self.nachrichtenliste.identify_column(event.x)
+                if col == "#4":  # Spalte Löschen
+                    index = int(ausgewählt[0])
+                    nachrichten = lade_nachrichten()
+                    if messagebox.askyesno("Löschen", "Möchten Sie diese Nachricht wirklich löschen?"):
+                        del nachrichten[index]
+                        with open(MESS_JSON_PATH, "w", encoding="utf-8") as f:
+                            json.dump(nachrichten, f, indent=2, ensure_ascii=False)
+                        filter_nachrichten()
+                    return
+
                 index = int(ausgewählt[0])
                 nachricht = lade_nachrichten()[index]
 
@@ -66,23 +78,18 @@ class Modul:
                 fenster.geometry("800x500")
                 fenster.configure(bg="#f0f2f5")
 
-                # Betreff
                 tk.Label(fenster, text=f"Betreff: {nachricht['betreff']}",
                         bg="#f0f2f5", font=("Arial", 12, "bold"), anchor="w").pack(fill="x", padx=10, pady=(10, 5))
 
-                # Datum + Absender
                 tk.Label(fenster, text=f"Datum: {nachricht['datum']}  |  Von: {nachricht['absender']}",
                         bg="#f0f2f5", anchor="w").pack(fill="x", padx=10, pady=(0, 10))
 
-                # Inhalt
                 textfeld = tk.Text(fenster, wrap="word", state="normal", bg="white")
                 textfeld.pack(fill="both", expand=True, padx=10, pady=5)
                 textfeld.insert("1.0", nachricht['inhalt'])
                 textfeld.config(state="disabled")
 
-                # Schließen-Button (optional)
                 tk.Button(fenster, text="Schließen", command=fenster.destroy).pack(pady=5)
-
 
         def senden():
             empfänger = empfänger_entry.get().strip()
@@ -105,7 +112,6 @@ class Modul:
                 messagebox.showerror("Fehler", f"Der Nutzer '{empfänger}' existiert nicht.")
                 return
 
-            # Prüfen, ob Nutzer nicht kontaktiert werden möchte
             if nutzer_daten[empfänger].get("kontaktierbar") is False:
                 messagebox.showwarning("Nicht möglich", f"Der Nutzer '{empfänger}' kann nicht kontaktiert werden.")
                 return
@@ -150,7 +156,6 @@ class Modul:
             textfeld.delete("1.0", tk.END)
             filter_nachrichten()
 
-
         def autocomplete_empfänger(event=None):
             empfänger_input = empfänger_entry.get().lower()
             vorschlagsbox.delete(0, tk.END)
@@ -180,11 +185,11 @@ class Modul:
         suche_entry.pack(side=tk.LEFT, fill="x", expand=True, padx=5)
         suche_entry.bind("<KeyRelease>", filter_nachrichten)
 
-        self.nachrichtenliste = ttk.Treeview(self.frame, columns=("Datum", "Von", "Betreff"), show="headings", height=10)
-        for col in ("Datum", "Von", "Betreff"):
+        self.nachrichtenliste = ttk.Treeview(self.frame, columns=("Datum", "Von", "Betreff", "Löschen"), show="headings", height=10)
+        for col in ("Datum", "Von", "Betreff", "Löschen"):
             self.nachrichtenliste.heading(col, text=col)
         self.nachrichtenliste.pack(fill="both", expand=True, padx=10, pady=10)
-        self.nachrichtenliste.bind("<<TreeviewSelect>>", zeige_nachricht)
+        self.nachrichtenliste.bind("<Button-1>", zeige_nachricht)
 
         senden_frame = tk.LabelFrame(self.frame, text="Neue Nachricht", bg="#f0f2f5", padx=10, pady=10)
         senden_frame.pack(fill="both", expand=True, padx=10, pady=10)
