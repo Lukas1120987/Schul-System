@@ -7,3 +7,4 @@ qrcode
 webbrowser
 urllib.parse
 tkinterweb
+pywebview 
