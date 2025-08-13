@@ -59,10 +59,30 @@ class Modul:
             if ausgewählt:
                 index = int(ausgewählt[0])
                 nachricht = lade_nachrichten()[index]
-                messagebox.showinfo(
-                    f"Nachricht von {nachricht['absender']}",
-                    f"Betreff: {nachricht['betreff']}\n\n{nachricht['inhalt']}"
-                )
+
+                # Neues Fenster erstellen
+                fenster = tk.Toplevel(self.frame)
+                fenster.title(f"Nachricht von {nachricht['absender']}")
+                fenster.geometry("800x500")
+                fenster.configure(bg="#f0f2f5")
+
+                # Betreff
+                tk.Label(fenster, text=f"Betreff: {nachricht['betreff']}",
+                        bg="#f0f2f5", font=("Arial", 12, "bold"), anchor="w").pack(fill="x", padx=10, pady=(10, 5))
+
+                # Datum + Absender
+                tk.Label(fenster, text=f"Datum: {nachricht['datum']}  |  Von: {nachricht['absender']}",
+                        bg="#f0f2f5", anchor="w").pack(fill="x", padx=10, pady=(0, 10))
+
+                # Inhalt
+                textfeld = tk.Text(fenster, wrap="word", state="normal", bg="white")
+                textfeld.pack(fill="both", expand=True, padx=10, pady=5)
+                textfeld.insert("1.0", nachricht['inhalt'])
+                textfeld.config(state="disabled")
+
+                # Schließen-Button (optional)
+                tk.Button(fenster, text="Schließen", command=fenster.destroy).pack(pady=5)
+
 
         def senden():
             empfänger = empfänger_entry.get().strip()
