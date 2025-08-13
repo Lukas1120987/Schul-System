@@ -98,7 +98,7 @@ class Modul:
     # ---------- UI ----------
 
     def _build_ui(self):
-        tk.Label(self.frame, text="🌐 Internetverwaltung (Whitelist-Browser)",
+        tk.Label(self.frame, text="🌐 Internet",
                  font=("Arial", 18, "bold"), bg="#f0f2f5").pack(pady=(10, 6))
 
         self.nb = ttk.Notebook(self.frame)
