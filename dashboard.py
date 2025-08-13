@@ -122,7 +122,8 @@ class Dashboard:
             "team": {"aktiv": True, "beschreibung": "Development-Bereich zum beheben von Fehlern"},
             "umfragen": {"aktiv": False, "beschreibung": "Durchführen und Auswerten von Umfragen."},
             "bibliothek": {"aktiv": True, "beschreibung": "Bchereisystem mit: Bücher hinzufügen, anzeigen, ausleihen und zurückgeben."},
-            "statistiken": {"aktiv": True, "beschreibung": "Anzeigen von Statistiken"}
+            "statistiken": {"aktiv": True, "beschreibung": "Anzeigen von Statistiken"},
+            "internet": {"aktiv": True, "beschreibung": "Internetzugang zum Internet, Verwaltung mit Whitelisten"}
         }
 
         if not os.path.exists(MODULE_PATH):
@@ -694,4 +695,5 @@ class Dashboard:
         filter_dropdown.bind("<<ComboboxSelected>>", lambda e: on_search_change())
 
         display_entries(all_entries)
+
 
