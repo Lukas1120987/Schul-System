@@ -262,7 +262,10 @@ class Modul:
                 "password": "", 
                 "group": group, 
                 "second_group": group2 if group2 else None, 
-                "is_admin": False
+                "is_admin": False,
+                "kontaktierbar": True,
+                "geschützt": False
+
             }
             self.save_users(users)
 
@@ -341,3 +344,4 @@ class Modul:
             win.destroy()
 
         tk.Button(win, text="Speichern", command=save_changes).pack(pady=10)
+
