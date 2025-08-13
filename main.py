@@ -45,30 +45,43 @@ def setup_databases(admin_name, admin_password):
                 "group": "Verwaltung",
                 "second_group": "Musterklasse",
                 "is_admin": True,
+                "kontaktierbar": True,
+                "geschützt": True,
             },
             "default_user1": {
                 "password": admin_password,
                 "group": "Lehrer",
                 "second_group": "Musterklasse",
                 "is_admin": False,
+                "kontaktierbar": False,
+                "geschützt": True,
             },
             "default_user2": {
                 "password": admin_password,
                 "group": "Schüler",
                 "second_group": "Musterklasse",
                 "is_admin": False,
+                "kontaktierbar": False,
+                "geschützt": True,
+
             },
             "SchulSystem": {
                 "password": admin_password,
                 "group": "SchulSystem-Team",
                 "second_group": "Verwaltung",
                 "is_admin": True,
+                "kontaktierbar": False,
+                "geschützt": True,
+
             },
             "default_user3": {
                 "password": admin_password,
                 "group": "Verwaltung",
                 "second_group": "Musterklasse",
                 "is_admin": True,
+                "kontaktierbar": False,
+                "geschützt": True,
+
             }
         },
     )
@@ -406,3 +419,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
