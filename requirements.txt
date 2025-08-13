@@ -6,3 +6,4 @@ pyotp
 qrcode
 webbrowser
 urllib.parse
+tkinterweb
