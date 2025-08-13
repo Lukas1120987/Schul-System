@@ -6,6 +6,9 @@ import os as os
 import json
 from PIL import Image, ImageTk
 from ordner import get_data_path
+import webbrowser
+import customtkinter as ctk
+from datetime import date
 
 CONFIG_PATH = os.path.join(get_data_path(), "data/config.json")
 MODULE_PATH = os.path.join(get_data_path(), "data/modules.json")
@@ -87,6 +90,15 @@ class Dashboard:
 
         self.check_unread_notifications()
         self.add_notification_button()
+
+        # Toolbar im Content-Bereich anlegen
+        self.toolbar_frame = tk.Frame(self.content, bg="#ecf0f1", height=40)
+        self.toolbar_frame.pack(fill="x", side="top")
+
+        from about_overlay import attach_about_button, ABOUT_CONFIG
+        about_btn = attach_about_button(self.toolbar_frame, text="ℹ️ Über", config=ABOUT_CONFIG)
+        about_btn.pack(side="right", padx=500, pady=10)
+
 
 
         self.add_user_info()
