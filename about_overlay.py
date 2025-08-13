@@ -16,6 +16,7 @@ ABOUT_CONFIG = {
         {
             "role": "Entwickler",
             "name": "Lukas1120987",
+            "email": "team.schulsystem@outlook.com",
         },
     ],
 
