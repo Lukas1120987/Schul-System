@@ -8,6 +8,7 @@ from updater import check_and_update
 import smtplib
 import ssl
 import os
+import customtkinter as ctk
 from ordner import get_data_path  # Import der Pfadfunktion
 
 # Farben
@@ -88,70 +89,57 @@ class LoginWindow:
     def __init__(self, master):
         self.master = master
         self.master.title("Login - SchulSystem")
+        self.master.geometry(f"{self.master.winfo_screenwidth()}x{self.master.winfo_screenheight()}")
         self.master.configure(bg=WHITE)
-        self.master.attributes("-fullscreen", True)
 
-        self.frame = tk.Frame(master, bg=WHITE, padx=20, pady=20)
-        self.frame.pack(expand=True)
+        # zentrierter Frame
+        self.frame = ctk.CTkFrame(master, corner_radius=15, fg_color=WHITE)
+        self.frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        tk.Label(self.frame, text="Willkommen bei SchulSystem", font=("Segoe UI", 16, "bold"),
-                 bg=WHITE, fg=PRIMARY_BLUE).grid(row=0, column=0, columnspan=2, pady=(10, 20))
+        # Überschrift
+        self.title_label = ctk.CTkLabel(self.frame, text="Willkommen bei SchulSystem",
+                                        font=ctk.CTkFont(size=20, weight="bold"), text_color=PRIMARY_BLUE)
+        self.title_label.grid(row=0, column=0, columnspan=2, pady=(20, 30))
 
         # Benutzername
-        tk.Label(self.frame, text="Benutzername:", bg=WHITE, fg=TEXT_COLOR, font=("Segoe UI", 10))\
-            .grid(row=1, column=0, sticky="e", pady=5, padx=(0, 10))
-        self.entry_username = tk.Entry(self.frame, font=("Segoe UI", 10), bg="#f1f3f4",
-                                       bd=0, relief="flat", width=30)
-        self.entry_username.grid(row=1, column=1, pady=5, sticky="w")
+        self.username_label = ctk.CTkLabel(self.frame, text="Benutzername:", text_color=TEXT_COLOR)
+        self.username_label.grid(row=1, column=0, sticky="e", padx=(10,5), pady=5)
+        self.entry_username = ctk.CTkEntry(self.frame, width=250, placeholder_text="Benutzername")
+        self.entry_username.grid(row=1, column=1, pady=5, padx=(5,10))
 
         # Passwort
-        tk.Label(self.frame, text="Passwort:", bg=WHITE, fg=TEXT_COLOR, font=("Segoe UI", 10))\
-            .grid(row=2, column=0, sticky="e", pady=5, padx=(0, 10))
+        self.password_label = ctk.CTkLabel(self.frame, text="Passwort:", text_color=TEXT_COLOR)
+        self.password_label.grid(row=2, column=0, sticky="e", padx=(10,5), pady=5)
 
-        self.password_container = tk.Frame(self.frame, bg=WHITE)
-        self.password_container.grid(row=2, column=1, pady=5, sticky="w")
+        self.entry_password = ctk.CTkEntry(self.frame, width=250, placeholder_text="Passwort", show="•")
+        self.entry_password.grid(row=2, column=1, pady=5, padx=(5,10), sticky="w")
 
-        self.entry_password = tk.Entry(self.password_container, show="·", font=("Segoe UI", 10),
-                                       bg="#f1f3f4", bd=0, relief="flat", width=27)
-        self.entry_password.pack(side="left", ipadx=5, ipady=3)
+        self.show_password_var = ctk.BooleanVar(value=False)
+        self.show_password_checkbox = ctk.CTkCheckBox(self.frame, text="Passwort anzeigen",
+                                                      variable=self.show_password_var,
+                                                      command=self.toggle_password)
+        self.show_password_checkbox.grid(row=3, column=1, sticky="w", pady=(0,10), padx=(5,10))
 
-        self.eye_button = tk.Button(self.password_container, text="👁️", bg=WHITE, bd=0,
-                                    font=("Segoe UI", 10), command=self.toggle_password_visibility)
-        self.eye_button.pack(side="left", padx=5)
+        # Buttons
+        self.login_btn = ctk.CTkButton(self.frame, text="Login", command=self.login, width=200,
+                                       fg_color=PRIMARY_BLUE, hover_color="#1669c1")
+        self.login_btn.grid(row=4, column=0, columnspan=2, pady=10)
 
-        # Login-Button
-        self.login_btn = tk.Button(self.frame, text="Login", bg=PRIMARY_BLUE, fg="white",
-                                   font=("Segoe UI", 10, "bold"), activebackground="#1669c1",
-                                   activeforeground="white", command=self.login,
-                                   relief="flat", padx=10, pady=5)
-        self.login_btn.grid(row=3, column=0, columnspan=2, pady=20)
+        self.exit_btn = ctk.CTkButton(self.frame, text="Programm beenden", command=self.master.destroy,
+                                      fg_color="#f44336", hover_color="#e53935", width=200)
+        self.exit_btn.grid(row=5, column=0, columnspan=2, pady=(5, 20))
 
-        self.reset_pw_btn = tk.Button(self.frame, text="Programm beenden", bg="#f44336", fg="white",
-                                      font=("Segoe UI", 10, "bold"), command=self.beenden,
-                                      relief="flat", padx=10, pady=5)
-        self.reset_pw_btn.grid(row=4, column=0, columnspan=2, pady=(0, 20))
-
-    def toggle_password_visibility(self):
-        if self.entry_password.cget('show') == '':
-            self.entry_password.config(show='·')
-            self.eye_button.config(text="👁️")
+    def toggle_password(self):
+        if self.show_password_var.get():
+            self.entry_password.configure(show="")
         else:
-            self.entry_password.config(show='')
-            self.eye_button.config(text="🚫  ")
-
-    def beenden(self):
-        self.master.destroy()
-
-    
+            self.entry_password.configure(show="•")
 
     def login(self):
         username = self.entry_username.get()
         password = self.entry_password.get()
 
-        from ordner import get_data_path  # Import der Pfadfunktion
-
-        user_file_path = os.path.join(get_data_path(), "data/users.json")  # Dynamischer Pfad
-        print(user_file_path)
+        user_file_path = os.path.join(get_data_path(), "data/users.json")
 
         try:
             with open(user_file_path, "r", encoding="utf-8") as f:
@@ -159,7 +147,7 @@ class LoginWindow:
 
             if username in users:
                 if users[username]["password"] == "":
-                    # Erster Login – Passwort setzen
+                    # Erstes Passwort setzen
                     new_pw = simpledialog.askstring("Neues Passwort", "Bitte neues Passwort eingeben:", show="*")
                     if not new_pw:
                         messagebox.showerror("Fehler", "Passwort darf nicht leer sein.")
@@ -169,14 +157,15 @@ class LoginWindow:
                         json.dump(users, f, indent=2, ensure_ascii=False)
                     messagebox.showinfo("Erfolg", "Passwort gesetzt. Du bist jetzt eingeloggt.")
                     self.master.destroy()
-                    root = tk.Tk()
+                    root = ctk.CTk()
                     root.attributes("-fullscreen", True)
                     app = Dashboard(root, username, users[username])
                     root.mainloop()
                     return
                 elif users[username]["password"] == password:
                     self.master.destroy()
-                    root = tk.Tk()
+                    root = ctk.CTk()
+                    root.attributes("-fullscreen", True)
                     app = Dashboard(root, username, users[username])
                     root.mainloop()
                     return
@@ -184,7 +173,8 @@ class LoginWindow:
             messagebox.showerror("Fehler", "Benutzername oder Passwort falsch.")
         except FileNotFoundError:
             messagebox.showerror("Fehler", "Benutzerdaten nicht gefunden.")
-        
+
+                
 def open_login_window():
     root = tk.Tk()
     app = LoginWindow(root)
