@@ -131,7 +131,7 @@ class Modul:
         self._build_browser_tab(self.browser_tab)
 
         # Tab: Verwaltung nur für second_group == "Verwaltung"
-        if self.user_data.get("second_group") == "Verwaltung":
+        if self.user_data.get("group") == "Verwaltung":
             self.admin_tab = tk.Frame(self.nb, bg="#f0f2f5")
             self.nb.add(self.admin_tab, text="Whitelist verwalten")
             self._build_admin_tab(self.admin_tab)
