@@ -38,7 +38,7 @@ class Modul:
         self.aktualisiere_liste()
 
         # Prüfen, ob Verwaltung
-        if self.user_data.get("second_group") == "Verwaltung":
+        if self.user_data.get("group") == "Verwaltung":
             eingabe_frame = tk.Frame(self.frame, bg="#f0f2f5")
             eingabe_frame.pack(fill="x", padx=10, pady=5)
 
