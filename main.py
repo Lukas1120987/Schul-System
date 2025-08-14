@@ -83,7 +83,7 @@ def setup_databases(admin_name, admin_password):
                 "geschützt": True,
 
             }
-        },
+        }
     )
 
     create_file_if_missing(
@@ -463,5 +463,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
