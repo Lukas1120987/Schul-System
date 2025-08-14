@@ -11,6 +11,7 @@ import random
 import time
 import threading
 import json
+from ordner import get_data_path  # <<< hier richtig eingefügt
 
 # === Konfiguration ===
 GITHUB_ZIP_URL = "https://github.com/Lukas1120987/Schul-System/archive/refs/heads/main.zip"
@@ -186,7 +187,7 @@ def check_and_update():
         with open("version.txt", "w") as f:
             f.write(remote)
             try:
-                config_path = "data/config.json"
+                config_path = os.path.join(get_data_path(), "data/config.json")  # <-- hier gefixt
                 config = {}
                 if os.path.exists(config_path):
                     with open(config_path, "r", encoding="utf-8") as f:
@@ -199,7 +200,7 @@ def check_and_update():
                     json.dump(config, f, indent=2)
 
                 admin_name = config.get("admin_name", "admin")
-                add_update_notification(admin_name)  # <-- Hier Benachrichtigung hinzufügen
+                add_update_notification(admin_name)
 
             except Exception as e:
                 print(f"[Updater] Fehler beim Schreiben von config.json: {e}")
@@ -210,20 +211,9 @@ def check_and_update():
     else:
         print("[Updater] Version ist aktuell: " + local)
 
-# === Hauptprogrammstart mit Splashscreen ===
-def start_update():
-    threading.Thread(target=check_and_update).start()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    splash = InstallAssistantSplash(root, on_continue_callback=lambda: [root.destroy(), start_update()])
-    root.mainloop()
-
-
 def add_update_notification(admin_name):
     notifications_url = "https://raw.githubusercontent.com/Lukas1120987/Schul-System/main/notifications.txt"
-    notifications_path = "data/notifications.json"
-
+    notifications_path = os.path.join(get_data_path(), "data/notifications.json")  # <-- hier gefixt
 
     try:
         with urllib.request.urlopen(notifications_url) as response:
@@ -231,7 +221,6 @@ def add_update_notification(admin_name):
     except Exception as e:
         print(f"[Updater] Fehler beim Laden der Benachrichtigungen: {e}")
         return
-
 
     notifications = {}
     if os.path.exists(notifications_path):
@@ -242,20 +231,17 @@ def add_update_notification(admin_name):
             print(f"[Updater] Fehler beim Laden von notifications.json: {e}")
             notifications = {}
 
-
     if admin_name not in notifications:
         notifications[admin_name] = []
 
-
     import datetime
-    timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M") #29.06.2025 12:34
+    timestamp = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
     new_entry = {
         "text": message,
         "datum": timestamp,
         "gelesen": False
     }
     notifications[admin_name].append(new_entry)
-
 
     try:
         with open(notifications_path, "w", encoding="utf-8") as f:
