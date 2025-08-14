@@ -97,7 +97,7 @@ class Dashboard:
 
         from about_overlay import attach_about_button, ABOUT_CONFIG
         self.about_btn = attach_about_button(self.master, text="ℹ️ Über", config=ABOUT_CONFIG)
-        self.about_btn.place(relx=1.0, x=-500, y=10, anchor="ne")  # Verschoben von rechts
+        self.about_btn.place(relx=1.0, x=-750, y=10, anchor="ne")  # Verschoben von rechts
 
 
 
@@ -707,5 +707,6 @@ class Dashboard:
         filter_dropdown.bind("<<ComboboxSelected>>", lambda e: on_search_change())
 
         display_entries(all_entries)
+
 
 
