@@ -34,28 +34,45 @@ LIGHT_BLUE = "#dbe9ff"
 class SplashScreen:
     def __init__(self, root):
         self.root = root
-        #self.root.overrideredirect(True)
-        self.root.attributes("-fullscreen", True)
+        self.root.attributes("-fullscreen", True)  # Vollbild
 
-
-        self.frame = tk.Frame(self.root, bg=PRIMARY_BLUE, bd=2, relief="ridge")
+        # Haupt-Frame
+        self.frame = ctk.CTkFrame(self.root, fg_color=PRIMARY_BLUE, corner_radius=0)
         self.frame.pack(fill="both", expand=True)
 
-        tk.Label(self.frame, text="SchulSystem", font=("Segoe UI", 26, "bold"),
-                 bg=PRIMARY_BLUE, fg=WHITE).pack(pady=(40, 10))
+        # Titel
+        self.title_label = ctk.CTkLabel(
+            self.frame,
+            text="SchulSystem",
+            font=ctk.CTkFont(family="Segoe UI", size=32, weight="bold"),
+            text_color=WHITE
+        )
+        self.title_label.pack(pady=(60, 15))
 
-        self.status_label = tk.Label(self.frame, text="Starte Anwendung...", font=("Segoe UI", 12),
-                                     bg=PRIMARY_BLUE, fg=LIGHT_BLUE)
+        # Statusanzeige
+        self.status_label = ctk.CTkLabel(
+            self.frame,
+            text="Starte Anwendung...",
+            font=ctk.CTkFont(family="Segoe UI", size=14),
+            text_color=LIGHT_BLUE
+        )
         self.status_label.pack()
 
-        self.progress = ttk.Progressbar(self.frame, orient="horizontal", length=350,
-                                        mode="indeterminate")
-        self.progress.pack(pady=30)
-        self.progress.start(15)
+        # Fortschrittsbalken
+        self.progress = ctk.CTkProgressBar(self.frame, width=400, height=18, corner_radius=10)
+        self.progress.set(0)
+        self.progress.pack(pady=40)
 
-        tk.Label(self.frame, text="© SchulSystem 2025 \n Unter MIT License", font=("Segoe UI", 8), #© SchulSystem 2025
-                 bg=PRIMARY_BLUE, fg="#cccccc").pack(side="bottom", pady=10)
+        # Footer
+        self.footer_label = ctk.CTkLabel(
+            self.frame,
+            text="© SchulSystem 2025\nUnter MIT License",
+            font=ctk.CTkFont(size=10),
+            text_color="#cccccc"
+        )
+        self.footer_label.pack(side="bottom", pady=15)
 
+        # Ladephasen
         self.loading_steps = [
             "Initialisiere Datenbanken...",
             "Lade Benutzeroberflächen...",
@@ -63,26 +80,84 @@ class SplashScreen:
             "Verbinde mit Updater...",
             "Lade Module...",
             "Lade Einstellungen...",
-            "Überprüfe Benutzerrechte...",
+            "Überprüfe Benutzerrechte..."
         ]
-
         self.step_index = 0
-        self.total_time = random.randint(3000, 10000)  # 3–10 Sekunden (vorher 3000, 10000)
-        self.interval = 1500  # alle 1.5 Sekunden neuer Text
+        self.total_time = random.randint(3000, 10000)  # 3–10 Sekunden
+        self.interval = 1500  # alle 1,5 Sekunden neuer Text
 
+        # Start
         self.schedule_loading_steps()
+        self.animate_progress()
         self.root.after(self.total_time, self.load_main)
 
     def schedule_loading_steps(self):
         if self.step_index < len(self.loading_steps):
-            self.status_label.config(text=self.loading_steps[self.step_index])
+            self.status_label.configure(text=self.loading_steps[self.step_index])
             self.step_index += 1
             self.root.after(self.interval, self.schedule_loading_steps)
+
+    def animate_progress(self):
+        """Simuliert den Ladefortschritt"""
+        current = self.progress.get()
+        if current < 1:
+            self.progress.set(current + 0.01)
+            self.root.after(30, self.animate_progress)
+
 
     def load_main(self):
         self.root.destroy()
         open_login_window()  # das Login-Fenster
 
+class CTkPasswordDialog(ctk.CTkToplevel):
+    def __init__(self, parent, title="Neues Passwort", prompt="Bitte neues Passwort eingeben:"):
+        super().__init__(parent)
+        self.title(title)
+        self.geometry("400x200")
+        self.resizable(False, False)
+        self.grab_set()  # blockiert Hauptfenster
+
+        # zentriert
+        self.update_idletasks()
+        x = (self.winfo_screenwidth() // 2) - (400 // 2)
+        y = (self.winfo_screenheight() // 2) - (200 // 2)
+        self.geometry(f"+{x}+{y}")
+
+        # Frame
+        frame = ctk.CTkFrame(self, corner_radius=15, fg_color=WHITE)
+        frame.pack(fill="both", expand=True, padx=15, pady=15)
+
+        # Label
+        label = ctk.CTkLabel(frame, text=prompt, text_color="#000", font=ctk.CTkFont(size=14))
+        label.pack(pady=(20, 10))
+
+        # Eingabefeld
+        self.entry = ctk.CTkEntry(frame, placeholder_text="Neues Passwort", show="•", width=250)
+        self.entry.pack(pady=5)
+
+        # Buttons
+        btn_frame = ctk.CTkFrame(frame, fg_color="transparent")
+        btn_frame.pack(pady=(20, 10))
+
+        ok_btn = ctk.CTkButton(btn_frame, text="OK", width=100, command=self.on_ok)
+        ok_btn.pack(side="left", padx=5)
+
+        cancel_btn = ctk.CTkButton(
+            btn_frame, text="Abbrechen", fg_color="#f44336", hover_color="#e53935",
+            width=100, command=self.on_cancel
+        )
+        cancel_btn.pack(side="left", padx=5)
+
+        # Returnwert
+        self.result = None
+
+    def on_ok(self):
+        self.result = self.entry.get().strip()
+        self.destroy()
+
+    def on_cancel(self):
+        self.result = None
+        self.destroy()
 
 
 class LoginWindow:
@@ -147,14 +222,18 @@ class LoginWindow:
 
             if username in users:
                 if users[username]["password"] == "":
-                    # Erstes Passwort setzen
-                    new_pw = simpledialog.askstring("Neues Passwort", "Bitte neues Passwort eingeben:", show="*")
+                    dialog = CTkPasswordDialog(self.master)
+                    self.master.wait_window(dialog)  # warten bis Fenster zu
+                    new_pw = dialog.result
+
                     if not new_pw:
                         messagebox.showerror("Fehler", "Passwort darf nicht leer sein.")
                         return
+
                     users[username]["password"] = new_pw
                     with open(user_file_path, "w", encoding="utf-8") as f:
                         json.dump(users, f, indent=2, ensure_ascii=False)
+
                     messagebox.showinfo("Erfolg", "Passwort gesetzt. Du bist jetzt eingeloggt.")
                     self.master.destroy()
                     root = ctk.CTk()
@@ -162,6 +241,7 @@ class LoginWindow:
                     app = Dashboard(root, username, users[username])
                     root.mainloop()
                     return
+
                 elif users[username]["password"] == password:
                     self.master.destroy()
                     root = ctk.CTk()
