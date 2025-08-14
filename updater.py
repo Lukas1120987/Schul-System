@@ -249,3 +249,7 @@ def add_update_notification(admin_name):
         print("[Updater] Benachrichtigung für Admin hinzugefügt.")
     except Exception as e:
         print(f"[Updater] Fehler beim Schreiben von notifications.json: {e}")
+
+
+if __name__ == "__main__":
+    check_and_update
