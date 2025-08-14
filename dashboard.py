@@ -96,8 +96,8 @@ class Dashboard:
         self.toolbar_frame.pack(fill="x", side="top")
 
         from about_overlay import attach_about_button, ABOUT_CONFIG
-        about_btn = attach_about_button(self.toolbar_frame, text="ℹ️ Über", config=ABOUT_CONFIG)
-        about_btn.pack(side="right", padx=500, pady=10)
+        self.about_btn = attach_about_button(self.master, text="ℹ️ Über", config=ABOUT_CONFIG)
+        self.about_btn.place(relx=1.0, x=-500, y=10, anchor="ne")  # Verschoben von rechts
 
 
 
