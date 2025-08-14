@@ -11,7 +11,12 @@ ctk.set_default_color_theme("blue")
 
 ABOUT_CONFIG = {
     "app_name": "SchulSystem",
+    "org_name": "Lukas Seifert",
+    "org_address": "Medebacher Weg 13, 13507 Berlin",
     "org_website": "https://lukas1120987.github.io/SchulSystem/",
+    "org_email": "team.schulsystem@outlook.com",
+    "org_phone": "000 0000 0000 0000",
+
     "responsibles": [
         {
             "role": "Entwickler",
