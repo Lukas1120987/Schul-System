@@ -1,5 +1,4 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
+import customtkinter as ctk
 import json
 import os
 from datetime import datetime
@@ -21,13 +20,7 @@ users = load_or_create_json("data/users.json", {})
 stundenplan = load_or_create_json("data/schedule.json", {})
 vertretungen = load_or_create_json("data/vertretungen.json", {})
 organisation = load_or_create_json("data/organisation.json", {
-    "tage": [
-        "Montag",
-        "Dienstag",
-        "Mittwoch",
-        "Donnerstag",
-        "Freitag"
-    ],
+    "tage": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"],
     "stunden": [
         "08:00-08:45",
         "08:55-09:40",
@@ -38,11 +31,10 @@ organisation = load_or_create_json("data/organisation.json", {
         "14:00-14:45",
         "14:55-15:40"
     ]
-}
-
-)
+})
 
 klassen = list({user["second_group"] for user in users.values() if user.get("second_group")})
+
 
 # === GUI-Klasse ===
 class Modul:
@@ -51,64 +43,80 @@ class Modul:
         self.username = username
         self.user_data = user_data
 
-        self.frame = ttk.Frame(master)
+        self.frame = ctk.CTkFrame(master, corner_radius=10)
+        self.frame.pack(fill="both", expand=True)
 
-        self.auswahl_frame = ttk.Frame(self.frame)
+        # Auswahl
+        self.auswahl_frame = ctk.CTkFrame(self.frame, corner_radius=10)
         self.auswahl_frame.pack(pady=10)
 
-        self.klasse_var = tk.StringVar()
-        ttk.Label(self.auswahl_frame, text="Klasse auswählen:").pack(side=tk.LEFT)
-        self.klasse_combo = ttk.Combobox(self.auswahl_frame, textvariable=self.klasse_var, values=klassen, state="readonly")
-        self.klasse_combo.pack(side=tk.LEFT, padx=5)
-        self.klasse_combo.bind("<<ComboboxSelected>>", lambda e: self.anzeige_aktualisieren())
+        ctk.CTkLabel(self.auswahl_frame, text="Klasse auswählen:").pack(side="left", padx=5)
+        self.klasse_combo = ctk.CTkComboBox(self.auswahl_frame, values=klassen, command=lambda e=None: self.anzeige_aktualisieren())
+        self.klasse_combo.pack(side="left", padx=5)
 
-        self.anzeige_frame = ttk.Frame(self.frame)
-        self.anzeige_frame.pack()
+        # Tabelle (mit ScrollFrame)
+        self.anzeige_frame = ctk.CTkScrollableFrame(self.frame, width=800, height=400, corner_radius=10)
+        self.anzeige_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
-        self.tabelle = ttk.Treeview(self.anzeige_frame, columns=["Tag"] + organisation["stunden"], show="headings", height=6)
-        for col in ["Tag"] + organisation["stunden"]:
-            self.tabelle.heading(col, text=col)
-            self.tabelle.column(col, width=100, anchor="center")
-        self.tabelle.pack()
+        # Spaltenüberschriften
+        header_frame = ctk.CTkFrame(self.anzeige_frame)
+        header_frame.pack(fill="x", pady=2)
+        ctk.CTkLabel(header_frame, text="Tag", width=100, anchor="center").pack(side="left", padx=1)
+        for stunde in organisation["stunden"]:
+            ctk.CTkLabel(header_frame, text=stunde, width=100, anchor="center").pack(side="left", padx=1)
+
+        # Container für dynamische Zeilen
+        self.table_rows_frame = ctk.CTkFrame(self.anzeige_frame)
+        self.table_rows_frame.pack(fill="x")
 
     def get_frame(self):
         return self.frame
 
+    def clear_table(self):
+        for widget in self.table_rows_frame.winfo_children():
+            widget.destroy()
+
     def anzeige_aktualisieren(self):
-        klasse = self.klasse_var.get()
+        klasse = self.klasse_combo.get()
         if not klasse:
             return
 
-        self.tabelle.delete(*self.tabelle.get_children())
+        self.clear_table()
 
         for tag in organisation["tage"]:
-            zeile = [tag]
+            row_frame = ctk.CTkFrame(self.table_rows_frame)
+            row_frame.pack(fill="x", pady=1)
+
+            # Erste Spalte: Tag
+            ctk.CTkLabel(row_frame, text=tag, width=100, anchor="center").pack(side="left", padx=1)
+
+            # Stunden-Spalten
             for std_idx, _ in enumerate(organisation["stunden"]):
                 stunde_info = stundenplan.get(klasse, {}).get(tag, {}).get(str(std_idx+1), {})
                 vertretung_info = vertretungen.get(tag, {}).get(klasse, {}).get(str(std_idx+1), {})
 
                 if not stunde_info:
-                    zeile.append("-")
-                    continue
+                    text = "-"
+                else:
+                    text = f"{stunde_info.get('fach', '')}\n{stunde_info.get('lehrer', '')}\n{stunde_info.get('raum', '')}"
+                    if vertretung_info:
+                        if vertretung_info.get("art") == "ausfall":
+                            text = "❌ AUSFALL"
+                        else:
+                            text = f"{vertretung_info.get('fach', stunde_info.get('fach', ''))}\n{vertretung_info.get('lehrer', stunde_info.get('lehrer', ''))}\n{vertretung_info.get('raum', stunde_info.get('raum', ''))}"
+                            text += "\n(vertret.)"
 
-                text = f"{stunde_info.get('fach', '')}\n{stunde_info.get('lehrer', '')}\n{stunde_info.get('raum', '')}"
-
-                if vertretung_info:
-                    if vertretung_info.get("art") == "ausfall":
-                        text = "AUSFALL"
-                    else:
-                        text = f"{vertretung_info.get('fach', stunde_info.get('fach', ''))}\n{vertretung_info.get('lehrer', stunde_info.get('lehrer', ''))}\n{vertretung_info.get('raum', stunde_info.get('raum', ''))}"
-                        text += f"\n(vertret.)"
-                zeile.append(text)
-
-            self.tabelle.insert('', 'end', values=zeile)
+                ctk.CTkLabel(row_frame, text=text, width=100, anchor="center").pack(side="left", padx=1)
 
 
 # === Hauptprogramm starten ===
 if __name__ == "__main__":
-    root = tk.Tk()
+    ctk.set_appearance_mode("System")  # "Dark" oder "Light"
+    ctk.set_default_color_theme("blue")
+
+    root = ctk.CTk()
+    root.title("Stundenplan & Vertretungen")
+    root.geometry("1000x600")
+
     app = Modul(root)
     root.mainloop()
-
-
-
