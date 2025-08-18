@@ -7,13 +7,14 @@ import random
 from login import SplashScreen, open_login_window, start
 from first_splash import InstallAssistantSplash
 from datetime import datetime
+from ordner import get_data_path
 
 # Farbdefinitionen 
 PRIMARY_BLUE = "#2a4d8f"
 WHITE = "#ffffff"
 LIGHT_BLUE = "#aaccff"
 
-
+DATA_PATH = os.path.join(get_data_path(), "data/users.json")
 
 def load_data_path():
     """Lädt den Speicherort aus setup.json"""
@@ -385,7 +386,9 @@ Klicke auf „Weiter“, um SchulSystem zu starten.
 def main():
     os.makedirs("data", exist_ok=True)
 
-    if os.path.exists("data/users.json"):
+    
+
+    if os.path.exists(DATA_PATH):
         # Normales Starten mit klassischem SplashScreen (nicht InstallAssistantSplash!)
         start()
         return
