@@ -13,6 +13,7 @@ CONFIG_PATH = os.path.join(get_data_path(), "data/config.json")
 USERS_PATH = os.path.join(get_data_path(), "data/users.json")
 SUPPORT_PATH = os.path.join(get_data_path(), "data/support.json")
 FEEDBACK_PATH = os.path.join(get_data_path(), "data/feedback.json")
+SYSTEM_PATH = os.path.join(get_data_path(), "data/system_info.json")
 
 
 
@@ -37,6 +38,7 @@ class Modul:
         self.add_darkmode_toggle()
         self.add_account_delete()
         self.add_version_display()
+        self.add_system_info()
 
 
 
@@ -455,5 +457,22 @@ class Modul:
             messagebox.showerror("Fehler", "Die Datei 'config.json' enthält ungültiges JSON.")
 
         version_text = f"  Version:\n    {local_version}"
+        tk.Label(section, text=version_text, font=("Arial", 10), fg="gray", justify="center").pack(pady=(5, 0), anchor="center")
+
+        
+    def add_system_info(self):
+        section = tk.LabelFrame(self.frame, text="")
+        section.pack(padx=10, pady=5, fill="x")
+
+        try:
+            with open(SYSTEM_PATH, "r", encoding="utf-8") as f:
+                        config = json.load(f)
+                        local_version = config.get("local_version", "Nicht angegeben")
+        except FileNotFoundError:
+                    messagebox.showerror(f"Fehler", "Die Datei {SYSTEM_PATH} wurde nicht gefunden.")
+        except json.JSONDecodeError:
+                    messagebox.showerror("Fehler", "Die Datei {SYSTEM_PATH} enthält ungültiges JSON.")
+
+        version_text = f"  System-ID:\n    {local_version}"
         tk.Label(section, text=version_text, font=("Arial", 10), fg="gray", justify="center").pack(pady=(5, 0), anchor="center")
 
