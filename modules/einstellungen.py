@@ -461,18 +461,30 @@ class Modul:
 
         
     def add_system_info(self):
-        section = tk.LabelFrame(self.frame, text="")
+        section = tk.LabelFrame(self.frame, text="System-Infos")
         section.pack(padx=10, pady=5, fill="x")
 
         try:
             with open(SYSTEM_PATH, "r", encoding="utf-8") as f:
-                        config = json.load(f)
-                        local_version = config.get("local_version", "Nicht angegeben")
+                system_data = json.load(f)
         except FileNotFoundError:
-                    messagebox.showerror(f"Fehler", "Die Datei {SYSTEM_PATH} wurde nicht gefunden.")
+            messagebox.showerror("Fehler", f"Die Datei {SYSTEM_PATH} wurde nicht gefunden.")
+            system_data = {}
         except json.JSONDecodeError:
-                    messagebox.showerror("Fehler", "Die Datei {SYSTEM_PATH} enthält ungültiges JSON.")
+            messagebox.showerror("Fehler", f"Die Datei {SYSTEM_PATH} enthält ungültiges JSON.")
+            system_data = {}
 
-        version_text = f"  System-ID:\n    {local_version}"
-        tk.Label(section, text=version_text, font=("Arial", 10), fg="gray", justify="center").pack(pady=(5, 0), anchor="center")
+        info_text = json.dumps(system_data, indent=2, ensure_ascii=False)
+        tk.Label(section, text="System-Infos:", font=("Arial", 10), fg="gray", anchor="w").pack(anchor="w", padx=5, pady=(0,3))
 
+        text_display = tk.Text(section, height=6, wrap="none")
+        text_display.insert("1.0", info_text)
+        text_display.config(state="disabled")
+        text_display.pack(fill="x", padx=5, pady=(0,5))
+
+        def copy_system_info():
+            self.frame.clipboard_clear()
+            self.frame.clipboard_append(info_text)
+            messagebox.showinfo("Kopiert", "System-Infos wurden in die Zwischenablage kopiert.")
+
+        tk.Button(section, text="In Zwischenablage kopieren", command=copy_system_info).pack(padx=5, pady=(0,5))
