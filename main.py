@@ -8,6 +8,10 @@ from login import SplashScreen, open_login_window, start
 from first_splash import InstallAssistantSplash
 from datetime import datetime
 from ordner import get_data_path
+import platform
+import sys
+import psutil
+import socket
 
 # Farbdefinitionen 
 PRIMARY_BLUE = "#2a4d8f"
@@ -375,6 +379,7 @@ Klicke auf „Weiter“, um SchulSystem zu starten.
         root.destroy()
         from updater import check_and_update
         check_and_update()
+        
         open_login_window()
 
     button = tk.Button(root, text="Weiter", command=continue_to_login)
@@ -398,35 +403,86 @@ def main():
     SYSTEM_INFO_FILE = os.path.join(get_data_path(), "data/system_info.json")
 
 
-    def get_current_version():
-        """Liest die Version aus version.txt."""
-        try:
-            with open("version.txt", "r", encoding="utf-8") as f:
-                return f.read().strip()
-        except FileNotFoundError:
-            return "unbekannt"
+    def _init_system_info():
+        """Erstellt oder aktualisiert die Systeminformationen inklusive Hardware, OS, Python, Netzwerk usw."""
 
-    def init_system_info():
-        """Erstellt oder lädt System-ID + Versionsinformationen."""
+        def get_current_version():
+            """Liest die Version aus version.txt"""
+            try:
+                with open("version.txt", "r", encoding="utf-8") as f:
+                    return f.read().strip()
+            except FileNotFoundError:
+                return "unbekannt"
+
         current_version = get_current_version()
-        if not os.path.exists(SYSTEM_INFO_FILE):
-            info = {
-                "system_id": str(uuid.uuid4()),
-                "version": current_version,
-                "created": datetime.now().isoformat(timespec="seconds")
-            }
-            with open(SYSTEM_INFO_FILE, "w", encoding="utf-8") as f:
-                json.dump(info, f, indent=4, ensure_ascii=False)
-            print(f"[INFO] Neue System-ID erstellt: {info['system_id']}")
-        else:
-            with open(SYSTEM_INFO_FILE, "r", encoding="utf-8") as f:
-                info = json.load(f)
-            # Falls Version abweicht, aktualisieren
-            if info.get("version") != current_version:
-                info["version"] = current_version
-                with open(SYSTEM_INFO_FILE, "w", encoding="utf-8") as f:
-                    json.dump(info, f, indent=4, ensure_ascii=False)
-            print(f"[INFO] System-ID geladen: {info['system_id']} (Version: {info['version']})")
+
+        # Falls Datei existiert, laden, sonst neu erstellen
+        info = {}
+        if os.path.exists(SYSTEM_INFO_FILE):
+            try:
+                with open(SYSTEM_INFO_FILE, "r", encoding="utf-8") as f:
+                    info = json.load(f)
+            except Exception:
+                info = {}
+
+        # System-ID erstellen falls nicht vorhanden
+        if "system_id" not in info:
+            info["system_id"] = str(uuid.uuid4())
+
+        # Versionsinformationen
+        info["version"] = current_version
+        info["created"] = info.get("created", datetime.now().isoformat(timespec="seconds"))
+        info["last_update"] = datetime.now().isoformat(timespec="seconds")
+
+        # --- 1. Betriebssystem & Hardware ---
+        info["os"] = platform.system()
+        info["os_release"] = platform.release()
+        info["os_version"] = platform.version()
+        info["architecture"] = platform.architecture()[0]
+        info["machine"] = platform.machine()
+        info["processor"] = platform.processor()
+        info["cpu_count"] = os.cpu_count()
+        try:
+            ram = psutil.virtual_memory()
+            info["ram_total_gb"] = round(ram.total / (1024 ** 3), 2)
+        except Exception:
+            info["ram_total_gb"] = None
+
+        try:
+            disk = psutil.disk_usage("/")
+            info["disk_total_gb"] = round(disk.total / (1024 ** 3), 2)
+            info["disk_free_gb"] = round(disk.free / (1024 ** 3), 2)
+        except Exception:
+            info["disk_total_gb"] = None
+            info["disk_free_gb"] = None
+
+        try:
+            info["hostname"] = socket.gethostname()
+            info["ip_address"] = socket.gethostbyname(info["hostname"])
+        except Exception:
+            info["hostname"] = None
+            info["ip_address"] = None
+
+        # --- 2. Python & Laufzeit ---
+        info["python_version"] = sys.version
+        info["python_executable"] = sys.executable
+        info["python_platform"] = sys.platform
+        info["sys_path"] = sys.path
+
+        # --- 3. Systemstart & Logging ---
+        info["uuid"] = str(uuid.uuid4())
+        info["timestamp"] = datetime.now().isoformat(timespec="seconds")
+
+        # --- 4. Optional / Debugging (falls relevant) ---
+        # info["environment_variables"] = dict(os.environ)
+
+        # Datei speichern
+        os.makedirs(os.path.dirname(SYSTEM_INFO_FILE), exist_ok=True)
+        with open(SYSTEM_INFO_FILE, "w", encoding="utf-8") as f:
+            json.dump(info, f, indent=4, ensure_ascii=False)
+
+        print(f"[INFO] Systeminformationen gespeichert: {SYSTEM_INFO_FILE}")
+        return info
 
     def get_system_info():
         """Liest Systeminformationen aus."""
@@ -448,7 +504,7 @@ def main():
         # setup_databases.py oder direkt in main()
         with open("data/config.json", "w", encoding="utf-8") as f:
             json.dump({"admin_name": admin_name}, f, indent=2)
-        init_system_info()
+        _init_system_info()
         splash_root.destroy()  # Splash schließen
         show_tutorial(admin_name)
         
@@ -466,6 +522,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
 
 
 
