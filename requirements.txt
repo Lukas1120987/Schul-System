@@ -9,3 +9,4 @@ urllib.parse
 tkinterweb
 pywebview 
 uuid
+cefpython3
