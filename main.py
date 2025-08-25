@@ -1,4 +1,4 @@
-# main.py – Hauptkonfiguration von EduClass
+# main.py – Hauptkonfiguration vom SchulSystem
 import os
 import json
 import tkinter as tk
