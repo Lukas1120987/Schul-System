@@ -1,13 +1,26 @@
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox
 import json
 import os
 import sys
 import datetime
+from ordner import get_data_path
 
 DATA_DIR = "data"
 LOG_BUFFER = []  # Globale Log-Speicherung für Modulwechsel
 LOG_MAX_LENGTH = 5000  # Maximale Zeilen in der Konsole
+CONSOLE_LOG_FILE = "console.log"
+
+
+#  Globale Funktion für externe Logs
+def add_log(message: str, level: str = "INFO"):
+    """Extern aufrufbare Funktion zum Hinzufügen von Logs ins globale Log-System."""
+    timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+    line = f"[{timestamp}] [{level}] {message}\n"
+    LOG_BUFFER.append(line)
+    LOG_BUFFER[:] = LOG_BUFFER[-LOG_MAX_LENGTH:]
+    with open(CONSOLE_LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(line)
 
 
 class Redirector:
@@ -25,6 +38,11 @@ class Redirector:
         LOG_BUFFER.append(line)
         LOG_BUFFER[:] = LOG_BUFFER[-LOG_MAX_LENGTH:]  # begrenzen
 
+        # in Datei speichern
+        with open(CONSOLE_LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(line)
+
+        # Ausgabe in Tkinter-Konsole
         self.text_widget.config(state=tk.NORMAL)
         self.text_widget.insert(tk.END, line)
         if self.auto_scroll:
@@ -53,14 +71,16 @@ class Modul:
 
         self.is_admin = self.check_is_admin()
 
+        tk.Label(self.frame, text="🛠 Development Console & JSON Editor",
+                 font=("Arial", 16), bg="white").pack(pady=10)
 
-        tk.Label(self.frame, text="🛠 Development Console & JSON Editor", font=("Arial", 16), bg="white").pack(pady=10)
-
-        self.console_button = tk.Button(self.frame, text="Konsole in neuem Fenster öffnen", command=self.open_console_window)
+        self.console_button = tk.Button(
+            self.frame, text="Konsole in neuem Fenster öffnen", command=self.open_console_window)
         self.console_button.pack(pady=5)
 
         # Konsole intern
-        self.konsole_rahmen = tk.LabelFrame(self.frame, text="Konsole (Debug-Ausgabe)", bg="white")
+        self.konsole_rahmen = tk.LabelFrame(
+            self.frame, text="Konsole (Debug-Ausgabe)", bg="white")
         self.konsole_rahmen.pack(fill="both", expand=True, padx=10, pady=5)
 
         self.konsole_text = self.create_console_widget(self.konsole_rahmen)
@@ -72,15 +92,25 @@ class Modul:
 
         self.control_buttons()
 
-        print("System bereit.")
+        # Alte Logs laden
+        if os.path.exists(CONSOLE_LOG_FILE):
+            with open(CONSOLE_LOG_FILE, "r", encoding="utf-8") as f:
+                for line in f.readlines()[-LOG_MAX_LENGTH:]:
+                    LOG_BUFFER.append(line)
+            self.refresh_console()
+            print("[INFO] Alte Logs aus console.log geladen. \n")
+
+        print("System bereit. \n")
 
     def get_frame(self):
+        self.refresh_console()
         return self.frame
 
-
     def create_console_widget(self, parent):
-        text = tk.Text(parent, height=10, bg="#1e1e1e", fg="white", insertbackground="white")
-        text.pack(side=tk.LEFT, fill="both", expand=True, padx=(5, 0), pady=5)
+        text = tk.Text(parent, height=10, bg="#1e1e1e",
+                       fg="white", insertbackground="white")
+        text.pack(side=tk.LEFT, fill="both", expand=True,
+                  padx=(5, 0), pady=5)
         scroll = tk.Scrollbar(parent, command=text.yview)
         scroll.pack(side=tk.RIGHT, fill="y")
         text.config(yscrollcommand=scroll.set, state=tk.DISABLED)
@@ -90,12 +120,59 @@ class Modul:
         controls = tk.Frame(self.frame, bg="white")
         controls.pack()
 
-        tk.Button(controls, text="Test-Log ausgeben", command=lambda: self.log("Test-Log: Modul funktioniert!")).pack(side=tk.LEFT, padx=5)
-        tk.Button(controls, text="Nur Fehler anzeigen", command=lambda: self.set_filter("ERROR")).pack(side=tk.LEFT, padx=5)
-        tk.Button(controls, text="Nur Info anzeigen", command=lambda: self.set_filter("INFO")).pack(side=tk.LEFT, padx=5)
-        tk.Button(controls, text="Alles anzeigen", command=lambda: self.set_filter("ALL")).pack(side=tk.LEFT, padx=5)
-        tk.Button(controls, text="Log kopieren", command=self.copy_log_to_clipboard).pack(side=tk.LEFT, padx=5)
-        tk.Button(controls, text="Auto-Scroll an/aus", command=self.toggle_scroll).pack(side=tk.LEFT, padx=5)
+        tk.Button(controls, text="Test-Log ausgeben",
+                  command=lambda: self.log("Test-Log: Modul funktioniert! \n")).pack(side=tk.LEFT, padx=5)
+        tk.Button(controls, text="Nur Fehler anzeigen",
+                  command=lambda: self.set_filter("ERROR \n")).pack(side=tk.LEFT, padx=5)
+        tk.Button(controls, text="Nur Info anzeigen",
+                  command=lambda: self.set_filter("INFO \n")).pack(side=tk.LEFT, padx=5)
+        tk.Button(controls, text="Alles anzeigen",
+                  command=lambda: self.set_filter("ALL \n")).pack(side=tk.LEFT, padx=5)
+        tk.Button(controls, text="Log kopieren",
+                  command=self.copy_log_to_clipboard).pack(side=tk.LEFT, padx=5)
+        tk.Button(controls, text="Auto-Scroll an/aus",
+                  command=self.toggle_scroll).pack(side=tk.LEFT, padx=5)
+
+        # ➕ NEU: Button für System-Info
+        tk.Button(controls, text="System-Info anzeigen",
+                  command=self.show_system_info).pack(side=tk.LEFT, padx=5)
+
+    def show_system_info(self):
+        """Liest system_info.json und zeigt sie an."""
+        system_info_file = os.path.join(
+            get_data_path(), "data/system_info.json")
+
+        if not os.path.exists(system_info_file):
+            messagebox.showerror(
+                "Fehler", f"Datei nicht gefunden: {system_info_file} \n")
+            print("[ERROR] System-Info-Datei fehlt. \n")
+            return
+
+        try:
+            with open(system_info_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception as e:
+            messagebox.showerror("Fehler", f"Konnte Datei nicht lesen:\n{e}")
+            print(f"[ERROR] System-Info konnte nicht geladen werden: {e} \n")
+            return
+
+        # Neues Fenster für Anzeige
+        win = tk.Toplevel(self.master)
+        win.title("System-Informationen")
+        win.geometry("700x500")
+
+        text = tk.Text(win, wrap="word", bg="white", fg="black")
+        text.pack(fill="both", expand=True, padx=5, pady=5)
+        scroll = tk.Scrollbar(win, command=text.yview)
+        scroll.pack(side=tk.RIGHT, fill="y")
+        text.config(yscrollcommand=scroll.set)
+
+        # JSON schön formatieren
+        formatted = json.dumps(data, indent=4, ensure_ascii=False)
+        text.insert(tk.END, formatted)
+        text.config(state=tk.DISABLED)
+
+        print("System-Info erfolgreich geladen und angezeigt. \n")
 
     def set_filter(self, mode):
         self.filter_mode = mode
@@ -116,17 +193,22 @@ class Modul:
         full_log = "".join(LOG_BUFFER)
         self.master.clipboard_clear()
         self.master.clipboard_append(full_log)
-        print("Log in Zwischenablage kopiert.")
+        print("Log in Zwischenablage kopiert. \n")
 
     def toggle_scroll(self):
         self.stdout_redirector.auto_scroll = not self.stdout_redirector.auto_scroll
         self.stderr_redirector.auto_scroll = self.stdout_redirector.auto_scroll
-        print(f"Auto-Scroll ist {'aktiviert' if self.stdout_redirector.auto_scroll else 'deaktiviert'}.")
+        print(
+            f"Auto-Scroll ist {'aktiviert' if self.stdout_redirector.auto_scroll else 'deaktiviert'}.")
 
     def log(self, text: str):
+        add_log(text, "INFO")  # nutzt jetzt globale Logfunktion
         print(text)
 
     def open_console_window(self):
+                
+        add_log("Test von add_log. \n", "DEBUG")
+        add_log("Test \n", "ERROR")
         if self.console_window:
             self.console_window.lift()
             return
@@ -134,7 +216,8 @@ class Modul:
         self.console_window = tk.Toplevel(self.master)
         self.console_window.title("Externe Konsole")
         self.console_window.geometry("800x400")
-        self.console_window.protocol("WM_DELETE_WINDOW", self.close_console_window)
+        self.console_window.protocol("WM_DELETE_WINDOW",
+                                     self.close_console_window)
 
         self.konsole_text.pack_forget()
         self.konsole_rahmen.pack_forget()
@@ -161,3 +244,5 @@ class Modul:
         with open(users_datei, "r", encoding="utf-8") as f:
             users = json.load(f)
             return users.get(self.username, {}).get("is_admin", False)
+
+
