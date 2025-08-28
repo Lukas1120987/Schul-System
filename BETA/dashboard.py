@@ -144,7 +144,7 @@ class Dashboard:
         todos = self.get_open_todos()
         self.create_widget_card(
             dashboard_frame, "✅ Offene ToDos", todos, 1, 0,
-            lambda: self.load_module("todos")
+            lambda: self.load_module("todo")
         )
 
         # 4. Heutige Termine
@@ -171,20 +171,51 @@ class Dashboard:
             btn.pack(anchor="e", padx=10, pady=(0,10))
 
 
-    #  Hilfsmethoden 
+        #  Hilfsmethoden 
 
     def get_next_class(self):
         try:
             import json, os
             from datetime import date
-            with open(os.path.join(get_data_path(),"data/schedule.json"), "r", encoding="utf-8") as f:
+
+            # Pfade
+            base = get_data_path()
+            users_file = os.path.join(base, "data/users.json")
+            schedule_file = os.path.join(base, "data/schedule.json")
+
+            # Userdaten laden
+            with open(users_file, "r", encoding="utf-8") as f:
+                users = json.load(f)
+            user_data = users.get(self.username, {})
+            second_group = user_data.get("second_group")
+
+            if not second_group:
+                return "Keine Klassengruppe zugewiesen"
+
+            # Stundenplan laden
+            with open(schedule_file, "r", encoding="utf-8") as f:
                 schedule = json.load(f)
-            weekday = date.today().strftime("%A")
-            user_plan = schedule.get(self.username, {})
-            today = user_plan.get(weekday, [])
-            return today[0] if today else "Heute keine Stunden 🎉"
-        except:
-            return "Keine Daten verfügbar"
+
+            weekday = date.today().strftime("%A")  # Montag, Dienstag...
+            today_plan = schedule.get(second_group, {}).get(weekday, {})
+
+            if not today_plan:
+                return "Heute keine Stunden 🎉"
+
+            # Alle Stunden sortiert nach Nummer
+            output_lines = []
+            for stunde in sorted(today_plan.keys(), key=lambda k: int(k)):
+                lesson = today_plan[stunde]
+                fach = lesson.get("fach", "")
+                lehrer = lesson.get("lehrer", "")
+                raum = lesson.get("raum", "")
+                output_lines.append(f"{stunde}. Stunde: {fach} (Raum {raum}, {lehrer})")
+
+            return "\n".join(output_lines) if output_lines else "Heute keine Stunden 🎉"
+
+        except Exception as e:
+            return f"Keine Daten verfügbar ({e})"
+
 
     def get_unread_messages(self):
         try:
