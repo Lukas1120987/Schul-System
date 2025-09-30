@@ -10,3 +10,4 @@ tkinterweb
 pywebview 
 uuid
 psutil
+PyPDF2
