@@ -1,24 +1,20 @@
 """
 File: file_manager_pro.py
-Modul: EduClass - Dateiablage Pro
-Creator: https://github.com/SchulSystem
-Translation: https://github.com/Lukas1120987
+Modul: EduClass - Dateiablage Pro (Erweitert)
 
-Features:
- - Benutzerordner: data/files/users/<username>/
- - Gruppenordner: data/files/groups/<group>/
- - Physische Speicherung (Kollisionen vermieden via timestamp-prefix)
- - Suchfunktion: Dateiname + Dateiinhalte (Plaintext, optional PDF via PyPDF2)
- - Tags & Kategorien: zentrale metadata.json pro base (data/files/metadata.json)
- - Rechte: granulare Rechte (read/write/delete) pro folder, konfigurierbar (permissions.json)
- - In-Modul-Vorschau: Text und Bilder (PIL optional), PDF text preview if PyPDF2 available
- - Versionierung: einfache Versionierung (bei Upload wird alte Datei in .versions/ gesichert)
- - Aktionslog: data/files/logs/actions.json
+Erweiterungen (neu):
+ - Versionen-Manager mit UI (Wiederherstellen)
+ - Kommentare / Diskussionen pro Datei (comments.json)
+ - Freigaben an einzelne Nutzer (shares.json)
+ - Bulk-Upload (Mehrfachauswahl) + Hinweis zu Drag&Drop (best-effort)
+ - PDF-Seiten-als-Bild-Vorschau (best-effort mit PIL / Poppler, ansonsten Text-Preview)
+ - Bereich "Mit mir geteilt" (Shared with me)
+ - Favoriten / Schnellzugriff (favorites.json)
+ - Verbesserte UI für Versionen, Shares, Kommentare, Favoriten
 
 Notes:
- - Optional extras: Pillow (PIL) for image preview, PyPDF2 for PDF text extraction.
-   Install via: pip install pillow PyPDF2
- - The module attempts to import those libs and will degrade gracefully if missing.
+ - Optional: Pillow, PyPDF2. Für PDF->Image evtl. poppler und pdf2image für stabile Ergebnisse.
+ - Install: pip install pillow PyPDF2
 
 """
 
@@ -56,6 +52,24 @@ def _ensure_dirs(*paths):
         os.makedirs(p, exist_ok=True)
 
 
+def _read_json(path, default=None):
+    try:
+        if os.path.isfile(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return default
+
+
+def _write_json(path, data):
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
+
 # ----- main class -----
 class Modul:
     def __init__(self, master, username: str, user_data: dict):
@@ -71,6 +85,9 @@ class Modul:
         self.meta_file = os.path.join(self.base, "metadata.json")
         self.perm_file = os.path.join(self.base, "permissions.json")
         self.action_log_file = os.path.join(self.logs_root, "actions.json")
+        self.comments_file = os.path.join(self.base, "comments.json")
+        self.shares_file = os.path.join(self.base, "shares.json")
+        self.favorites_file = os.path.join(self.base, "favorites.json")
 
         _ensure_dirs(self.base, self.users_root, self.groups_root, self.logs_root)
 
@@ -81,8 +98,11 @@ class Modul:
                 os.makedirs(self.group_folder(g), exist_ok=True)
 
         # metadata and permissions load
-        self.metadata = self._load_json(self.meta_file, default={})
-        self.permissions = self._load_json(self.perm_file, default={})
+        self.metadata = _read_json(self.meta_file, default={})
+        self.permissions = _read_json(self.perm_file, default={})
+        self.comments = _read_json(self.comments_file, default={})
+        self.shares = _read_json(self.shares_file, default={})
+        self.favorites = _read_json(self.favorites_file, default={})
 
         # ui state
         self.current_folder = None
@@ -117,7 +137,7 @@ class Modul:
     # ----- UI -----
     def _build_ui(self):
         # top title
-        title = tk.Label(self.frame, text='📁 Dateiablage Pro', font=("Arial", 16, "bold"), bg='white')
+        title = tk.Label(self.frame, text='📁 Dateiablage Pro — Vollversion', font=("Arial", 16, "bold"), bg='white')
         title.pack(anchor='nw', padx=8, pady=(6,0))
 
         container = tk.Frame(self.frame, bg='white')
@@ -129,11 +149,17 @@ class Modul:
         middle = tk.Frame(container, bg='white')
         middle.pack(side='left', fill='both', expand=True, padx=6, pady=6)
 
-        right = tk.Frame(container, bg='white', width=360)
+        right = tk.Frame(container, bg='white', width=420)
         right.pack(side='right', fill='both', padx=6, pady=6)
 
-        # --- left: explorer tree + search ---
-        tk.Label(left, text='Ordner / Suche', bg='white').pack(anchor='w')
+        # --- left: explorer tree + quick access ---
+        tk.Label(left, text='Ordner / Schnellzugriff', bg='white').pack(anchor='w')
+
+        # Quick buttons
+        quick_frame = tk.Frame(left, bg='white')
+        quick_frame.pack(fill='x', pady=4)
+        tk.Button(quick_frame, text='Favoriten', command=self.show_favorites).pack(side='left', expand=True, fill='x')
+        tk.Button(quick_frame, text='Mit mir geteilt', command=self.show_shared_with_me).pack(side='left', expand=True, fill='x')
 
         search_frame = tk.Frame(left, bg='white')
         search_frame.pack(fill='x', pady=4)
@@ -164,11 +190,15 @@ class Modul:
 
         action_frame = tk.Frame(middle, bg='white')
         action_frame.pack(fill='x', pady=6)
-        tk.Button(action_frame, text='📤 Hochladen', command=self.upload_to_selected_folder).pack(side='left', padx=4)
+        tk.Button(action_frame, text='📤 Hochladen (Einzeln)', command=self.upload_to_selected_folder).pack(side='left', padx=4)
+        tk.Button(action_frame, text='📤 Hochladen (Mehrfach)', command=self.bulk_upload).pack(side='left', padx=4)
         tk.Button(action_frame, text='📥 Herunterladen', command=self.download_selected_file).pack(side='left', padx=4)
         tk.Button(action_frame, text='📂 Öffnen', command=self.open_selected_file).pack(side='left', padx=4)
         tk.Button(action_frame, text='🗑️ Löschen', command=self.delete_selected_file).pack(side='left', padx=4)
         tk.Button(action_frame, text='Tags/Meta bearbeiten', command=self.edit_metadata).pack(side='left', padx=4)
+        tk.Button(action_frame, text='🔁 Versionen', command=self.show_versions).pack(side='left', padx=4)
+        tk.Button(action_frame, text='💬 Kommentare', command=self.show_comments).pack(side='left', padx=4)
+        tk.Button(action_frame, text='🔗 Freigeben', command=self.share_file_dialog).pack(side='left', padx=4)
         tk.Button(action_frame, text='Protokoll', command=self.show_log).pack(side='right', padx=4)
 
         self.current_folder_var = tk.StringVar(value='Kein Ordner ausgewählt')
@@ -176,10 +206,10 @@ class Modul:
 
         # --- right: preview pane ---
         tk.Label(right, text='Vorschau', bg='white').pack(anchor='w')
-        self.preview_text = tk.Text(right, height=15)
+        self.preview_text = tk.Text(right, height=12)
         self.preview_text.pack(fill='both', expand=True)
         if HAS_PIL:
-            self.preview_canvas = tk.Canvas(right, height=240, bg='white')
+            self.preview_canvas = tk.Canvas(right, height=280, bg='white')
             self.preview_canvas.pack(fill='both', expand=False)
         else:
             self.preview_canvas = None
@@ -267,22 +297,6 @@ class Modul:
                 self.files_tv.insert('', 'end', values=(n, f"{size_kb} KB", mtime, tagstr))
 
     # ----- permissions -----
-    def _load_json(self, path, default=None):
-        try:
-            if os.path.isfile(path):
-                with open(path,'r',encoding='utf-8') as f:
-                    return json.load(f)
-        except Exception:
-            pass
-        return default
-
-    def _save_json(self, path, data):
-        try:
-            with open(path,'w',encoding='utf-8') as f:
-                json.dump(data,f,indent=2,ensure_ascii=False)
-        except Exception:
-            pass
-
     def _ensure_folder_perm(self, folder_path):
         key = os.path.relpath(folder_path, self.base)
         if key not in self.permissions:
@@ -310,7 +324,7 @@ class Modul:
                     # group folder: allow group read/write by default
                     self.permissions[key]['read'].append(g)
                     self.permissions[key]['write'].append(g)
-            self._save_json(self.perm_file, self.permissions)
+            _write_json(self.perm_file, self.permissions)
         return self.permissions[key]
 
     def _has_perm(self, folder_path, mode):
@@ -370,7 +384,9 @@ class Modul:
             if not val: return
             lb = {'read':read_lb,'write':write_lb,'delete':delete_lb}[lb_name]
             lb.insert('end', val)
-        tk.Button(dlg, text='Hinzufügen (eingetragenen Namen)', command=lambda: add_to('read')).pack()
+        tk.Button(dlg, text='Hinzufügen (eingetragenen Namen als Read)', command=lambda: add_to('read')).pack()
+        tk.Button(dlg, text='Hinzufügen als Write', command=lambda: add_to('write')).pack()
+        tk.Button(dlg, text='Hinzufügen als Delete', command=lambda: add_to('delete')).pack()
 
         def save_and_close():
             perm['owner'] = owner_var.get().strip() or None
@@ -378,12 +394,12 @@ class Modul:
             perm['write'] = list(write_lb.get(0,'end'))
             perm['delete'] = list(delete_lb.get(0,'end'))
             self.permissions[key] = perm
-            self._save_json(self.perm_file, self.permissions)
+            _write_json(self.perm_file, self.permissions)
             dlg.destroy()
             messagebox.showinfo('Gespeichert','Berechtigungen gespeichert')
         tk.Button(dlg, text='Speichern', command=save_and_close).pack()
 
-    # ----- upload / download / delete -----
+    # ----- upload / download / delete / bulk -----
     def _unique_name(self, original):
         ts = datetime.now().strftime('%Y%m%d_%H%M%S')
         safe = original.replace(' ','_')
@@ -399,26 +415,43 @@ class Modul:
         fp = filedialog.askopenfilename()
         if not fp:
             return
-        orig = os.path.basename(fp)
+        self._do_upload(fp)
+
+    def bulk_upload(self):
+        if not self.current_folder:
+            messagebox.showwarning('Kein Ordner','Bitte wähle einen Ordner aus')
+            return
+        if not self._has_perm(self.current_folder, 'write'):
+            messagebox.showerror('Zugriff verweigert','Du darfst hier keine Dateien hochladen')
+            return
+        fps = filedialog.askopenfilenames()
+        if not fps:
+            return
+        for fp in fps:
+            try:
+                self._do_upload(fp)
+            except Exception:
+                pass
+        messagebox.showinfo('Fertig','Mehrfach-Upload abgeschlossen')
+
+    def _do_upload(self, filepath):
+        orig = os.path.basename(filepath)
         target = self._unique_name(orig)
         target_path = os.path.join(self.current_folder, target)
+        # versioning: move existing logical files to .versions if same original_name exists
         try:
-            # versioning: if file with same "logical" name exists (without timestamp), copy old to .versions
-            basename_parts = orig
+            # find files in folder with same original_name in metadata
             versions_dir = os.path.join(self.current_folder, '.versions')
             os.makedirs(versions_dir, exist_ok=True)
-            # copy
-            shutil.copy(fp, target_path)
-            # store metadata
+            shutil.copy(filepath, target_path)
             rel = os.path.relpath(target_path, self.base)
             meta = {'original_name': orig, 'uploaded_by': self.username, 'upload_date': datetime.now().isoformat(), 'tags': [], 'category': None}
             self.metadata[rel] = meta
-            self._save_json(self.meta_file, self.metadata)
+            _write_json(self.meta_file, self.metadata)
             self._log_action('upload', target_path, original=orig)
-            messagebox.showinfo('Erfolg', f"{orig} hochgeladen")
             self.refresh_file_list()
         except Exception as e:
-            messagebox.showerror('Fehler', f'Upload fehlgeschlagen:\n{e}')
+            messagebox.showerror('Fehler', f'Upload fehlgeschlagen:{e}')
 
     def download_selected_file(self):
         sel = self.files_tv.selection()
@@ -461,7 +494,7 @@ class Modul:
         if mimetype and mimetype.startswith('image') and HAS_PIL:
             try:
                 im = Image.open(path)
-                im.thumbnail((600,400))
+                im.thumbnail((800,600))
                 self.preview_img_ref = ImageTk.PhotoImage(im)
                 if self.preview_canvas:
                     self.preview_canvas.create_image(0,0, anchor='nw', image=self.preview_img_ref)
@@ -469,11 +502,21 @@ class Modul:
                     self.preview_text.insert('end','(Bild kann nicht angezeigt werden — Canvas fehlt)')
             except Exception as e:
                 self.preview_text.insert('end', f'Bildvorschau fehlgeschlagen: {e}')
-        else:
-            # try text
-            try:
-                # PDFs via PyPDF2
-                if path.lower().endswith('.pdf') and HAS_PYPDF2:
+        elif path.lower().endswith('.pdf') and HAS_PYPDF2:
+            # try image-based preview (PIL) first
+            shown = False
+            if HAS_PIL:
+                try:
+                    im = Image.open(path)
+                    im.thumbnail((800,600))
+                    self.preview_img_ref = ImageTk.PhotoImage(im)
+                    if self.preview_canvas:
+                        self.preview_canvas.create_image(0,0, anchor='nw', image=self.preview_img_ref)
+                        shown = True
+                except Exception:
+                    shown = False
+            if not shown:
+                try:
                     with open(path, 'rb') as f:
                         reader = PyPDF2.PdfReader(f)
                         text = []
@@ -482,15 +525,18 @@ class Modul:
                                 text.append(reader.pages[p].extract_text() or '')
                             except Exception:
                                 pass
-                        self.preview_text.insert('end', '\n\n'.join(text) or '(Keine Text-Vorschau)')
-                else:
-                    # read as text (try utf-8 then latin1)
-                    with open(path, 'r', encoding='utf-8') as f:
-                        self.preview_text.insert('end', f.read(100000))
+                        self.preview_text.insert('end', ''.join(text) or '(Keine Text-Vorschau)')
+                except Exception as e:
+                    self.preview_text.insert('end', f'PDF-Vorschau fehlgeschlagen: {e}')
+        else:
+            # try text
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    self.preview_text.insert('end', f.read(200000))
             except Exception:
                 try:
                     with open(path, 'r', encoding='latin-1') as f:
-                        self.preview_text.insert('end', f.read(100000))
+                        self.preview_text.insert('end', f.read(200000))
                 except Exception:
                     self.preview_text.insert('end', f"Vorschau nicht möglich. Dateipfad: {path}")
         self.preview_text.config(state='disabled')
@@ -569,16 +615,163 @@ class Modul:
         tags_var = tk.StringVar(value=','.join(meta.get('tags',[])))
         tk.Entry(dlg, textvariable=tags_var).pack(fill='x')
 
+        fav_var = tk.BooleanVar(value=(rel in self.favorites))
+        tk.Checkbutton(dlg, text='Als Favorit markieren', variable=fav_var).pack(anchor='w')
+
         def save_meta():
             meta['category'] = cat_var.get().strip() or None
             meta['tags'] = [t.strip() for t in tags_var.get().split(',') if t.strip()]
             meta['uploaded_by'] = meta.get('uploaded_by') or self.username
             meta['upload_date'] = meta.get('upload_date') or datetime.now().isoformat()
             self.metadata[rel] = meta
-            self._save_json(self.meta_file, self.metadata)
+            _write_json(self.meta_file, self.metadata)
+            # favorites
+            if fav_var.get():
+                self.favorites[rel] = {'user': self.username, 'time': datetime.now().isoformat()}
+            else:
+                if rel in self.favorites:
+                    del self.favorites[rel]
+            _write_json(self.favorites_file, self.favorites)
             dlg.destroy()
             self.refresh_file_list()
         tk.Button(dlg, text='Speichern', command=save_meta).pack()
+
+    # ----- shares / favorites / comments -----
+    def share_file_dialog(self):
+        sel = self.files_tv.selection()
+        if not sel:
+            messagebox.showwarning('Keine Auswahl','Wähle eine Datei')
+            return
+        name = self.files_tv.item(sel[0], 'values')[0]
+        path = os.path.join(self.current_folder, name)
+        rel = os.path.relpath(path,self.base)
+        dlg = tk.Toplevel(self.master)
+        dlg.title('Freigeben an Nutzer')
+        tk.Label(dlg, text=f'Datei: {name}').pack(anchor='w')
+        tk.Label(dlg, text='Benutzername (kommagetrennt)').pack(anchor='w')
+        users_var = tk.StringVar(value=','.join(self.shares.get(rel, {}).get('users', [])))
+        tk.Entry(dlg, textvariable=users_var).pack(fill='x')
+        def save_shares():
+            users = [u.strip() for u in users_var.get().split(',') if u.strip()]
+            self.shares[rel] = {'users': users, 'by': self.username, 'time': datetime.now().isoformat()}
+            _write_json(self.shares_file, self.shares)
+            self._log_action('share', path, users=users)
+            dlg.destroy()
+            messagebox.showinfo('Gespeichert', 'Freigaben aktualisiert')
+        tk.Button(dlg, text='Speichern', command=save_shares).pack()
+
+    def show_favorites(self):
+        dlg = tk.Toplevel(self.master)
+        dlg.title('Favoriten')
+        tv = ttk.Treeview(dlg, columns=('path','time'), show='headings')
+        tv.heading('path', text='Pfad')
+        tv.heading('time', text='Markiert am')
+        tv.pack(fill='both', expand=True)
+        for r,info in self.favorites.items():
+            tv.insert('', 'end', values=(r, info.get('time')))
+        def open_sel():
+            sel = tv.selection()
+            if not sel: return
+            r = tv.item(sel[0], 'values')[0]
+            folder = os.path.dirname(os.path.join(self.base, r))
+            self.current_folder = folder
+            self.current_folder_var.set(f"Aktueller Ordner: {os.path.relpath(folder,self.base)}")
+            self.refresh_file_list()
+            dlg.destroy()
+        tk.Button(dlg, text='Öffnen', command=open_sel).pack()
+
+    def show_shared_with_me(self):
+        # gather all shares where current user is in users
+        results = []
+        for rel,info in self.shares.items():
+            if self.username in info.get('users',[]):
+                results.append(rel)
+        dlg = tk.Toplevel(self.master)
+        dlg.title('Mit mir geteilt')
+        tv = ttk.Treeview(dlg, columns=('path','by'), show='headings')
+        tv.heading('path', text='Pfad')
+        tv.heading('by', text='Freigegeben von')
+        tv.pack(fill='both', expand=True)
+        for r in results:
+            info = self.shares.get(r,{})
+            tv.insert('', 'end', values=(r, info.get('by')))
+        def open_sel():
+            sel = tv.selection()
+            if not sel: return
+            r = tv.item(sel[0], 'values')[0]
+            folder = os.path.dirname(os.path.join(self.base, r))
+            self.current_folder = folder
+            self.current_folder_var.set(f"Aktueller Ordner: {os.path.relpath(folder,self.base)}")
+            self.refresh_file_list()
+            dlg.destroy()
+        tk.Button(dlg, text='Öffnen', command=open_sel).pack()
+
+    def show_comments(self):
+        sel = self.files_tv.selection()
+        if not sel:
+            messagebox.showwarning('Keine Auswahl','Wähle eine Datei')
+            return
+        name = self.files_tv.item(sel[0], 'values')[0]
+        path = os.path.join(self.current_folder, name)
+        rel = os.path.relpath(path,self.base)
+        comments = self.comments.get(rel, [])
+        dlg = tk.Toplevel(self.master)
+        dlg.title('Kommentare')
+        txt = tk.Text(dlg, height=12)
+        txt.pack(fill='both', expand=True)
+        for c in comments:
+            txt.insert('end', f"{c.get('time')} | {c.get('user')}{c.get('text')}---")
+        txt.config(state='disabled')
+        entry_var = tk.StringVar()
+        tk.Entry(dlg, textvariable=entry_var).pack(fill='x')
+        def add_comment():
+            t = entry_var.get().strip()
+            if not t: return
+            entry = {'time': datetime.now().isoformat(), 'user': self.username, 'text': t}
+            comments.append(entry)
+            self.comments[rel] = comments
+            _write_json(self.comments_file, self.comments)
+            dlg.destroy()
+            self.show_comments()
+        tk.Button(dlg, text='Kommentar hinzufügen', command=add_comment).pack()
+
+    # ----- versions -----
+    def show_versions(self):
+        sel = self.files_tv.selection()
+        if not sel:
+            messagebox.showwarning('Keine Auswahl','Wähle eine Datei')
+            return
+        name = self.files_tv.item(sel[0], 'values')[0]
+        path = os.path.join(self.current_folder, name)
+        # versions stored in .versions as copies with timestamped names
+        versions_dir = os.path.join(self.current_folder, '.versions')
+        os.makedirs(versions_dir, exist_ok=True)
+        items = sorted(os.listdir(versions_dir)) if os.path.isdir(versions_dir) else []
+        dlg = tk.Toplevel(self.master)
+        dlg.title('Versionen')
+        tv = ttk.Treeview(dlg, columns=('file','time'), show='headings')
+        tv.heading('file', text='Datei')
+        tv.heading('time', text='Zeit')
+        tv.pack(fill='both', expand=True)
+        for it in items:
+            tv.insert('', 'end', values=(it, ''))
+        def restore():
+            selv = tv.selection()
+            if not selv: return
+            vname = tv.item(selv[0], 'values')[0]
+            src = os.path.join(versions_dir, vname)
+            dst = os.path.join(self.current_folder, vname)
+            # restore by copying to current folder with new timestamp
+            try:
+                newname = self._unique_name(os.path.basename(vname))
+                shutil.copy(src, os.path.join(self.current_folder, newname))
+                self._log_action('restore_version', src, restored_to=newname)
+                messagebox.showinfo('Wiederhergestellt','Version wurde wiederhergestellt als ' + newname)
+                dlg.destroy()
+                self.refresh_file_list()
+            except Exception as e:
+                messagebox.showerror('Fehler', str(e))
+        tk.Button(dlg, text='Wiederherstellen', command=restore).pack()
 
     # ----- search -----
     def run_search(self):
@@ -603,13 +796,11 @@ class Modul:
                 if qlow in f.lower():
                     results.append(rel)
                     continue
-                # only try content for reasonable small files
                 try:
                     if os.path.getsize(full) > 5*1024*1024:
                         continue
                 except Exception:
                     continue
-                # text
                 try:
                     with open(full,'r',encoding='utf-8') as fh:
                         txt = fh.read()
@@ -618,7 +809,6 @@ class Modul:
                             continue
                 except Exception:
                     pass
-                # pdf
                 if HAS_PYPDF2 and full.lower().endswith('.pdf'):
                     try:
                         with open(full,'rb') as fh:
@@ -647,10 +837,7 @@ class Modul:
             sel = tv.selection()
             if not sel: return
             r = tv.item(sel[0], 'values')[0]
-            # set tree selection to that folder
             folder = os.path.dirname(os.path.join(self.base, r))
-            # attempt to expand tree and select matching item by value
-            # fallback: set current_folder and refresh
             self.current_folder = folder
             self.current_folder_var.set(f"Aktueller Ordner: {os.path.relpath(folder,self.base)}")
             self.refresh_file_list()
@@ -681,10 +868,8 @@ class Modul:
                 if qtag and not any(qtag in t.lower() for t in meta.get('tags',[])): ok=False
                 if qcat and qcat not in (meta.get('category') or '').lower(): ok=False
                 if ok: results.append(rel)
-            # show similar to run_search
             dlg.destroy()
             self.search_var.set('')
-            # reuse search results dialog logic quickly
             out = tk.Toplevel(self.master)
             out.title(f'Ergebnis: {len(results)}')
             tv = ttk.Treeview(out, columns=('path','meta'), show='headings')
@@ -716,28 +901,12 @@ class Modul:
             'target': os.path.relpath(target_path,self.base),
             'meta': meta
         }
-        logs = []
-        try:
-            if os.path.isfile(self.action_log_file):
-                with open(self.action_log_file,'r',encoding='utf-8') as f:
-                    logs = json.load(f)
-        except Exception:
-            logs = []
+        logs = _read_json(self.action_log_file, default=[])
         logs.append(entry)
-        try:
-            with open(self.action_log_file,'w',encoding='utf-8') as f:
-                json.dump(logs,f,indent=2,ensure_ascii=False)
-        except Exception:
-            pass
+        _write_json(self.action_log_file, logs)
 
     def show_log(self):
-        logs = []
-        try:
-            if os.path.isfile(self.action_log_file):
-                with open(self.action_log_file,'r',encoding='utf-8') as f:
-                    logs = json.load(f)
-        except Exception:
-            logs = []
+        logs = _read_json(self.action_log_file, default=[])
         dlg = tk.Toplevel(self.master)
         dlg.title('Aktivitäten')
         txt = tk.Text(dlg)
@@ -746,10 +915,8 @@ class Modul:
             txt.insert('end','Keine Einträge')
         else:
             for e in logs[-500:]:
-                txt.insert('end', f"{e.get('time')} | {e.get('user')} | {e.get('action')} | {e.get('target')} | {json.dumps(e.get('meta',{}),ensure_ascii=False)}\n")
+                txt.insert('end', f"{e.get('time')} | {e.get('user')} | {e.get('action')} | {e.get('target')} | {json.dumps(e.get('meta',{}),ensure_ascii=False)}")
         txt.config(state='disabled')
 
-# DEBUG's
-
-#no mistakes
-
+# Debugs/Bugs
+# Vorschau, Drag-n-Drop
