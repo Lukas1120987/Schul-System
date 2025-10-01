@@ -1,61 +1,97 @@
-import tkinter as tk
-from tkinter import messagebox
 import json
+import os
+import tkinter as tk
+from tkinter import ttk, messagebox
 from datetime import datetime
-import uuid
+from ordner import get_data_path
+
+MELDUNGEN_JSON_PATH = os.path.join(get_data_path(), "data/meldungen.json")
+MELDUNGEN_JSON_PATH_GRÜNDE = os.path.join(get_data_path(), "data/stoerungsgrunde.json")
 
 class Modul:
-    def __init__(self, root, benutzername, frame_platzhalter):
-        self.root = root
-        self.benutzername = benutzername
-        self.frame_platzhalter = frame_platzhalter
+    def __init__(self, username, user_data, master):
+        self.username = username
+        self.user_data = user_data
+        self.master = master
+        self.frame = tk.Frame()
+        self.meldungen_file = MELDUNGEN_JSON_PATH
+        self.stoerungs_file = MELDUNGEN_JSON_PATH_GRÜNDE
+        self.load_meldungen()
+        self.load_stoerungsgrunde()
+        self.create_ui()
 
-        self.messages_file = "data/messages.json"
+    def load_meldungen(self):
+        if not os.path.exists(self.meldungen_file):
+            with open(self.meldungen_file, "w") as f:
+                json.dump({}, f)
+        with open(self.meldungen_file, "r") as f:
+            self.meldungen = json.load(f)
 
-        self.frame = tk.Frame(self.frame_platzhalter)
-        self.frame.pack(fill="both", expand=True)
+    def load_stoerungsgrunde(self):
+        if not os.path.exists(self.stoerungs_file):
+            with open(self.stoerungs_file, "w") as f:
+                json.dump({"Verwaltung": ["Server down", "Drucker defekt", "Netzwerkproblem", "Softwarefehler"]}, f)
+        with open(self.stoerungs_file, "r") as f:
+            self.stoerungsgrunde = json.load(f)
 
-        tk.Label(self.frame, text="Meldung erstellen", font=("Arial", 16)).pack(pady=10)
+    def create_ui(self):
+        tk.Label(self.frame, text="Neue Meldung erstellen", font=("Arial", 14)).pack(pady=5)
 
-        tk.Label(self.frame, text="Betreff:").pack()
-        self.entry_betreff = tk.Entry(self.frame, width=40)
-        self.entry_betreff.pack()
+        # Typ Auswahl
+        tk.Label(self.frame, text="Meldungstyp:").pack()
+        self.typ_var = tk.StringVar(value="nachricht")
+        ttk.Combobox(self.frame, textvariable=self.typ_var, values=["nachricht", "datei", "stoerung"]).pack(pady=2)
 
-        tk.Label(self.frame, text="Nachricht:").pack()
-        self.text_nachricht = tk.Text(self.frame, height=8, width=50)
-        self.text_nachricht.pack()
+        # Elementeingabe
+        tk.Label(self.frame, text="Betreff/Element:").pack()
+        self.element_entry = tk.Entry(self.frame, width=30)
+        self.element_entry.pack(pady=2)
 
-        tk.Button(self.frame, text="Absenden", command=self.absenden).pack(pady=10)
+        # Störungsgrund Dropdown (nur bei "stoerung")
+        tk.Label(self.frame, text="Störungsgrund:").pack()
+        self.grund_var = tk.StringVar()
+        self.grund_combo = ttk.Combobox(self.frame, textvariable=self.grund_var, values=self.stoerungsgrunde.get("Verwaltung", []))
+        self.grund_combo.pack(pady=2)
 
-    def absenden(self):
-        betreff = self.entry_betreff.get()
-        inhalt = self.text_nachricht.get("1.0", tk.END).strip()
+        # Meldung absenden
+        tk.Button(self.frame, text="Meldung senden", command=self.add_meldung).pack(pady=5)
 
-        if not betreff or not inhalt:
-            messagebox.showwarning("Fehler", "Bitte Betreff und Nachricht ausfüllen.")
+        # Eigene Meldungen anzeigen
+        tk.Label(self.frame, text="Meine Meldungen", font=("Arial", 12)).pack(pady=10)
+        self.tree = ttk.Treeview(self.frame, columns=("Typ", "Element", "Status", "Grund", "Zeit"), show="headings")
+        for col in ("Typ", "Element", "Status", "Grund", "Zeit"):
+            self.tree.heading(col, text=col)
+        self.tree.pack(pady=5, fill="x")
+        self.refresh_tree()
+
+    def add_meldung(self):
+        typ = self.typ_var.get()
+        element = self.element_entry.get()
+        grund = self.grund_var.get() if typ == "stoerung" else ""
+        if typ != "stoerung" and element == "":
+            messagebox.showwarning("Fehler", "Bitte Betreff/Element eingeben!")
             return
-
-        datum = datetime.now().strftime("%Y-%m-%d %H:%M")
-        meldung = {
-            "id": str(uuid.uuid4()),  # Eindeutige ID
-            "absender": self.benutzername,
-            "datum": datum,
-            "betreff": betreff,
-            "inhalt": inhalt,
-            "empfänger": "Verwaltung"
+        new_id = str(max([int(k) for k in self.meldungen.keys()] + [0]) + 1)
+        self.meldungen[new_id] = {
+            "typ": typ,
+            "element": element,
+            "ersteller": self.username,
+            "status": "offen",
+            "zeit": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "grund": grund
         }
+        with open(self.meldungen_file, "w") as f:
+            json.dump(self.meldungen, f, indent=2)
+        self.element_entry.delete(0, tk.END)
+        self.refresh_tree()
+        messagebox.showinfo("Erfolg", "Meldung wurde gesendet!")
 
-        try:
-            with open(self.messages_file, "r") as f:
-                messages = json.load(f)
-        except FileNotFoundError:
-            messages = []
+    def refresh_tree(self):
+        for i in self.tree.get_children():
+            self.tree.delete(i)
+        for mid, data in self.meldungen.items():
+            if data["ersteller"] == self.username:
+                self.tree.insert("", "end", values=(data["typ"], data["element"], data["status"], data["grund"], data["zeit"]))
 
-        messages.append(meldung)
-
-        with open(self.messages_file, "w") as f:
-            json.dump(messages, f, indent=4)
-
-        messagebox.showinfo("Erfolg", "Meldung wurde erfolgreich gesendet.")
-        self.entry_betreff.delete(0, tk.END)
-        self.text_nachricht.delete("1.0", tk.END)
+    def get_frame(self):
+        return self.frame
