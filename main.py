@@ -271,48 +271,11 @@ def setup_databases(admin_name, admin_password):
 
 
 
-import customtkinter as ctk
-from tkinter import filedialog
-import json
-import re
-
-# Farben
-PRIMARY_BLUE = "#2a4d8f"
-FRAME_BLUE = "#3b5fa5"
-WHITE = "#ffffff"
-LIGHT_BLUE = "#aaccff"
-
 def show_admin_creation_dialog():
     def choose_directory():
         path = filedialog.askdirectory(parent=dialog, title="Speicherort wählen")
         if path:
             path_var.set(path)
-
-    def is_password_strong(password):
-        if len(password) < 8:
-            return False
-        if not re.search(r"[A-Z]", password):
-            return False
-        if not re.search(r"[a-z]", password):
-            return False
-        if not re.search(r"[0-9]", password):
-            return False
-        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-            return False
-        return True
-
-    def validate_password(event=None):
-        pw = pw_entry.get().strip()
-        if not pw:
-            warning_label.configure(text="")
-            return
-        if is_password_strong(pw):
-            warning_label.configure(text="Passwort ist stark ✅", text_color="green")
-        else:
-            warning_label.configure(
-                text="Unsicher! Mind. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl, Sonderzeichen.",
-                text_color="red"
-            )
 
     def submit():
         name = name_entry.get().strip()
@@ -320,15 +283,10 @@ def show_admin_creation_dialog():
         path = path_var.get().strip()
 
         if not name or not pw or not path:
-            warning_label.configure(text="Bitte alle Felder ausfüllen!", text_color="red")
+            messagebox.showerror("Fehler", "Bitte fülle alle Felder aus.")
             return
 
-        if not is_password_strong(pw):
-            warning_label.configure(
-                text="Passwort entspricht nicht den Sicherheitsanforderungen!", text_color="red"
-            )
-            return
-
+        # Speichere setup.json
         with open("setup.json", "w", encoding="utf-8") as f:
             json.dump({"data_path": path}, f, indent=4)
 
@@ -338,62 +296,58 @@ def show_admin_creation_dialog():
 
     result = {"name": None, "password": None}
 
-    ctk.set_appearance_mode("System")
-    ctk.set_default_color_theme("blue")
+    parent = tk.Tk()
+    parent.withdraw()
 
-    # Toplevel
-    dialog = ctk.CTkToplevel()
+    dialog = tk.Toplevel(parent)
     dialog.title("Admin-Setup")
-    dialog.attributes("-fullscreen", True)
+    dialog.configure(bg=PRIMARY_BLUE)
+    dialog.overrideredirect(True)
+
+    screen_width = dialog.winfo_screenwidth()
+    screen_height = dialog.winfo_screenheight()
+    dialog.geometry(f"{screen_width}x{screen_height}+0+0")
     dialog.grab_set()
-    dialog.configure(fg_color=PRIMARY_BLUE)
 
-    # zentrales Frame (helles Blau)
-    frame = ctk.CTkFrame(dialog, corner_radius=15, fg_color=FRAME_BLUE)
-    frame.pack(padx=50, pady=50, fill="both", expand=True)
+    frame = tk.Frame(dialog, bg=PRIMARY_BLUE)
+    frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    # Titel
-    title = ctk.CTkLabel(frame, text="Admin-Konto erstellen", font=ctk.CTkFont(size=28, weight="bold"), text_color=WHITE)
-    title.pack(pady=(20, 30))
+    title = tk.Label(frame, text="Admin-Konto erstellen", font=("Segoe UI", 28, "bold"),
+                     bg=PRIMARY_BLUE, fg=WHITE)
+    title.pack(pady=(0, 40))
 
     # Benutzername
-    tk_label_user = ctk.CTkLabel(frame, text="Benutzername:", text_color=WHITE)
-    tk_label_user.pack(anchor="w", pady=(10, 5), padx=20)
-    name_entry = ctk.CTkEntry(frame, placeholder_text="Admin-Benutzername")
-    name_entry.pack(fill="x", pady=(0, 15), padx=20)
+    tk.Label(frame, text="Benutzername:", bg=PRIMARY_BLUE, fg=WHITE, font=("Segoe UI", 14)).pack(fill="x")
+    name_entry = tk.Entry(frame, font=("Segoe UI", 14))
+    name_entry.pack(fill="x", pady=(0, 20))
 
     # Passwort
-    tk_label_pw = ctk.CTkLabel(frame, text="Passwort:", text_color=WHITE)
-    tk_label_pw.pack(anchor="w", pady=(10, 5), padx=20)
-    pw_entry = ctk.CTkEntry(frame, placeholder_text="Passwort", show="*")
-    pw_entry.pack(fill="x", pady=(0, 5), padx=20)
-    pw_entry.bind("<KeyRelease>", validate_password)
-
-    # Passwort-Warnhinweis
-    warning_label = ctk.CTkLabel(frame, text="", font=ctk.CTkFont(size=12))
-    warning_label.pack(anchor="w", pady=(0, 15), padx=20)
+    tk.Label(frame, text="Passwort:", bg=PRIMARY_BLUE, fg=WHITE, font=("Segoe UI", 14)).pack(fill="x")
+    pw_entry = tk.Entry(frame, show="*", font=("Segoe UI", 14))
+    pw_entry.pack(fill="x", pady=(0, 20))
 
     # Speicherort
-    tk_label_path = ctk.CTkLabel(frame, text="Datei-Speicherort:", text_color=WHITE)
-    tk_label_path.pack(anchor="w", pady=(10, 5), padx=20)
-    path_var = ctk.StringVar()
-    path_frame = ctk.CTkFrame(frame, fg_color=PRIMARY_BLUE, corner_radius=10)
-    path_frame.pack(fill="x", pady=(0, 20), padx=20)
+    tk.Label(frame, text="Datei-Speicherort:", bg=PRIMARY_BLUE, fg=WHITE, font=("Segoe UI", 14)).pack(fill="x")
 
-    path_entry = ctk.CTkEntry(path_frame, textvariable=path_var)
-    path_entry.pack(side="left", fill="x", expand=True, padx=(10,5), pady=5)
-    browse_btn = ctk.CTkButton(path_frame, text="...", width=40, command=choose_directory)
-    browse_btn.pack(side="right", padx=(5,10), pady=5)
+    path_frame = tk.Frame(frame, bg=PRIMARY_BLUE)
+    path_frame.pack(fill="x", pady=(0, 30))
 
-    # Submit-Button
-    submit_btn = ctk.CTkButton(frame, text="Erstellen", command=submit, fg_color=LIGHT_BLUE, hover_color="#88bbff")
-    submit_btn.pack(pady=(10, 30), ipadx=10, ipady=5)
+    path_var = tk.StringVar()
+    path_entry = tk.Entry(path_frame, textvariable=path_var, font=("Segoe UI", 14))
+    path_entry.pack(side="left", fill="x", expand=True)
+    browse_btn = tk.Button(path_frame, text="...", command=choose_directory, bg=LIGHT_BLUE)
+    browse_btn.pack(side="right")
 
-    dialog.mainloop()
+    submit_btn = tk.Button(frame, text="Erstellen", command=submit,
+                           bg=LIGHT_BLUE, fg="black", font=("Segoe UI", 14))
+    submit_btn.pack()
+
+    dialog.bind("<Escape>", lambda e: dialog.destroy())
+
+    parent.wait_window(dialog)
+    parent.destroy()
+
     return result["name"], result["password"]
-
-
-
 
 
 
