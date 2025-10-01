@@ -1,6 +1,8 @@
 """
 File: file_manager_pro.py
 Modul: EduClass - Dateiablage Pro
+Creator: https://github.com/SchulSystem
+Translation: https://github.com/Lukas1120987
 
 Features:
  - Benutzerordner: data/files/users/<username>/
@@ -12,11 +14,6 @@ Features:
  - In-Modul-Vorschau: Text und Bilder (PIL optional), PDF text preview if PyPDF2 available
  - Versionierung: einfache Versionierung (bei Upload wird alte Datei in .versions/ gesichert)
  - Aktionslog: data/files/logs/actions.json
-
-Usage:
- from file_manager_pro import FileManagerPro
- module = FileManagerPro(root_window, username, user_data)
- module.get_frame().pack(fill="both", expand=True)
 
 Notes:
  - Optional extras: Pillow (PIL) for image preview, PyPDF2 for PDF text extraction.
@@ -755,3 +752,4 @@ class Modul:
 # DEBUG's
 
 #no mistakes
+
