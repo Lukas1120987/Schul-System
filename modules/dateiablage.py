@@ -347,57 +347,77 @@ class Modul:
         return False
 
     def edit_permissions(self):
-        # only admin or owner can edit
+        # Nur Admin oder Owner dürfen bearbeiten
         if not self.current_folder:
             messagebox.showwarning('Kein Ordner', 'Bitte wähle einen Ordner aus.')
             return
         if not self._has_perm(self.current_folder, 'write') and not self.user_data.get('is_admin'):
             messagebox.showerror('Zugriff', 'Du hast keine Berechtigung, Berechtigungen zu bearbeiten.')
             return
+
         key = os.path.relpath(self.current_folder, self.base)
         self._ensure_folder_perm(self.current_folder)
         perm = self.permissions.get(key, {})
 
         dlg = tk.Toplevel(self.master)
-        dlg.title('Berechtigungen')
-        tk.Label(dlg, text=f'Ordner: {key}').pack(anchor='w')
-        tk.Label(dlg, text='Owner (username)').pack(anchor='w')
-        owner_var = tk.StringVar(value=perm.get('owner') or '')
-        tk.Entry(dlg, textvariable=owner_var).pack(fill='x')
+        dlg.title('🔐 Berechtigungen verwalten')
+        dlg.geometry("500x600")
 
-        def make_listbox(name):
-            tk.Label(dlg, text=name).pack(anchor='w')
-            lb = tk.Listbox(dlg)
-            lb.pack(fill='both', expand=True)
-            for it in perm.get(name.lower(), []):
+        tk.Label(dlg, text=f'📁 Ordner: {key}', font=("Arial", 12, "bold")).pack(anchor='w', pady=(5,10))
+
+        # Owner ändern
+        tk.Label(dlg, text='Besitzer (Owner):').pack(anchor='w')
+        owner_var = tk.StringVar(value=perm.get('owner') or '')
+        tk.Entry(dlg, textvariable=owner_var).pack(fill='x', padx=5, pady=5)
+
+        # Hilfsfunktion für Listbox + Buttons
+        def make_section(name):
+            frame = tk.LabelFrame(dlg, text=f"{name.capitalize()}-Rechte", padx=5, pady=5)
+            frame.pack(fill='both', expand=True, padx=5, pady=5)
+            lb = tk.Listbox(frame, selectmode='single', height=6)
+            lb.pack(fill='both', expand=True, side='left')
+            for it in perm.get(name, []):
                 lb.insert('end', it)
+
+            btn_frame = tk.Frame(frame)
+            btn_frame.pack(side='right', fill='y', padx=5)
+            entry_var = tk.StringVar()
+
+            tk.Entry(btn_frame, textvariable=entry_var).pack(fill='x', pady=2)
+            tk.Button(btn_frame, text='➕ Hinzufügen', command=lambda: add_to(lb, entry_var)).pack(fill='x', pady=2)
+            tk.Button(btn_frame, text='➖ Entfernen', command=lambda: remove_selected(lb)).pack(fill='x', pady=2)
+
             return lb
 
-        read_lb = make_listbox('read')
-        write_lb = make_listbox('write')
-        delete_lb = make_listbox('delete')
+        def add_to(lb, var):
+            val = var.get().strip()
+            if val and val not in lb.get(0, 'end'):
+                lb.insert('end', val)
+                var.set('')
 
-        entry_var = tk.StringVar()
-        tk.Entry(dlg, textvariable=entry_var).pack(fill='x')
-        def add_to(lb_name):
-            val = entry_var.get().strip()
-            if not val: return
-            lb = {'read':read_lb,'write':write_lb,'delete':delete_lb}[lb_name]
-            lb.insert('end', val)
-        tk.Button(dlg, text='Hinzufügen (eingetragenen Namen als Read)', command=lambda: add_to('read')).pack()
-        tk.Button(dlg, text='Hinzufügen als Write', command=lambda: add_to('write')).pack()
-        tk.Button(dlg, text='Hinzufügen als Delete', command=lambda: add_to('delete')).pack()
+        def remove_selected(lb):
+            sel = lb.curselection()
+            if sel:
+                lb.delete(sel[0])
 
+        # Drei Abschnitte: read / write / delete
+        read_lb = make_section('read')
+        write_lb = make_section('write')
+        delete_lb = make_section('delete')
+
+        # Speichern
         def save_and_close():
             perm['owner'] = owner_var.get().strip() or None
-            perm['read'] = list(read_lb.get(0,'end'))
-            perm['write'] = list(write_lb.get(0,'end'))
-            perm['delete'] = list(delete_lb.get(0,'end'))
+            perm['read'] = list(read_lb.get(0, 'end'))
+            perm['write'] = list(write_lb.get(0, 'end'))
+            perm['delete'] = list(delete_lb.get(0, 'end'))
             self.permissions[key] = perm
             _write_json(self.perm_file, self.permissions)
             dlg.destroy()
-            messagebox.showinfo('Gespeichert','Berechtigungen gespeichert')
-        tk.Button(dlg, text='Speichern', command=save_and_close).pack()
+            messagebox.showinfo('✅ Gespeichert', 'Berechtigungen wurden aktualisiert.')
+
+        tk.Button(dlg, text='💾 Speichern', bg='#4CAF50', fg='white', command=save_and_close).pack(fill='x', padx=5, pady=10)
+
 
     # ----- upload / download / delete / bulk -----
     def _unique_name(self, original):
