@@ -4,10 +4,27 @@ import webbrowser
 import tkinter as tk
 import customtkinter as ctk
 from datetime import date
+import json
+import os
+from ordner import get_data_path
 
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("blue")
 
+PERM_FILE = os.path.join(get_data_path(), "perm_overwiev.json"
+
+def _load_perm_overwiev():
+    if os.path.exists(PERM_FILE):
+        with open(PERM_FILE, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+def _save_perm_overwiev(usernames):
+    with open(PERM_FILE, "w", encoding="utf-8") as f:
+        json.dump(usernames, f, indent=4)
 
 ABOUT_CONFIG = {
     "app_name": "SchulSystem",
@@ -52,12 +69,12 @@ Stand: {date.today().strftime("%d.%m.%Y")}
 
 
 class AboutOverlay(ctk.CTkToplevel):
-    def __init__(self, master=None, config: dict = ABOUT_CONFIG):
+    def __init__(self, master, username, user_data, config: dict = ABOUT_CONFIG):
         super().__init__(master)
-        self.title(f"Über – {config.get('app_name','App')}")
-        self.geometry("820x560")
-        self.resizable(True, True)
+        self.username = username
+        self.user_data = user_data
         self.config_dict = config
+        self.perm_list = _load_perm_overwiev()
         self._make_ui()
 
         # Modal/fokusfreundlich
@@ -113,8 +130,31 @@ class AboutOverlay(ctk.CTkToplevel):
         ).pack(side="left")
         ctk.CTkButton(footer, text="Schließen", command=self.destroy).pack(side="right")
 
+        # Ausblenden-Button nur anzeigen, wenn Nutzer noch nicht in perm_overwiev.json steht
+        if self.username not in self.perm_list:
+            hide_btn = ctk.CTkButton(
+                footer,
+                text="Ausblenden",
+                fg_color="red",
+                hover_color="darkred",
+                command=self._hide_user
+            )
+            hide_btn.pack(side="right", padx=6)
+
+    def _hide_user(self):
+        # Nutzer in perm_overwiev.json speichern
+        if self.username not in self.perm_list:
+            self.perm_list.append(self.username)
+            _save_perm_overwiev(self.perm_list)
+        # Button ausblenden
+        for widget in self.winfo_children():
+            if isinstance(widget, ctk.CTkFrame):  # Footer
+                for child in widget.winfo_children():
+                    if isinstance(child, ctk.CTkButton) and child.cget("text") == "Ausblenden":
+                        child.destroy()
+
+    # ---- Tabs ----
     def _build_privacy_tab(self, parent):
-        # Scrollbarer Text
         frame = ctk.CTkFrame(parent, corner_radius=16)
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -183,7 +223,6 @@ class AboutOverlay(ctk.CTkToplevel):
                 command=lambda p=phone: self._tel(p),
             ).pack(side="left", padx=6)
 
-            # Kontaktzeile
             ctk.CTkLabel(card, text=f"✉ {email}   ☎ {phone}").grid(
                 row=2, column=0, columnspan=2, sticky="w", padx=12, pady=(0, 10)
             )
@@ -222,7 +261,6 @@ class AboutOverlay(ctk.CTkToplevel):
             row, text="Kontakt kopieren", command=lambda: self._copy_to_clipboard(info)
         ).pack(side="left", padx=6)
 
-        # Kleines Formular für kurze Nachricht
         ctk.CTkLabel(grid, text="Kurze Nachricht (öffnet Ihr E-Mail-Programm):").pack(
             anchor="w", padx=12, pady=(6, 2)
         )
@@ -242,7 +280,6 @@ class AboutOverlay(ctk.CTkToplevel):
             webbrowser.open(f"mailto:{email}")
 
     def _tel(self, phone: str | None):
-        # Öffnet tel:-Links (wirkt v. a. auf Geräten/Apps, die das unterstützen)
         if phone:
             webbrowser.open(f"tel:{phone}")
 
@@ -277,13 +314,14 @@ class AboutOverlay(ctk.CTkToplevel):
         from urllib.parse import quote
         return quote(s)
 
-def attach_about_button(parent, text: str = "ℹ️ Über", config: dict = ABOUT_CONFIG):
+
+def attach_about_button(parent, username, user_data, text: str = "ℹ️ Über", config: dict = ABOUT_CONFIG):
     """
     Fügt dem übergebenen Container (Frame/Fenster) einen Button hinzu,
     der den Über-Dialog öffnet. Gibt den Button zurück.
     """
     def open_dialog():
-        AboutOverlay(parent.winfo_toplevel(), config=config)
+        AboutOverlay(parent.winfo_toplevel(), username, user_data, config=config)
 
     btn = ctk.CTkButton(parent, text=text, command=open_dialog)
     return btn
@@ -307,8 +345,11 @@ if __name__ == "__main__":
     toolbar = ctk.CTkFrame(root, corner_radius=16)
     toolbar.pack(fill="x", pady=(0, 12))
 
+    # Beispiel: aktueller Nutzername
+    current_user = "default_user1"
+    user_data = {}
 
-    about_btn = attach_about_button(toolbar)
+    about_btn = attach_about_button(toolbar, current_user, user_data)
     about_btn.pack(side="right", padx=6, pady=6)
 
     ctk.CTkTextbox(root, height=260, corner_radius=16).pack(fill="both", expand=True)
