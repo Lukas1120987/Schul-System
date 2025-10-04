@@ -1,30 +1,13 @@
 # file: about_overlay.py
 # Erfordert: pip install customtkinter
+
 import webbrowser
 import tkinter as tk
 import customtkinter as ctk
 from datetime import date
-import json
-import os
-from ordner import get_data_path
 
 ctk.set_appearance_mode("system")
 ctk.set_default_color_theme("blue")
-
-PERM_FILE = os.path.join(get_data_path(), "perm_overwiev.json"
-
-def _load_perm_overwiev():
-    if os.path.exists(PERM_FILE):
-        with open(PERM_FILE, "r", encoding="utf-8") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return []
-    return []
-
-def _save_perm_overwiev(usernames):
-    with open(PERM_FILE, "w", encoding="utf-8") as f:
-        json.dump(usernames, f, indent=4)
 
 ABOUT_CONFIG = {
     "app_name": "SchulSystem",
@@ -33,7 +16,6 @@ ABOUT_CONFIG = {
     "org_website": "https://lukas1120987.github.io/SchulSystem/",
     "org_email": "team.schulsystem@outlook.com",
     "org_phone": "000 0000 0000 0000",
-
     "responsibles": [
         {
             "role": "Entwickler",
@@ -41,11 +23,13 @@ ABOUT_CONFIG = {
             "email": "team.schulsystem@outlook.com",
         },
     ],
-
     "privacy_text": f"""
-Verantwortlich im Sinne der DSGVO für die Verarbeitung personenbezogener Daten im Rahmen der Anwendung „SchulSystem“ ist die
-Schule an der das System genutzt wird. Die Datenverarbeitung erfolgt zum Zweck der Schulorganisation, Kommunikation und
-pädagogischen Arbeit. Rechtsgrundlagen sind insbesondere Art. 6 Abs. 1 lit. e DSGVO i. V. m. den einschlägigen Schul- und Datenschutzgesetzen des Bundeslandes.
+Verantwortlich im Sinne der DSGVO für die Verarbeitung personenbezogener Daten 
+im Rahmen der Anwendung „SchulSystem“ ist die Schule an der das System genutzt wird.
+
+Die Datenverarbeitung erfolgt zum Zweck der Schulorganisation, Kommunikation 
+und pädagogischen Arbeit. Rechtsgrundlagen sind insbesondere Art. 6 Abs. 1 lit. e DSGVO 
+i. V. m. den einschlägigen Schul- und Datenschutzgesetzen des Bundeslandes.
 
 Kategorien von Daten:
 • Stammdaten (z. B. Name, Klasse, Rolle)
@@ -69,12 +53,12 @@ Stand: {date.today().strftime("%d.%m.%Y")}
 
 
 class AboutOverlay(ctk.CTkToplevel):
-    def __init__(self, master, username, user_data, config: dict = ABOUT_CONFIG):
+    def __init__(self, master=None, config: dict = ABOUT_CONFIG):
         super().__init__(master)
-        self.username = username
-        self.user_data = user_data
+        self.title(f"Über – {config.get('app_name', 'App')}")
+        self.geometry("820x560")
+        self.resizable(True, True)
         self.config_dict = config
-        self.perm_list = _load_perm_overwiev()
         self._make_ui()
 
         # Modal/fokusfreundlich
@@ -91,7 +75,7 @@ class AboutOverlay(ctk.CTkToplevel):
 
         title = ctk.CTkLabel(
             header,
-            text=f"ℹ️  {self.config_dict.get('app_name','App')} – Informationen",
+            text=f"ℹ️ {self.config_dict.get('app_name', 'App')} – Informationen",
             font=ctk.CTkFont(size=22, weight="bold"),
         )
         title.pack(side="left", padx=12, pady=12)
@@ -99,13 +83,17 @@ class AboutOverlay(ctk.CTkToplevel):
         # Quick actions
         actions = ctk.CTkFrame(header, fg_color="transparent")
         actions.pack(side="right", padx=12, pady=12)
+
         ctk.CTkButton(
             actions,
             text="Website öffnen",
             command=lambda: self._open_url(self.config_dict.get("org_website")),
         ).pack(side="left", padx=6)
+
         ctk.CTkButton(
-            actions, text="E-Mail schreiben", command=self._mailto_org
+            actions,
+            text="E-Mail schreiben",
+            command=self._mailto_org
         ).pack(side="left", padx=6)
 
         # Tabs
@@ -123,38 +111,17 @@ class AboutOverlay(ctk.CTkToplevel):
         # Footer
         footer = ctk.CTkFrame(self, fg_color="transparent")
         footer.pack(fill="x", padx=pad, pady=(0, pad))
+
         ctk.CTkLabel(
             footer,
-            text=f"© {date.today().year} {self.config_dict.get('org_name','')}",
+            text=f"© {date.today().year} {self.config_dict.get('org_name', '')}",
             anchor="w",
         ).pack(side="left")
+
         ctk.CTkButton(footer, text="Schließen", command=self.destroy).pack(side="right")
 
-        # Ausblenden-Button nur anzeigen, wenn Nutzer noch nicht in perm_overwiev.json steht
-        if self.username not in self.perm_list:
-            hide_btn = ctk.CTkButton(
-                footer,
-                text="Ausblenden",
-                fg_color="red",
-                hover_color="darkred",
-                command=self._hide_user
-            )
-            hide_btn.pack(side="right", padx=6)
-
-    def _hide_user(self):
-        # Nutzer in perm_overwiev.json speichern
-        if self.username not in self.perm_list:
-            self.perm_list.append(self.username)
-            _save_perm_overwiev(self.perm_list)
-        # Button ausblenden
-        for widget in self.winfo_children():
-            if isinstance(widget, ctk.CTkFrame):  # Footer
-                for child in widget.winfo_children():
-                    if isinstance(child, ctk.CTkButton) and child.cget("text") == "Ausblenden":
-                        child.destroy()
-
-    # ---- Tabs ----
     def _build_privacy_tab(self, parent):
+        # Scrollbarer Text
         frame = ctk.CTkFrame(parent, corner_radius=16)
         frame.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -167,7 +134,6 @@ class AboutOverlay(ctk.CTkToplevel):
             font=("Segoe UI", 11),
         )
         text.pack(side="left", fill="both", expand=True)
-
         text.insert("1.0", self.config_dict.get("privacy_text", ""))
         text.config(state="disabled")
 
@@ -177,13 +143,17 @@ class AboutOverlay(ctk.CTkToplevel):
 
         row = ctk.CTkFrame(parent, fg_color="transparent")
         row.pack(fill="x", padx=10, pady=(0, 10))
+
         ctk.CTkButton(
             row,
             text="Datenschutz per E-Mail anfordern",
             command=self._mailto_privacy_request,
         ).pack(side="left")
+
         ctk.CTkButton(
-            row, text="In Zwischenablage kopieren", command=self._copy_privacy
+            row,
+            text="In Zwischenablage kopieren",
+            command=self._copy_privacy,
         ).pack(side="right")
 
     def _build_responsibles_tab(self, parent):
@@ -196,7 +166,7 @@ class AboutOverlay(ctk.CTkToplevel):
 
             title = ctk.CTkLabel(
                 card,
-                text=f"{person.get('role','Rolle')}",
+                text=f"{person.get('role', 'Rolle')}",
                 font=ctk.CTkFont(size=16, weight="bold"),
             )
             title.grid(row=0, column=0, sticky="w", padx=12, pady=(10, 0))
@@ -216,6 +186,7 @@ class AboutOverlay(ctk.CTkToplevel):
                 width=110,
                 command=lambda e=email: self._mailto(e),
             ).pack(side="left", padx=6)
+
             ctk.CTkButton(
                 btns,
                 text="Anrufen",
@@ -223,7 +194,7 @@ class AboutOverlay(ctk.CTkToplevel):
                 command=lambda p=phone: self._tel(p),
             ).pack(side="left", padx=6)
 
-            ctk.CTkLabel(card, text=f"✉ {email}   ☎ {phone}").grid(
+            ctk.CTkLabel(card, text=f"✉ {email} ☎ {phone}").grid(
                 row=2, column=0, columnspan=2, sticky="w", padx=12, pady=(0, 10)
             )
 
@@ -237,13 +208,14 @@ class AboutOverlay(ctk.CTkToplevel):
             f"{self.config_dict.get('org_name')}\n"
             f"{self.config_dict.get('org_address')}\n\n"
             f"Website: {self.config_dict.get('org_website')}\n"
-            f"E-Mail:  {self.config_dict.get('org_email')}\n"
+            f"E-Mail: {self.config_dict.get('org_email')}\n"
             f"Telefon: {self.config_dict.get('org_phone')}\n"
         )
 
         ctk.CTkLabel(
             grid, text="Kontakt", font=ctk.CTkFont(size=18, weight="bold")
         ).pack(anchor="w", padx=12, pady=(12, 4))
+
         box = ctk.CTkTextbox(grid, height=180)
         box.pack(fill="x", padx=12)
         box.insert("1.0", info)
@@ -251,26 +223,37 @@ class AboutOverlay(ctk.CTkToplevel):
 
         row = ctk.CTkFrame(grid, fg_color="transparent")
         row.pack(fill="x", padx=12, pady=12)
+
         ctk.CTkButton(
-            row, text="Website öffnen", command=lambda: self._open_url(self.config_dict.get("org_website"))
+            row,
+            text="Website öffnen",
+            command=lambda: self._open_url(self.config_dict.get("org_website")),
         ).pack(side="left", padx=6)
+
         ctk.CTkButton(row, text="E-Mail schreiben", command=self._mailto_org).pack(
             side="left", padx=6
         )
+
         ctk.CTkButton(
-            row, text="Kontakt kopieren", command=lambda: self._copy_to_clipboard(info)
+            row,
+            text="Kontakt kopieren",
+            command=lambda: self._copy_to_clipboard(info),
         ).pack(side="left", padx=6)
 
-        ctk.CTkLabel(grid, text="Kurze Nachricht (öffnet Ihr E-Mail-Programm):").pack(
-            anchor="w", padx=12, pady=(6, 2)
-        )
+        # Kurze Nachricht
+        ctk.CTkLabel(
+            grid, text="Kurze Nachricht (öffnet Ihr E-Mail-Programm):"
+        ).pack(anchor="w", padx=12, pady=(6, 2))
+
         self.msg_entry = ctk.CTkEntry(grid, placeholder_text="Ihr Anliegen in einem Satz …")
         self.msg_entry.pack(fill="x", padx=12, pady=(0, 8))
+
         ctk.CTkButton(
             grid, text="Als E-Mail vorbereiten", command=self._mailto_with_message
         ).pack(padx=12, pady=(0, 12))
 
     # ---- Helpers ----
+
     def _open_url(self, url: str | None):
         if url:
             webbrowser.open(url)
@@ -307,7 +290,8 @@ class AboutOverlay(ctk.CTkToplevel):
         self.clipboard_clear()
         self.clipboard_append(text)
         self.update()
-        ctk.CTkMessagebox(title="Kopiert", message="In Zwischenablage kopiert.") if hasattr(ctk, "CTkMessagebox") else None
+        if hasattr(ctk, "CTkMessagebox"):
+            ctk.CTkMessagebox(title="Kopiert", message="In Zwischenablage kopiert.")
 
     @staticmethod
     def _q(s: str) -> str:
@@ -315,13 +299,13 @@ class AboutOverlay(ctk.CTkToplevel):
         return quote(s)
 
 
-def attach_about_button(parent, username, user_data, text: str = "ℹ️ Über", config: dict = ABOUT_CONFIG):
+def attach_about_button(parent, text: str = "ℹ️ Über", config: dict = ABOUT_CONFIG):
     """
     Fügt dem übergebenen Container (Frame/Fenster) einen Button hinzu,
     der den Über-Dialog öffnet. Gibt den Button zurück.
     """
     def open_dialog():
-        AboutOverlay(parent.winfo_toplevel(), username, user_data, config=config)
+        AboutOverlay(parent.winfo_toplevel(), config=config)
 
     btn = ctk.CTkButton(parent, text=text, command=open_dialog)
     return btn
@@ -332,7 +316,6 @@ if __name__ == "__main__":
     app = ctk.CTk()
     app.title("Demo – Über-Button")
 
-    # Hauptcontainer
     root = ctk.CTkFrame(app, corner_radius=20)
     root.pack(fill="both", expand=True, padx=20, pady=20)
 
@@ -345,11 +328,7 @@ if __name__ == "__main__":
     toolbar = ctk.CTkFrame(root, corner_radius=16)
     toolbar.pack(fill="x", pady=(0, 12))
 
-    # Beispiel: aktueller Nutzername
-    current_user = "default_user1"
-    user_data = {}
-
-    about_btn = attach_about_button(toolbar, current_user, user_data)
+    about_btn = attach_about_button(toolbar)
     about_btn.pack(side="right", padx=6, pady=6)
 
     ctk.CTkTextbox(root, height=260, corner_radius=16).pack(fill="both", expand=True)
