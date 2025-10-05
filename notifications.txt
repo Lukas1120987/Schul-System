@@ -1,3 +1,3 @@
 Neues Update:
 Es gibt gerade verschiedene Umstellungen im System. Bitte warten Sie bei der Erstellung von neuen Nutzeraccount o.ä. bis das Update veröffentlicht wurde. Sollten Sie bereits die neuste Version haben und die Datei ordner.py sehen, dann löschen Sie bitte die users.json Datei mithilfe des folgenden Button:
-#COMMAND:DELETE_FILE:users.json
+(#)COMMAND:DELETE_FILE:users.json
