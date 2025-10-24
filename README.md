@@ -53,7 +53,7 @@ Bevor du `main.py` startest:
 
 ```bash
 git clone https://github.com/Lukas1120987/Schul-System.git
-cd SchulSystem
+cd Schul-System
 pip install -r requirements.txt
 python main.py
 ```
