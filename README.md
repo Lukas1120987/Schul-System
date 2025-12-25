@@ -3,7 +3,7 @@
 
 
 ![Version](https://img.shields.io/badge/Version-2.1.0-blue?style=flat-square)
-![Status](https://img.shields.io/badge/Status-BETA-red?style=flat-square)
+![Status](https://img.shields.io/badge/Status:%20Release%20Candidate/Prerelease-red?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 ![Made with Python](https://img.shields.io/badge/Made%20with-Python-3776AB?logo=python&logoColor=white&style=flat-square)
 
