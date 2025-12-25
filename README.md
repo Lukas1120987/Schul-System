@@ -29,8 +29,8 @@ Bevor du `main.py` startest:
 | Modul | Funktion |
 |-------|-------|
 | 💬 **Nachrichten** | ![Nachrichten](https://img.shields.io/badge/Schulinterne%20Nachrichten%20mit%20Suchfunktion-lightgrey) |
-| ☁️ **Cloud** | ![Cloud](https://img.shields.io/badge/Dateien%20mit%20Gruppen%20oder%20Personen%20teilen-lightgrey) |
-| 🗂️ **Dateiablage** | ![Dateiablage](https://img.shields.io/badge/%C3%96ffentlicher%20Dateiupload%20f%C3%BCr%20alle-lightgrey) |
+| ☁️ **Cloud** | ![Cloud](https://img.shields.io/badge/Dateien%20mit%20allen%20teilen-lightgrey) |
+| 🗂️ **Dateiablage** | ![Dateiablage](https://img.shields.io/badge/%C3%96ffentlicher%20Dateiupload%20f%C3%BCr%20Gruppen%20oder%20bestimmte%20Nutzer-lightgrey) |
 | 🪑 **Sitzplan** | ![Sitzplan](https://img.shields.io/badge/Drag--and--Drop%20Sitzplaneditor-lightgrey) |
 | 🧪 **E-Learning** | ![E-Learning](https://img.shields.io/badge/Digitale%20Tests%20mit%20Ergebnisauswertung-lightgrey) |
 | 📅 **Stundenplan** | ![Stundenplan](https://img.shields.io/badge/Individuelle%20Anzeige%20nach%20Gruppe-lightgrey) |
